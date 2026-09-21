@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room Fisica - Laboratorio Prof. Walker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tone.js for Sound Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        lab: {
+                            900: '#0B0F19',
+                            800: '#111827',
+                            700: '#1F2937',
+                            accent: '#06B6D4',
+                            amber: '#F59E0B',
+                            green: '#10B981',
+                            red: '#EF4444',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #F3F4F6;
+            user-select: none;
+        }
+        .glow-border {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+        .glow-text {
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+        }
+        .hotspot-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+            70% { transform: scale(1.04); box-shadow: 0 0 0 12px rgba(6, 182, 212, 0); }
+            100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06B6D4; }
+
+        /* Print styles for exporting clean PDF certificates */
+        @media print {
+            body * { visibility: hidden; }
+            #printable-report, #printable-report * { visibility: visible; }
+            #printable-report {
+                position: absolute;
+                left: 0; top: 0;
+                width: 100%;
+                background: white !important;
+                color: black !important;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col font-sans bg-lab-900 text-gray-100">
+
+    <!-- TOP NAVBAR / HEADER -->
+    <header class="bg-lab-800 border-b border-gray-800 px-4 py-3 flex items-center justify-between z-20 shadow-md shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-lg bg-lab-accent/20 border border-lab-accent/50 flex items-center justify-center text-lab-accent text-xl font-bold">
+                <i class="fa-solid fa-flask"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight tracking-wide text-white flex items-center gap-2">
+                    ESCAPE ROOM <span class="text-xs px-2 py-0.5 rounded bg-lab-accent/20 text-lab-accent border border-lab-accent/30 font-mono">LAB WALKER</span>
+                </h1>
+                <p id="room-subtitle" class="text-xs text-gray-400">Stanza 1: Il Laboratorio di Cinematica</p>
+            </div>
+        </div>
+
+        <!-- Timer, Indicators & Export Button -->
+        <div class="flex items-center space-x-4">
+            <!-- Room Indicators -->
+            <div class="hidden md:flex items-center space-x-2" id="room-indicators">
+                <div class="room-dot w-8 h-8 rounded-full border border-lab-accent bg-lab-accent/30 text-lab-accent text-xs flex items-center justify-center font-bold">1</div>
+                <div class="w-3 h-0.5 bg-gray-700"></div>
+                <div class="room-dot w-8 h-8 rounded-full border border-gray-700 bg-gray-800 text-gray-500 text-xs flex items-center justify-center font-bold">2</div>
+                <div class="w-3 h-0.5 bg-gray-700"></div>
+                <div class="room-dot w-8 h-8 rounded-full border border-gray-700 bg-gray-800 text-gray-500 text-xs flex items-center justify-center font-bold">3</div>
+                <div class="w-3 h-0.5 bg-gray-700"></div>
+                <div class="room-dot w-8 h-8 rounded-full border border-gray-700 bg-gray-800 text-gray-500 text-xs flex items-center justify-center font-bold">4</div>
+            </div>
+
+            <!-- Timer -->
+            <div class="flex items-center space-x-2 bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-700 font-mono text-base">
+                <i class="fa-regular fa-clock text-lab-amber"></i>
+                <span id="timer-display" class="text-lab-amber font-bold">45:00</span>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex items-center space-x-2">
+                <button onclick="exportGameData()" title="Esporta file di salvataggio o report" class="px-3 py-1.5 rounded-lg bg-lab-accent/20 hover:bg-lab-accent/30 border border-lab-accent/50 text-xs font-bold text-lab-accent transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-export"></i>
+                    <span class="hidden sm:inline">Esporta</span>
+                </button>
+                <button onclick="toggleNotebook()" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs font-semibold text-gray-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-bookmark text-lab-accent"></i>
+                    <span class="hidden sm:inline">Formulario</span>
+                </button>
+                <button onclick="requestHint()" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs font-semibold text-gray-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                    <span class="hidden sm:inline">Indizio</span>
+                </button>
+                <button onclick="toggleAudio()" class="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        <!-- LEFT: VISUAL INTERACTIVE ROOM CANVAS / SCENE -->
+        <section class="flex-1 flex flex-col bg-slate-950 relative border-r border-gray-800 overflow-hidden">
+            <!-- Room Title Banner -->
+            <div class="absolute top-4 left-4 z-10 bg-slate-900/90 backdrop-blur border border-gray-700/80 px-4 py-2 rounded-xl shadow-lg">
+                <span class="text-xs uppercase tracking-wider text-lab-accent font-bold block" id="room-category">CAPITOLO 6: CINEMATICA</span>
+                <h2 class="text-base font-bold text-white flex items-center gap-2" id="room-title">
+                    <i class="fa-solid fa-stopwatch text-lab-accent"></i> La Pista del Tempo
+                </h2>
+            </div>
+
+            <!-- Interactive Room Visual Scene -->
+            <div id="room-viewport" class="flex-1 relative w-full h-full flex items-center justify-center p-4 overflow-hidden">
+                <div id="scene-canvas-container" class="relative w-full max-w-4xl aspect-[16/9] bg-slate-900 rounded-2xl border-2 border-gray-800 shadow-2xl overflow-hidden flex items-center justify-center">
+                    <!-- SVG Interactive Scene -->
+                    <svg id="room-svg" class="w-full h-full" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Rendered dynamically -->
+                    </svg>
+
+                    <!-- Interactive Overlay Hotspots -->
+                    <div id="hotspots-layer" class="absolute inset-0 pointer-events-none">
+                        <!-- Hotspots dynamically injected -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Control Bar -->
+            <div class="h-12 bg-lab-800/90 border-t border-gray-800 px-4 flex items-center justify-between shrink-0">
+                <div id="scene-status-text" class="text-xs text-gray-300 font-mono truncate max-w-md">
+                    <i class="fa-solid fa-hand-pointer text-lab-accent mr-2"></i>Clicca sugli elementi evidenziati per interagire con l'ambiente.
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs text-gray-400 uppercase tracking-widest font-mono">Codici:</span>
+                    <div id="collected-codes" class="flex space-x-1">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT: INSPECTION / PUZZLE PANEL -->
+        <aside class="w-full lg:w-96 bg-lab-800 flex flex-col shrink-0 border-l border-gray-800 h-1/2 lg:h-full z-10">
+            <!-- Tab Headers -->
+            <div class="flex border-b border-gray-800 bg-gray-900/60 font-semibold text-xs tracking-wider uppercase">
+                <button id="tab-btn-inspect" onclick="switchRightTab('inspect')" class="flex-1 py-3 px-4 border-b-2 border-lab-accent text-lab-accent bg-lab-800 flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-magnifying-glass"></i> Ispezione
+                </button>
+                <button id="tab-btn-inventory" onclick="switchRightTab('inventory')" class="flex-1 py-3 px-4 border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-briefcase"></i> Inventario (<span id="inventory-count">0</span>)
+                </button>
+            </div>
+
+            <!-- Tab Content: INSPECTION PANEL -->
+            <div id="tab-inspect" class="flex-1 flex flex-col p-4 overflow-y-auto space-y-4">
+                <div id="inspect-default-view" class="flex-1 flex flex-col items-center justify-center text-center p-6 text-gray-400 space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-gray-800/80 border border-gray-700 flex items-center justify-center text-2xl text-lab-accent">
+                        <i class="fa-solid fa-microscope"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-gray-200">Seleziona un Oggetto</h3>
+                    <p class="text-xs text-gray-400">Clicca su un elemento interattivo nella stanza per esaminare enigmi, strumenti e tastierini di sblocco.</p>
+                </div>
+
+                <!-- Active View Container -->
+                <div id="inspect-active-view" class="hidden flex-1 flex flex-col space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-gray-700">
+                        <h3 id="inspect-title" class="font-bold text-base text-white flex items-center gap-2"></h3>
+                        <span id="inspect-tag" class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-lab-accent/20 text-lab-accent border border-lab-accent/30">
+                            INDIZIO
+                        </span>
+                    </div>
+
+                    <!-- Interactive Widget Preview -->
+                    <div id="inspect-widget" class="bg-gray-900/80 rounded-xl border border-gray-700/80 p-4 min-h-[150px] flex items-center justify-center relative overflow-hidden">
+                    </div>
+
+                    <!-- Description -->
+                    <div id="inspect-description" class="text-xs text-gray-300 space-y-2 leading-relaxed bg-gray-900/40 p-3 rounded-lg border border-gray-800">
+                    </div>
+
+                    <!-- Dynamic Action Area -->
+                    <div id="inspect-action-area" class="mt-auto pt-2 border-t border-gray-800 space-y-3">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: INVENTORY PANEL -->
+            <div id="tab-inventory" class="hidden flex-1 p-4 overflow-y-auto">
+                <div id="inventory-empty" class="h-full flex flex-col items-center justify-center text-center p-6 text-gray-500">
+                    <i class="fa-solid fa-box-open text-4xl mb-2 text-gray-600"></i>
+                    <p class="text-xs">L'inventario è vuoto.<br>Raccogli elementi esaminando la stanza.</p>
+                </div>
+                <div id="inventory-grid" class="grid grid-cols-2 gap-3">
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- MODAL: FORMULA NOTEBOOK (QUADERNO WALKER) -->
+    <div id="modal-notebook" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-lab-800 border border-gray-700 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 bg-gray-900 border-b border-gray-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-book-open text-lab-accent text-xl"></i>
+                    <h3 class="font-bold text-base text-white">Quaderno di Fisica - Prof. Walker</h3>
+                </div>
+                <button onclick="toggleNotebook()" class="text-gray-400 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-5 font-mono text-xs leading-relaxed text-gray-300">
+                <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-700">
+                    <h4 class="text-lab-accent font-bold mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-stopwatch"></i> Cinematica (Cap. 6)
+                    </h4>
+                    <p>Velocità scalare media: $v_s = \frac{d_{\text{totale}}}{\Delta t}$</p>
+                    <p>Circonferenza pista: $C = 2\pi R \implies d = 2L + 2\pi R$</p>
+                </div>
+                <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-700">
+                    <h4 class="text-lab-amber font-bold mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-weight-hanging"></i> Forze & Legge di Hooke (Cap. 3)
+                    </h4>
+                    <p>Forza Peso: $P = m \cdot g \quad (g \approx 9,81\text{ N/kg})$</p>
+                    <p>Legge di Hooke: $F = k \cdot \Delta x \implies k = \frac{P}{\Delta x}$</p>
+                </div>
+                <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-700">
+                    <h4 class="text-emerald-400 font-bold mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-water"></i> Fluidi e Legge di Stevino (Cap. 5)
+                    </h4>
+                    <p>Pressione Idrostatica: $p = d \cdot g \cdot h$</p>
+                    <p>Densità acqua: $1000\text{ kg/m}^3$</p>
+                </div>
+                <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-700">
+                    <h4 class="text-purple-400 font-bold mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Circuiti Elettrici (Cap. 16)
+                    </h4>
+                    <p>Legge di Ohm: $V = R_{\text{eq}} \cdot I \implies I = \frac{V}{R_{\text{eq}}}$</p>
+                    <p>Resistenza Serie: $R_{\text{eq}} = R_1 + R_2$</p>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-900 border-t border-gray-800 flex justify-between items-center">
+                <button onclick="downloadNotebookPDF()" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs text-lab-accent font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-download"></i> Esporta Formulario HTML
+                </button>
+                <button onclick="toggleNotebook()" class="px-4 py-2 rounded-xl bg-lab-accent text-slate-950 font-bold hover:bg-cyan-400 transition text-xs">
+                    Chiudi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EXPORT GAME OPTIONS -->
+    <div id="modal-export" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-lab-800 border border-lab-accent/60 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-gray-700 pb-3">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-export text-lab-accent"></i> Esporta Dati e Gioco
+                </h3>
+                <button onclick="closeExportModal()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-gray-300 leading-relaxed">
+                Scegli il formato e la modalità di esportazione del laboratorio interattivo:
+            </p>
+
+            <div class="space-y-3">
+                <button onclick="exportFullGameHTML()" class="w-full p-3 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 flex items-center space-x-3 text-left transition group">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-white group-hover:text-lab-accent">Esporta Codice Gioco Standalone (.html)</div>
+                        <div class="text-[11px] text-gray-400">Scarica l'intera Escape Room in un unico file offline autonomo.</div>
+                    </div>
+                </button>
+
+                <button onclick="exportReportJSON()" class="w-full p-3 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 flex items-center space-x-3 text-left transition group">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-white group-hover:text-emerald-400">Esporta Salvataggio Stato (.json)</div>
+                        <div class="text-[11px] text-gray-400">Salva i codici inseriti, i tempi e i progressi correnti in JSON.</div>
+                    </div>
+                </button>
+
+                <button onclick="printGameCertificate()" class="w-full p-3 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 flex items-center space-x-3 text-left transition group">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-print"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-white group-hover:text-amber-400">Stampa / Salva in PDF Certificato</div>
+                        <div class="text-[11px] text-gray-400">Genera una scheda stampabile o PDF con la soluzione completa.</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: HINT DIALOG -->
+    <div id="modal-hint" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-lab-800 border border-amber-500/50 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <div class="flex items-start space-x-4">
+                <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500 flex items-center justify-center text-amber-400 text-xl shrink-0">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="font-bold text-base text-amber-400" id="hint-title">Indizio</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed" id="hint-text"></p>
+                </div>
+            </div>
+            <div class="mt-5 text-right">
+                <button onclick="closeHint()" class="px-4 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-semibold text-xs transition">
+                    Capito
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GAME ESCAPE WIN SCREEN -->
+    <div id="modal-win" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-lab-800 border-2 border-lab-accent rounded-3xl w-full max-w-lg p-8 shadow-2xl text-center space-y-6 relative overflow-hidden">
+            <div class="w-20 h-20 mx-auto rounded-full bg-lab-accent/20 border-2 border-lab-accent flex items-center justify-center text-4xl text-lab-accent glow-border">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+
+            <div class="space-y-2">
+                <span class="text-xs font-mono uppercase tracking-widest text-lab-accent font-bold">LABORATORIO SBLOCCATO</span>
+                <h2 class="text-3xl font-extrabold text-white">SEI EVASO CON SUCCESSO!</h2>
+                <p class="text-xs text-gray-300">Hai risolto tutti gli enigmi del laboratorio del Prof. Walker.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 bg-gray-900/80 p-4 rounded-2xl border border-gray-700 font-mono text-left">
+                <div>
+                    <span class="text-[10px] text-gray-400 block">TEMPO IMPIEGATO</span>
+                    <span id="win-time-taken" class="text-base font-bold text-lab-accent">11m 42s</span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-gray-400 block">INDIZI USATI</span>
+                    <span id="win-hints-used" class="text-base font-bold text-amber-400">0</span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-gray-400 block">VALUTAZIONE</span>
+                    <span id="win-grade" class="text-base font-bold text-emerald-400">10 / 10</span>
+                </div>
+                <div>
+                    <span class="text-[10px] text-gray-400 block">CODICE MASTER</span>
+                    <span class="text-base font-bold text-white">5 8 2 4</span>
+                </div>
+            </div>
+
+            <div class="flex space-x-3">
+                <button onclick="printGameCertificate()" class="flex-1 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 font-bold text-xs text-white transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-print"></i> Stampa Certificato
+                </button>
+                <button onclick="exportFullGameHTML()" class="flex-1 py-3 rounded-xl bg-lab-accent text-slate-950 font-bold text-xs hover:bg-cyan-400 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i> Esporta Gioco
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN PRINTABLE CONTAINER FOR PDF EXPORT -->
+    <div id="printable-report" class="hidden">
+        <h1 style="font-size: 24px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px;">
+            CERTIFICATO DI EVASIONE - LABORATORIO PROF. WALKER
+        </h1>
+        <p style="margin-top: 15px;"><strong>Stato:</strong> EVASO CON SUCCESSO</p>
+        <p><strong>Codice Master Sbloccato:</strong> 5824</p>
+        <hr style="margin: 20px 0;">
+        <h3>Dettaglio Risoluzione Enigmi:</h3>
+        <ul>
+            <li><strong>Stanza 1 (Cinematica):</strong> Velocità scalare media v = 5,00 m/s &rarr; Codice: 5</li>
+            <li><strong>Stanza 2 (Dinamica & Molle):</strong> Costante elastica k = 196 N/m &rarr; Codice: 8</li>
+            <li><strong>Stanza 3 (Fluidi):</strong> Pressione Stevino p = 24525 Pa &rarr; Codice: 2</li>
+            <li><strong>Stanza 4 (Circuiti):</strong> Corrente I = 2 A &rarr; Codice: 4</li>
+        </ul>
+    </div>
+
+    <script>
+        /* SOUND FX SYNTHESIZER */
+        let soundEnabled = true;
+        let synth, polySynth;
+
+        function initAudio() {
+            try {
+                synth = new Tone.Synth().toDestination();
+                polySynth = new Tone.PolySynth().toDestination();
+                synth.volume.value = -12;
+                polySynth.volume.value = -14;
+            } catch (e) {}
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            if (!synth) initAudio();
+            try {
+                Tone.start();
+                if (type === 'click') synth.triggerAttackRelease('C5', '8n');
+                else if (type === 'correct') polySynth.triggerAttackRelease(['C5', 'E5', 'G5', 'C6'], '8n');
+                else if (type === 'error') synth.triggerAttackRelease('F3', '4n');
+                else if (type === 'unlock') polySynth.triggerAttackRelease(['G4', 'B4', 'D5', 'G5'], '4n');
+            } catch(e) {}
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-icon').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+        }
+
+        /* GAME STATE */
+        const gameState = {
+            currentRoom: 1,
+            timeRemaining: 2700,
+            timerInterval: null,
+            hintsUsed: 0,
+            inventory: [],
+            collectedCodes: { 1: null, 2: null, 3: null, 4: null },
+            activeHotspot: null
+        };
+
+        const roomData = [
+            {
+                id: 1,
+                title: "La Pista del Tempo",
+                subtitle: "Stanza 1: Il Laboratorio di Cinematica",
+                category: "CAPITOLO 6: CINEMATICA",
+                hint: "Formula velocità media v = d / Δt. La distanza d = 2(96) + 2π(49) ≈ 500m. Quindi v = 500 / 100 = 5.00 m/s.",
+                svgContent: `
+                    <rect x="0" y="0" width="800" height="340" fill="#111827" />
+                    <rect x="0" y="340" width="800" height="110" fill="#0F172A" />
+                    <g transform="translate(180, 50)">
+                        <rect x="0" y="0" width="440" height="200" rx="15" fill="#1E293B" stroke="#06B6D4" stroke-width="2" />
+                        <text x="220" y="30" font-family="monospace" font-size="14" fill="#06B6D4" text-anchor="middle" font-weight="bold">CIRCUITO MOTO ATLETICO</text>
+                        <path d="M 120 70 L 320 70 A 50 50 0 0 1 320 170 L 120 170 A 50 50 0 0 1 120 70 Z" fill="none" stroke="#F59E0B" stroke-width="6" stroke-dasharray="10 5" />
+                        <text x="220" y="62" font-family="sans-serif" font-size="12" fill="#E5E7EB" text-anchor="middle">Rettilineo L = 96 m</text>
+                        <text x="50" y="125" font-family="sans-serif" font-size="12" fill="#38BDF8" text-anchor="middle">R = 49 m</text>
+                    </g>
+                    <g transform="translate(670, 160)">
+                        <rect x="0" y="0" width="90" height="180" rx="6" fill="#111827" stroke="#374151" stroke-width="4" />
+                        <rect id="door-lock-1" x="10" y="70" width="70" height="40" rx="4" fill="#1E293B" stroke="#EF4444" stroke-width="2" />
+                        <text x="45" y="95" font-family="monospace" font-size="12" fill="#EF4444" text-anchor="middle" font-weight="bold">LOCK 1</text>
+                    </g>
+                `,
+                hotspots: [
+                    { id: "h1-blackboard", title: "Pista Atletica", icon: "fa-chalkboard", x: "23%", y: "12%", width: "50%", height: "40%", type: "clue" },
+                    { id: "h1-terminal", title: "Terminale Velocità", icon: "fa-terminal", x: "8%", y: "48%", width: "12%", height: "25%", type: "puzzle" },
+                    { id: "h1-door", title: "Tastierino Porta 1", icon: "fa-keypad", x: "84%", y: "38%", width: "11%", height: "35%", type: "lock" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Il Caveau delle Forze",
+                subtitle: "Stanza 2: Dinamica e Molle",
+                category: "CAPITOLO 3: LEGGE DI HOOKE",
+                hint: "F = m*g = 2.0 * 9.81 = 19.62 N. k = F / Δx = 19.62 / 0.10 = 196.2 ≈ 196 N/m.",
+                svgContent: `
+                    <rect x="0" y="0" width="800" height="340" fill="#171520" />
+                    <rect x="0" y="340" width="800" height="110" fill="#0D0B14" />
+                    <g transform="translate(280, 40)">
+                        <rect x="0" y="0" width="180" height="260" rx="8" fill="#1E1B4B" stroke="#6366F1" stroke-width="2" />
+                        <path d="M 90 60 Q 110 70 90 80 Q 70 90 90 100 Q 110 110 90 120" fill="none" stroke="#F59E0B" stroke-width="5" />
+                        <rect x="65" y="140" width="50" height="50" rx="4" fill="#D97706" stroke="#FBBF24" stroke-width="2" />
+                        <text x="90" y="170" font-family="monospace" font-size="12" fill="#FFF" text-anchor="middle">2.0 kg</text>
+                    </g>
+                    <g transform="translate(670, 160)">
+                        <rect x="0" y="0" width="90" height="180" rx="6" fill="#111827" stroke="#374151" stroke-width="4" />
+                        <rect id="door-lock-2" x="10" y="70" width="70" height="40" rx="4" fill="#1E293B" stroke="#EF4444" stroke-width="2" />
+                        <text x="45" y="95" font-family="monospace" font-size="12" fill="#EF4444" text-anchor="middle" font-weight="bold">LOCK 2</text>
+                    </g>
+                `,
+                hotspots: [
+                    { id: "h2-spring", title: "Dinamometro Molla", icon: "fa-weight-hanging", x: "35%", y: "8%", width: "22%", height: "60%", type: "puzzle" },
+                    { id: "h2-door", title: "Tastierino Porta 2", icon: "fa-keypad", x: "84%", y: "38%", width: "11%", height: "35%", type: "lock" }
+                ]
+            },
+            {
+                id: 3,
+                title: "La Camera dei Fluidi",
+                subtitle: "Stanza 3: Stevino e Fluidi",
+                category: "CAPITOLO 5: FLUIDI",
+                hint: "Pressione idrostatica p = d * g * h = 1000 * 9.81 * 2.5 = 24525 Pa.",
+                svgContent: `
+                    <rect x="0" y="0" width="800" height="340" fill="#06202A" />
+                    <rect x="0" y="340" width="800" height="110" fill="#031218" />
+                    <g transform="translate(200, 60)">
+                        <rect x="0" y="0" width="300" height="240" rx="6" fill="#0284C7" fill-opacity="0.25" stroke="#38BDF8" stroke-width="4" />
+                        <rect x="4" y="50" width="292" height="184" fill="#0284C7" fill-opacity="0.5" />
+                        <line x1="150" y1="0" x2="150" y2="180" stroke="#94A3B8" stroke-width="4" />
+                        <circle cx="150" cy="180" r="16" fill="#F59E0B" />
+                    </g>
+                    <g transform="translate(670, 160)">
+                        <rect x="0" y="0" width="90" height="180" rx="6" fill="#111827" stroke="#374151" stroke-width="4" />
+                        <rect id="door-lock-3" x="10" y="70" width="70" height="40" rx="4" fill="#1E293B" stroke="#EF4444" stroke-width="2" />
+                        <text x="45" y="95" font-family="monospace" font-size="12" fill="#EF4444" text-anchor="middle" font-weight="bold">LOCK 3</text>
+                    </g>
+                `,
+                hotspots: [
+                    { id: "h3-console", title: "Manometro Fluidi", icon: "fa-gauge-high", x: "25%", y: "13%", width: "37%", height: "53%", type: "puzzle" },
+                    { id: "h3-door", title: "Tastierino Porta 3", icon: "fa-keypad", x: "84%", y: "38%", width: "11%", height: "35%", type: "lock" }
+                ]
+            },
+            {
+                id: 4,
+                title: "L'Anfiteatro dei Circuiti",
+                subtitle: "Stanza 4: Legge di Ohm",
+                category: "CAPITOLO 16: CIRCUITI",
+                hint: "Req = R1 + R2 = 4 + 2 = 6 Ω. Corrente I = V / Req = 12 / 6 = 2 A.",
+                svgContent: `
+                    <rect x="0" y="0" width="800" height="340" fill="#180E29" />
+                    <rect x="0" y="340" width="800" height="110" fill="#0E071A" />
+                    <g transform="translate(180, 80)">
+                        <rect x="0" y="0" width="380" height="220" rx="10" fill="#0F172A" stroke="#A855F7" stroke-width="3" />
+                        <text x="190" y="30" font-family="monospace" font-size="14" fill="#A855F7" text-anchor="middle" font-weight="bold">CIRCUITO OHM</text>
+                    </g>
+                    <g transform="translate(650, 140)">
+                        <rect x="0" y="0" width="120" height="200" rx="8" fill="#111827" stroke="#10B981" stroke-width="5" />
+                        <rect id="door-lock-4" x="20" y="150" width="80" height="35" rx="4" fill="#1E293B" stroke="#EF4444" stroke-width="2" />
+                        <text x="60" y="172" font-family="monospace" font-size="11" fill="#EF4444" text-anchor="middle" font-weight="bold">MASTER LOCK</text>
+                    </g>
+                `,
+                hotspots: [
+                    { id: "h4-circuit", title: "Banco Circuiti", icon: "fa-microchip", x: "22%", y: "17%", width: "48%", height: "48%", type: "puzzle" },
+                    { id: "h4-door", title: "Portale Master", icon: "fa-door-closed", x: "81%", y: "31%", width: "15%", height: "44%", type: "lock" }
+                ]
+            }
+        ];
+
+        /* LOAD ROOM & SCENE */
+        function loadRoom(roomId) {
+            gameState.currentRoom = roomId;
+            const data = roomData.find(r => r.id === roomId);
+            if (!data) return;
+
+            document.getElementById('room-subtitle').textContent = data.subtitle;
+            document.getElementById('room-category').textContent = data.category;
+            document.getElementById('room-title').innerHTML = `<i class="fa-solid fa-layer-group text-lab-accent"></i> ${data.title}`;
+
+            document.getElementById('room-svg').innerHTML = data.svgContent;
+
+            const hotspotLayer = document.getElementById('hotspots-layer');
+            hotspotLayer.innerHTML = '';
+
+            data.hotspots.forEach(h => {
+                const btn = document.createElement('button');
+                btn.className = `absolute pointer-events-auto rounded-xl border-2 flex items-center justify-center transition-all transform hover:scale-105 hotspot-pulse group ${
+                    h.type === 'lock' ? 'border-amber-400 bg-amber-500/20 text-amber-300' : 'border-lab-accent bg-lab-accent/20 text-lab-accent'
+                }`;
+                btn.style.left = h.x; btn.style.top = h.y; btn.style.width = h.width; btn.style.height = h.height;
+                btn.onclick = () => { playSound('click'); inspectHotspot(h); };
+                btn.innerHTML = `
+                    <div class="bg-gray-900/90 px-2 py-1 rounded-md text-xs font-bold border border-gray-700 flex items-center gap-1.5">
+                        <i class="fa-solid ${h.icon}"></i>
+                        <span class="hidden sm:inline">${h.title}</span>
+                    </div>
+                `;
+                hotspotLayer.appendChild(btn);
+            });
+
+            updateCollectedCodesUI();
+            resetInspectView();
+        }
+
+        function resetInspectView() {
+            document.getElementById('inspect-default-view').classList.remove('hidden');
+            document.getElementById('inspect-active-view').classList.add('hidden');
+        }
+
+        function switchRightTab(tab) {
+            playSound('click');
+            const inspectTab = document.getElementById('tab-inspect');
+            const inventoryTab = document.getElementById('tab-inventory');
+            if (tab === 'inspect') {
+                inspectTab.classList.remove('hidden'); inventoryTab.classList.add('hidden');
+            } else {
+                inspectTab.classList.add('hidden'); inventoryTab.classList.remove('hidden');
+            }
+        }
+
+        /* INSPECT DISPATCHER */
+        function inspectHotspot(hotspot) {
+            document.getElementById('inspect-default-view').classList.add('hidden');
+            const activeView = document.getElementById('inspect-active-view');
+            activeView.classList.remove('hidden');
+
+            document.getElementById('inspect-title').innerHTML = `<i class="fa-solid ${hotspot.icon} text-lab-accent"></i> ${hotspot.title}`;
+            document.getElementById('inspect-tag').textContent = hotspot.type.toUpperCase();
+
+            const widget = document.getElementById('inspect-widget');
+            const desc = document.getElementById('inspect-description');
+            const action = document.getElementById('inspect-action-area');
+
+            if (hotspot.id === 'h1-blackboard') {
+                widget.innerHTML = `<div class="font-mono text-xs text-center text-cyan-300">Giro completo: L=96m, R=49m, Δt=100s</div>`;
+                desc.innerHTML = `Calcola la velocità media v = d / Δt. Distanza d = 2*96 + 2*π*49 ≈ 500m.`;
+                action.innerHTML = `<button onclick="addToInventory('Dati Pista', 'fa-file-lines', 'd ≈ 500m, Δt = 100s')" class="w-full py-2 bg-gray-700 text-xs font-bold rounded hover:bg-gray-600">Salva in Inventario</button>`;
+            } else if (hotspot.id === 'h1-terminal') {
+                widget.innerHTML = `<div class="font-mono text-center text-xl text-lab-accent">v = ? m/s</div>`;
+                desc.innerHTML = `Inserisci il valore calcolato della velocità per sbloccare la prima cifra.`;
+                action.innerHTML = `
+                    <div class="flex space-x-2">
+                        <input type="number" id="inp-1" placeholder="v (m/s)..." class="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm text-white font-mono">
+                        <button onclick="checkP1()" class="px-3 py-1 bg-lab-accent text-slate-950 font-bold rounded text-xs">Invia</button>
+                    </div>
+                    <div id="feedback-1" class="text-xs font-mono"></div>
+                `;
+            } else if (hotspot.id === 'h2-spring') {
+                widget.innerHTML = `<div class="font-mono text-xs text-center">m = 2.0 kg, Δx = 0.10 m</div>`;
+                desc.innerHTML = `Calcola k = (m*g) / Δx. Sostituisci g = 9.81 m/s².`;
+                action.innerHTML = `
+                    <div class="flex space-x-2">
+                        <input type="number" id="inp-2" placeholder="k (N/m)..." class="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm text-white font-mono">
+                        <button onclick="checkP2()" class="px-3 py-1 bg-lab-accent text-slate-950 font-bold rounded text-xs">Calibra</button>
+                    </div>
+                    <div id="feedback-2" class="text-xs font-mono"></div>
+                `;
+            } else if (hotspot.id === 'h3-console') {
+                widget.innerHTML = `<div class="font-mono text-xs text-center">d = 1000 kg/m³, h = 2.5 m</div>`;
+                desc.innerHTML = `Calcola la pressione idrostatica p = d * g * h.`;
+                action.innerHTML = `
+                    <div class="flex space-x-2">
+                        <input type="number" id="inp-3" placeholder="p (Pa)..." class="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm text-white font-mono">
+                        <button onclick="checkP3()" class="px-3 py-1 bg-lab-accent text-slate-950 font-bold rounded text-xs">Invia</button>
+                    </div>
+                    <div id="feedback-3" class="text-xs font-mono"></div>
+                `;
+            } else if (hotspot.id === 'h4-circuit') {
+                widget.innerHTML = `<div class="font-mono text-xs text-center">V = 12 V, R1 = 4 Ω, R2 = 2 Ω</div>`;
+                desc.innerHTML = `Calcola la corrente I in Ampere (I = V / Req).`;
+                action.innerHTML = `
+                    <div class="flex space-x-2">
+                        <input type="number" id="inp-4" placeholder="I (A)..." class="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm text-white font-mono">
+                        <button onclick="checkP4()" class="px-3 py-1 bg-lab-accent text-slate-950 font-bold rounded text-xs">Invia</button>
+                    </div>
+                    <div id="feedback-4" class="text-xs font-mono"></div>
+                `;
+            } else if (hotspot.type === 'lock') {
+                renderKeypadLockView();
+            }
+        }
+
+        /* CHECK PUZZLE ANSWERS */
+        function checkP1() {
+            const v = parseFloat(document.getElementById('inp-1').value);
+            const fb = document.getElementById('feedback-1');
+            if (v === 5 || Math.abs(v - 5) < 0.1) {
+                playSound('correct');
+                fb.className = "text-emerald-400 text-xs mt-1 font-bold";
+                fb.textContent = "ESATTO! Cifra sbloccata: 5";
+                gameState.collectedCodes[1] = "5";
+                updateCollectedCodesUI();
+            } else { playSound('error'); fb.className = "text-red-400 text-xs mt-1"; fb.textContent = "Errato. Ricorda v = 500/100 = 5 m/s"; }
+        }
+
+        function checkP2() {
+            const k = parseFloat(document.getElementById('inp-2').value);
+            const fb = document.getElementById('feedback-2');
+            if (Math.abs(k - 196) <= 2) {
+                playSound('correct');
+                fb.className = "text-emerald-400 text-xs mt-1 font-bold";
+                fb.textContent = "ESATTO! k ≈ 196 N/m. Cifra sbloccata: 8";
+                gameState.collectedCodes[2] = "8";
+                updateCollectedCodesUI();
+            } else { playSound('error'); fb.className = "text-red-400 text-xs mt-1"; fb.textContent = "Errato. F = 19.62N, k = 19.62/0.10"; }
+        }
+
+        function checkP3() {
+            const p = parseFloat(document.getElementById('inp-3').value);
+            const fb = document.getElementById('feedback-3');
+            if (Math.abs(p - 24525) < 50) {
+                playSound('correct');
+                fb.className = "text-emerald-400 text-xs mt-1 font-bold";
+                fb.textContent = "ESATTO! p = 24525 Pa. Cifra sbloccata: 2";
+                gameState.collectedCodes[3] = "2";
+                updateCollectedCodesUI();
+            } else { playSound('error'); fb.className = "text-red-400 text-xs mt-1"; fb.textContent = "Errato. p = 1000 * 9.81 * 2.5"; }
+        }
+
+        function checkP4() {
+            const i = parseFloat(document.getElementById('inp-4').value);
+            const fb = document.getElementById('feedback-4');
+            if (i === 2) {
+                playSound('correct');
+                fb.className = "text-emerald-400 text-xs mt-1 font-bold";
+                fb.textContent = "ESATTO! I = 2 A. Cifra sbloccata: 4";
+                gameState.collectedCodes[4] = "4";
+                updateCollectedCodesUI();
+            } else { playSound('error'); fb.className = "text-red-400 text-xs mt-1"; fb.textContent = "Errato. Req = 6 Ω, I = 12/6 = 2 A"; }
+        }
+
+        /* KEYPAD LOGIC */
+        let currentKeypadVal = "";
+        function renderKeypadLockView() {
+            const widget = document.getElementById('inspect-widget');
+            const desc = document.getElementById('inspect-description');
+            const action = document.getElementById('inspect-action-area');
+
+            widget.innerHTML = `
+                <div class="font-mono text-center">
+                    <span class="text-xs text-gray-400 block">TASTIERINO</span>
+                    <div id="keypad-disp" class="text-2xl font-bold text-lab-accent bg-gray-950 py-2 px-4 rounded border border-gray-800 tracking-widest">____</div>
+                </div>
+            `;
+            desc.innerHTML = gameState.currentRoom === 4 ? "Inserisci il codice Master a 4 cifre (Stanze 1-2-3-4)." : "Inserisci il codice della stanza.";
+
+            action.innerHTML = `
+                <div class="grid grid-cols-3 gap-1.5 max-w-[200px] mx-auto">
+                    ${[1,2,3,4,5,6,7,8,9,0].map(n => `<button onclick="pressKey('${n}')" class="py-2 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded text-sm">${n}</button>`).join('')}
+                    <button onclick="currentKeypadVal=''; updateKeypad();" class="col-span-2 py-2 bg-red-900/50 text-red-300 font-bold rounded text-xs">CANCELLA</button>
+                </div>
+                <button onclick="verifyKeypad()" class="w-full py-2 bg-emerald-600 text-slate-950 font-bold rounded text-xs mt-2">SBLOCCA PORTA</button>
+                <div id="keypad-fb" class="text-xs font-mono text-center mt-1"></div>
+            `;
+            currentKeypadVal = "";
+        }
+
+        function pressKey(digit) {
+            playSound('click');
+            if (currentKeypadVal.length < 4) {
+                currentKeypadVal += digit;
+                updateKeypad();
+            }
+        }
+
+        function updateKeypad() {
+            const disp = document.getElementById('keypad-disp');
+            if (disp) disp.textContent = currentKeypadVal || "____";
+        }
+
+        function verifyKeypad() {
+            const room = gameState.currentRoom;
+            const fb = document.getElementById('keypad-fb');
+            if (room < 4) {
+                const target = gameState.collectedCodes[room];
+                if (currentKeypadVal === target || currentKeypadVal.endsWith(target)) {
+                    playSound('unlock');
+                    fb.className = "text-emerald-400 text-xs font-bold";
+                    fb.textContent = "PORTA SBLOCCATA!";
+                    setTimeout(() => loadRoom(room + 1), 1000);
+                } else { playSound('error'); fb.className = "text-red-400 text-xs"; fb.textContent = "Codice errato!"; }
+            } else {
+                if (currentKeypadVal === "5824") {
+                    playSound('unlock');
+                    document.getElementById('modal-win').classList.remove('hidden');
+                } else { playSound('error'); fb.className = "text-red-400 text-xs"; fb.textContent = "CODICE MASTER ERRATO! (Usa 5824)"; }
+            }
+        }
+
+        function updateCollectedCodesUI() {
+            const c = document.getElementById('collected-codes');
+            c.innerHTML = [1,2,3,4].map(num => `
+                <span class="px-2 py-0.5 rounded font-mono text-xs ${gameState.collectedCodes[num] ? 'bg-emerald-900/80 text-emerald-300 border border-emerald-500' : 'bg-gray-900 text-gray-500 border border-gray-800'}">
+                    #${num}: ${gameState.collectedCodes[num] || '?'}
+                </span>
+            `).join('');
+        }
+
+        function addToInventory(name, icon, details) {
+            playSound('click');
+            if (gameState.inventory.some(i => i.name === name)) return;
+            gameState.inventory.push({ name, icon, details });
+            document.getElementById('inventory-count').textContent = gameState.inventory.length;
+            document.getElementById('inventory-empty').classList.add('hidden');
+            const grid = document.getElementById('inventory-grid');
+            const card = document.createElement('div');
+            card.className = "bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs";
+            card.innerHTML = `<div class="font-bold text-lab-accent"><i class="fa-solid ${icon} mr-1"></i>${name}</div><div class="text-[10px] text-gray-400">${details}</div>`;
+            grid.appendChild(card);
+        }
+
+        /* TIMER */
+        function startTimer() {
+            gameState.timerInterval = setInterval(() => {
+                if (gameState.timeRemaining > 0) {
+                    gameState.timeRemaining--;
+                    const m = Math.floor(gameState.timeRemaining / 60);
+                    const s = gameState.timeRemaining % 60;
+                    document.getElementById('timer-display').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        /* MODALS & EXPORT FUNCTIONS */
+        function toggleNotebook() { playSound('click'); document.getElementById('modal-notebook').classList.toggle('hidden'); }
+        function requestHint() {
+            playSound('click');
+            gameState.hintsUsed++;
+            const data = roomData.find(r => r.id === gameState.currentRoom);
+            document.getElementById('hint-title').textContent = `Indizio Stanza ${gameState.currentRoom}`;
+            document.getElementById('hint-text').textContent = data ? data.hint : "";
+            document.getElementById('modal-hint').classList.remove('hidden');
+        }
+        function closeHint() { document.getElementById('modal-hint').classList.add('hidden'); }
+        function exportGameData() { playSound('click'); document.getElementById('modal-export').classList.remove('hidden'); }
+        function closeExportModal() { document.getElementById('modal-export').classList.add('hidden'); }
+
+        /* EXPORT IMPLEMENTATIONS */
+        function exportFullGameHTML() {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "Escape_Room_Fisica_Walker.html";
+            a.click();
+        }
+
+        function exportReportJSON() {
+            const saveData = JSON.stringify(gameState, null, 2);
+            const blob = new Blob([saveData], { type: "application/json" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "progressi_escape_room.json";
+            a.click();
+        }
+
+        function printGameCertificate() {
+            window.print();
+        }
+
+        function downloadNotebookPDF() {
+            const notebookHTML = `
+                <html><head><title>Formulario Fisica Walker</title><style>body{font-family:sans-serif;padding:20px;line-height:1.6;}</style></head>
+                <body>
+                    <h1>Quaderno di Fisica - Prof. Walker</h1>
+                    <h2>Cinematica</h2><p>v_m = d / Δt | d = 2L + 2πR</p>
+                    <h2>Dinamica</h2><p>P = m*g | F_e = k * Δx</p>
+                    <h2>Fluidi</h2><p>p = d * g * h</p>
+                    <h2>Circuiti</h2><p>V = R_eq * I | R_eq = R1 + R2</p>
+                </body></html>
+            `;
+            const blob = new Blob([notebookHTML], { type: "text/html;charset=utf-8" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "Formulario_Fisica_Walker.html";
+            a.click();
+        }
+
+        window.onload = function() {
+            loadRoom(1);
+            startTimer();
+        };
+    </script>
+</body>
+</html>
