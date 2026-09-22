@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escape Room: Il Laboratorio Segreto del Prof. Aether</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+            tech: ['Orbitron', 'sans-serif'],
+          },
+          colors: {
+            cyan: {
+              400: '#22d3ee',
+              500: '#06b6d4',
+              900: '#164e63',
+            },
+            amber: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+            },
+            emerald: {
+              400: '#34d399',
+              500: '#10b981',
+            }
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 20px rgba(6, 182, 212, 0.4)',
+            'glow-amber': '0 0 20px rgba(245, 158, 11, 0.4)',
+            'glow-emerald': '0 0 20px rgba(16, 185, 129, 0.4)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .pulse-glow {
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 5px rgba(6, 182, 212, 0.2); }
+      100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+    }
+
+    .scanline {
+      background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(0, 0, 0, 0.3) 50%,
+        rgba(0, 0, 0, 0.3)
+      );
+      background-size: 100% 4px;
+    }
+  </style>
+</head>
+<body class="h-full font-sans bg-slate-950 text-slate-100 flex flex-col antialiased selection:bg-cyan-500 selection:text-slate-950">
+
+  <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-30 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl font-bold shadow-glow-cyan">
+          <i class="fa-solid fa-atom animate-spin-slow"></i>
+        </div>
+        <div>
+          <h1 class="font-tech text-base sm:text-lg font-bold tracking-wider text-cyan-400">LABORATORIO AETHER</h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Escape Room Didattica di Fisica - 1° Liceo</p>
+        </div>
+      </div>
+
+      <!-- Controls & Timer -->
+      <div class="flex items-center space-x-3 sm:space-x-6">
+        
+        <!-- Mission Timer -->
+        <div class="flex items-center space-x-2 bg-slate-950 px-3 sm:px-4 py-1.5 rounded-lg border border-slate-800">
+          <i class="fa-regular fa-clock text-amber-400"></i>
+          <span id="timer-display" class="font-tech font-bold text-lg sm:text-xl text-amber-400 tracking-widest">45:00</span>
+          <button id="btn-toggle-timer" onclick="toggleTimer()" class="text-slate-400 hover:text-slate-200 ml-1 text-xs">
+            <i class="fa-solid fa-pause" id="timer-icon"></i>
+          </button>
+        </div>
+
+        <!-- Utility Buttons -->
+        <button onclick="toggleScratchpad()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition" title="Foglio Appunti & Calcolatrice">
+          <i class="fa-solid fa-calculator"></i>
+        </button>
+
+        <button onclick="toggleGameMasterModal()" class="px-3 py-1.5 rounded-lg bg-purple-900/40 border border-purple-500/40 text-purple-300 hover:bg-purple-900/60 transition text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-user-gear"></i>
+          <span class="hidden md:inline">Game Master</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+    
+    <!-- Room Selection Stepper -->
+    <div class="grid grid-cols-3 gap-2 sm:gap-4">
+      
+      <!-- Room 1 Tab -->
+      <button id="tab-room-1" onclick="switchRoom(1)" class="glass-panel p-3 sm:p-4 rounded-xl flex items-center justify-between border-cyan-500/50 bg-cyan-950/20 text-left transition hover:border-cyan-400">
+        <div class="flex items-center gap-3">
+          <div id="room-1-badge" class="w-8 h-8 rounded-full bg-cyan-500 text-slate-950 font-bold flex items-center justify-center text-sm">1</div>
+          <div>
+            <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider block">Stanza 1</span>
+            <span class="font-semibold text-xs sm:text-sm text-slate-200 truncate block">Requisito della Misura</span>
+          </div>
+        </div>
+        <i id="room-1-status" class="fa-solid fa-unlock text-cyan-400"></i>
+      </button>
+
+      <!-- Room 2 Tab -->
+      <button id="tab-room-2" onclick="switchRoom(2)" class="glass-panel p-3 sm:p-4 rounded-xl flex items-center justify-between border-slate-800 bg-slate-900/40 text-left opacity-60 transition cursor-not-allowed">
+        <div class="flex items-center gap-3">
+          <div id="room-2-badge" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center text-sm">2</div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Stanza 2</span>
+            <span class="font-semibold text-xs sm:text-sm text-slate-300 truncate block">Il Vettore Perduto</span>
+          </div>
+        </div>
+        <i id="room-2-status" class="fa-solid fa-lock text-slate-600"></i>
+      </button>
+
+      <!-- Room 3 Tab -->
+      <button id="tab-room-3" onclick="switchRoom(3)" class="glass-panel p-3 sm:p-4 rounded-xl flex items-center justify-between border-slate-800 bg-slate-900/40 text-left opacity-60 transition cursor-not-allowed">
+        <div class="flex items-center gap-3">
+          <div id="room-3-badge" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center text-sm">3</div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Stanza 3</span>
+            <span class="font-semibold text-xs sm:text-sm text-slate-300 truncate block">L'Equilibrio Perfetto</span>
+          </div>
+        </div>
+        <i id="room-3-status" class="fa-solid fa-lock text-slate-600"></i>
+      </button>
+
+    </div>
+
+    <!-- ROOM 1 CONTENT -->
+    <div id="room-1-panel" class="space-y-6">
+      
+      <!-- Narrative Header -->
+      <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-cyan-500 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-xs font-semibold">Difficoltà: Facile</span>
+            <h2 class="text-2xl font-bold font-tech text-white mt-2">Stanza 1: Il Requisito della Misura</h2>
+            <p class="text-slate-300 text-sm mt-1 leading-relaxed">
+              Siete rimasti chiusi nel vecchio magazzino degli strumenti del professor <em>Aether</em>. L'aria profuma di ozono e carta antica. Per sbloccare il tastierino elettronico della prima porta occorre dimostrare di saper distinguere una misura rigorosa da una stima imprecisa.
+            </p>
+          </div>
+          <div class="shrink-0 text-cyan-400 text-5xl opacity-20 hidden md:block">
+            <i class="fa-solid fa-ruler-combined"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Enigma 1.1 -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between border-slate-800 hover:border-slate-700 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-cyan-400 bg-cyan-950/60 px-2.5 py-1 rounded border border-cyan-800">ENIGMA 1.1</span>
+              <span class="text-xs text-slate-400"><i class="fa-solid fa-flask text-cyan-400 mr-1"></i> Grandezze SI</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-white mb-2">Il Codice delle Unità di Misura</h3>
+            <p class="text-slate-300 text-sm mb-4">
+              Su un tavolo ci sono 5 fiale contrassegnate da alcune grandezze fisiche:
+            </p>
+
+            <!-- Vials display -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+              <div class="p-2.5 bg-slate-900/90 rounded-lg border border-slate-800 text-center">
+                <span class="block text-xs text-slate-500 font-mono">Fiala A</span>
+                <span class="text-sm font-bold text-cyan-300">12 N</span>
+              </div>
+              <div class="p-2.5 bg-slate-900/90 rounded-lg border border-slate-800 text-center">
+                <span class="block text-xs text-slate-500 font-mono">Fiala B</span>
+                <span class="text-sm font-bold text-cyan-300">5.2 m/s</span>
+              </div>
+              <div class="p-2.5 bg-slate-900/90 rounded-lg border border-cyan-500/40 bg-cyan-950/20 text-center">
+                <span class="block text-xs text-slate-400 font-mono">Fiala C</span>
+                <span class="text-sm font-bold text-cyan-300">3.5 kg</span>
+              </div>
+              <div class="p-2.5 bg-slate-900/90 rounded-lg border border-cyan-500/40 bg-cyan-950/20 text-center">
+                <span class="block text-xs text-slate-400 font-mono">Fiala D</span>
+                <span class="text-sm font-bold text-cyan-300">293.15 K</span>
+              </div>
+              <div class="p-2.5 bg-slate-900/90 rounded-lg border border-slate-800 text-center">
+                <span class="block text-xs text-slate-500 font-mono">Fiala E</span>
+                <span class="text-sm font-bold text-cyan-300">45 cm³</span>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-400 italic bg-slate-950/50 p-3 rounded-lg border border-slate-800/80 mb-4">
+              "Individuate l'ordine delle sole fiale corrispondenti a <strong>grandezze FONDAMENTALI del SI</strong> (es. CD). Inserite la sequenza delle lettere delle fiale corrette."
+            </p>
+          </div>
+
+          <!-- Input & Hints -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <div class="flex gap-2">
+              <input type="text" id="input-1-1" placeholder="Es. CD" uppercase class="bg-slate-950 border border-slate-700 focus:border-cyan-500 focus:outline-none rounded-lg px-3 py-2 text-sm text-white font-mono uppercase tracking-widest flex-1">
+              <button onclick="verifyAnswer('1.1')" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold rounded-lg text-sm transition">Verifica</button>
+            </div>
+            <div id="feedback-1-1" class="hidden text-xs p-2 rounded-lg"></div>
+
+            <!-- Hint Trigger -->
+            <div class="flex justify-between items-center text-xs pt-1">
+              <button onclick="showHint('1.1')" class="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium">
+                <i class="fa-regular fa-lightbulb"></i> Richiedi Suggerimento (<span id="hint-count-1-1">0</span>/2)
+              </button>
+            </div>
+            <div id="hint-box-1-1" class="hidden text-xs bg-amber-950/30 border border-amber-500/30 text-amber-200 p-3 rounded-lg space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- Enigma 1.2 -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between border-slate-800 hover:border-slate-700 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-cyan-400 bg-cyan-950/60 px-2.5 py-1 rounded border border-cyan-800">ENIGMA 1.2</span>
+              <span class="text-xs text-slate-400"><i class="fa-solid fa-calculator text-cyan-400 mr-1"></i> Incertezza & Cifre</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-white mb-2">L'Incertezza della Chiave</h3>
+            <p class="text-slate-300 text-sm mb-3">
+              Una cassaforte richiede un codice a tre cifre <strong>[ X | Y | Z ]</strong> calcolato dai seguenti quesiti:
+            </p>
+
+            <ul class="space-y-2 text-xs text-slate-300 mb-4 bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+              <li class="flex items-start gap-2">
+                <span class="font-bold text-cyan-400 font-mono">X:</span>
+                <span>Numero di cifre significative della misura <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">0.04050 m</code>.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="font-bold text-cyan-400 font-mono">Y:</span>
+                <span>Errore assoluto espresso in <strong>centimetri</strong> della misura di un banco <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">(1.25 ± 0.02) m</code>.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="font-bold text-cyan-400 font-mono">Z:</span>
+                <span>Valore percentuale intero dell'errore relativo per la misura <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">L = (50 ± 1) cm</code>.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Input & Hints -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <div class="flex gap-2">
+              <input type="text" id="input-1-2" placeholder="Codice [XYZ] es: 422" class="bg-slate-950 border border-slate-700 focus:border-cyan-500 focus:outline-none rounded-lg px-3 py-2 text-sm text-white font-mono tracking-widest flex-1">
+              <button onclick="verifyAnswer('1.2')" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-semibold rounded-lg text-sm transition">Verifica</button>
+            </div>
+            <div id="feedback-1-2" class="hidden text-xs p-2 rounded-lg"></div>
+
+            <!-- Hint Trigger -->
+            <div class="flex justify-between items-center text-xs pt-1">
+              <button onclick="showHint('1.2')" class="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium">
+                <i class="fa-regular fa-lightbulb"></i> Richiedi Suggerimento (<span id="hint-count-1-2">0</span>/2)
+              </button>
+            </div>
+            <div id="hint-box-1-2" class="hidden text-xs bg-amber-950/30 border border-amber-500/30 text-amber-200 p-3 rounded-lg space-y-1"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Unlock Next Room Banner -->
+      <div id="room-1-complete-banner" class="hidden glass-panel p-6 rounded-2xl border-emerald-500/50 bg-emerald-950/20 text-center space-y-3">
+        <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <h3 class="text-xl font-bold text-emerald-400">Stanza 1 Sbloccata con Successo!</h3>
+        <p class="text-sm text-slate-300">I sistemi della prima porta si aprono. Puoi accedere alla seconda stanza.</p>
+        <button onclick="switchRoom(2)" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl shadow-glow-emerald transition">
+          Avanza alla Stanza 2 <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ROOM 2 CONTENT -->
+    <div id="room-2-panel" class="hidden space-y-6">
+      
+      <!-- Narrative Header -->
+      <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-amber-500 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-semibold">Difficoltà: Media</span>
+            <h2 class="text-2xl font-bold font-tech text-white mt-2">Stanza 2: Il Vettore Perduto</h2>
+            <p class="text-slate-300 text-sm mt-1 leading-relaxed">
+              Superata la prima porta, vi trovate nell'officina dei meccanismi. Al centro della stanza c'è una piastra sospesa con tre cavi in tensione. Una freccia luminosa proietta un'ombra sul pavimento: rappresenta la risultante delle forze necessarie per disattivare il sistema d'allarme.
+            </p>
+          </div>
+          <div class="shrink-0 text-amber-400 text-5xl opacity-20 hidden md:block">
+            <i class="fa-solid fa-compass"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Enigma 2.1 -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between border-slate-800 hover:border-slate-700 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded border border-amber-800">ENIGMA 2.1</span>
+              <span class="text-xs text-slate-400"><i class="fa-solid fa-weight-hanging text-amber-400 mr-1"></i> Massa vs Peso</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-white mb-2">Il Peso Sull'Altro Pianeta</h3>
+            <p class="text-slate-300 text-sm mb-3">
+              Sulla cattedra c'è una bilancia dinamometrica e un blocco di metallo misterioso di massa <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">m = 8 kg</code>.
+            </p>
+
+            <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 mb-4 space-y-2">
+              <p class="text-xs text-amber-200/90 italic">
+                "Calcolate l'intensità della Forza Peso di questo blocco sul pianeta Marte dove l'accelerazione gravizionale è <strong class="text-amber-400">g<sub>Marte</sub> = 3.71 N/kg</strong>. Arrotondate l'esito all'intero più vicino."
+              </p>
+              <div class="text-right text-xs text-slate-500 font-mono">Unità di misura: Newton (N)</div>
+            </div>
+          </div>
+
+          <!-- Input & Hints -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <div class="flex gap-2">
+              <input type="number" id="input-2-1" placeholder="Inserisci valore intero (N)" class="bg-slate-950 border border-slate-700 focus:border-amber-500 focus:outline-none rounded-lg px-3 py-2 text-sm text-white font-mono tracking-widest flex-1">
+              <button onclick="verifyAnswer('2.1')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold rounded-lg text-sm transition">Verifica</button>
+            </div>
+            <div id="feedback-2-1" class="hidden text-xs p-2 rounded-lg"></div>
+
+            <!-- Hint Trigger -->
+            <div class="flex justify-between items-center text-xs pt-1">
+              <button onclick="showHint('2.1')" class="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium">
+                <i class="fa-regular fa-lightbulb"></i> Richiedi Suggerimento (<span id="hint-count-2-1">0</span>/2)
+              </button>
+            </div>
+            <div id="hint-box-2-1" class="hidden text-xs bg-amber-950/30 border border-amber-500/30 text-amber-200 p-3 rounded-lg space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- Enigma 2.2 -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between border-slate-800 hover:border-slate-700 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded border border-amber-800">ENIGMA 2.2</span>
+              <span class="text-xs text-slate-400"><i class="fa-solid fa-arrows-up-down-left-right text-amber-400 mr-1"></i> Somma e Differenza Vettoriale</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-white mb-2">Il Labirinto dei Vettori</h3>
+            <p class="text-slate-300 text-sm mb-3">
+              Sommate i vettori spostamento perpendicolari:
+            </p>
+
+            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+              <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block font-mono">Vettore A</span>
+                <span class="font-bold text-cyan-400">6 metri (Est)</span>
+              </div>
+              <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block font-mono">Vettore B</span>
+                <span class="font-bold text-cyan-400">8 metri (Nord)</span>
+              </div>
+            </div>
+
+            <!-- Vector Diagram Canvas Preview -->
+            <div class="bg-slate-950 rounded-xl border border-slate-800 p-2 text-center mb-3">
+              <canvas id="vector-canvas" width="280" height="130" class="mx-auto block bg-slate-950 rounded"></canvas>
+            </div>
+
+            <p class="text-xs text-slate-400 mb-3">
+              Calcolate il modulo del vettore risultante <strong>|R| = |A + B|</strong> e del vettore differenza <strong>|D| = |A - B|</strong>. Inserite i due valori separati da uno spazio (es. <code>10 10</code>).
+            </p>
+          </div>
+
+          <!-- Input & Hints -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <div class="flex gap-2">
+              <input type="text" id="input-2-2" placeholder="Es. 10 10" class="bg-slate-950 border border-slate-700 focus:border-amber-500 focus:outline-none rounded-lg px-3 py-2 text-sm text-white font-mono tracking-widest flex-1">
+              <button onclick="verifyAnswer('2.2')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold rounded-lg text-sm transition">Verifica</button>
+            </div>
+            <div id="feedback-2-2" class="hidden text-xs p-2 rounded-lg"></div>
+
+            <!-- Hint Trigger -->
+            <div class="flex justify-between items-center text-xs pt-1">
+              <button onclick="showHint('2.2')" class="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium">
+                <i class="fa-regular fa-lightbulb"></i> Richiedi Suggerimento (<span id="hint-count-2-2">0</span>/2)
+              </button>
+            </div>
+            <div id="hint-box-2-2" class="hidden text-xs bg-amber-950/30 border border-amber-500/30 text-amber-200 p-3 rounded-lg space-y-1"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Unlock Next Room Banner -->
+      <div id="room-2-complete-banner" class="hidden glass-panel p-6 rounded-2xl border-emerald-500/50 bg-emerald-950/20 text-center space-y-3">
+        <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <h3 class="text-xl font-bold text-emerald-400">Stanza 2 Sbloccata!</h3>
+        <p class="text-sm text-slate-300">I raccordi vettoriali si allineano. L'accesso all'ultima stanza è aperto.</p>
+        <button onclick="switchRoom(3)" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl shadow-glow-emerald transition">
+          Avanza alla Stanza 3 <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ROOM 3 CONTENT -->
+    <div id="room-3-panel" class="hidden space-y-6">
+      
+      <!-- Narrative Header -->
+      <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-emerald-500 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-semibold">Difficoltà: Avanzata</span>
+            <h2 class="text-2xl font-bold font-tech text-white mt-2">Stanza 3: L'Equilibrio Perfetto</h2>
+            <p class="text-slate-300 text-sm mt-1 leading-relaxed">
+              Siete nella stanza di controllo principale. Un grande macchinario a bilanciere oscilla pericolosamente. Sulla porta finale c'è una serratura idraulica azionata da una leva e un carrello su un piano inclinato. Solo ristabilendo le condizioni di equilibrio perfetto potrete aprire la porta ed uscire.
+            </p>
+          </div>
+          <div class="shrink-0 text-emerald-400 text-5xl opacity-20 hidden md:block">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Enigma 3.1 -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between border-slate-800 hover:border-slate-700 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-800">ENIGMA 3.1</span>
+              <span class="text-xs text-slate-400"><i class="fa-solid fa-scale-balanced text-emerald-400 mr-1"></i> Equilibrio dei Momenti</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-white mb-2">La Leva del Basculante</h3>
+            <p class="text-slate-300 text-sm mb-3">
+              Una barra omogenea priva di peso è vincolata nel suo punto centrale (fulcro):
+            </p>
+
+            <ul class="space-y-1.5 text-xs text-slate-300 mb-3 bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+              <li>• A sinistra del fulcro a distanza <strong>d<sub>1</sub> = 0.5 m</strong> è appesa <strong>M<sub>1</sub> = 12 kg</strong>.</li>
+              <li>• A destra del fulcro viene posizionata una massa <strong>M<sub>2</sub> = 4 kg</strong>.</li>
+            </ul>
+
+            <p class="text-xs text-slate-400 mb-3">
+              A quale distanza <strong>d<sub>2</sub> (espressa in CENTIMETRI)</strong> dal fulcro occorre posizionare la massa M<sub>2</sub> per ottenere l'equilibrio rotazionale?
+            </p>
+          </div>
+
+          <!-- Input & Hints -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <div class="flex gap-2">
+              <input type="number" id="input-3-1" placeholder="Valore in cm (es. 150)" class="bg-slate-950 border border-slate-700 focus:border-emerald-500 focus:outline-none rounded-lg px-3 py-2 text-sm text-white font-mono tracking-widest flex-1">
+              <button onclick="verifyAnswer('3.1')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold rounded-lg text-sm transition">Verifica</button>
+            </div>
+            <div id="feedback-3-1" class="hidden text-xs p-2 rounded-lg"></div>
+
+            <!-- Hint Trigger -->
+            <div class="flex justify-between items-center text-xs pt-1">
+              <button onclick="showHint('3.1')" class="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium">
+                <i class="fa-regular fa-lightbulb"></i> Richiedi Suggerimento (<span id="hint-count-3-1">0</span>/2)
+              </button>
+            </div>
+            <div id="hint-box-3-1" class="hidden text-xs bg-amber-950/30 border border-amber-500/30 text-amber-200 p-3 rounded-lg space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- Enigma 3.2 -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between border-slate-800 hover:border-slate-700 transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-800">ENIGMA 3.2</span>
+              <span class="text-xs text-slate-400"><i class="fa-solid fa-person-skiing text-emerald-400 mr-1"></i> Piano Inclinato</span>
+            </div>
+            
+            <h3 class="text-lg font-bold text-white mb-2">L'Incognito del Piano Inclinato</h3>
+            <p class="text-slate-300 text-sm mb-3">
+              Un carrello di massa <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">M = 10 kg</code> si trova su un piano inclinato privo di attrito con altezza <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">h = 3 m</code> e lunghezza <code class="text-amber-300 bg-slate-900 px-1 py-0.5 rounded">l = 5 m</code>.
+            </p>
+
+            <div class="bg-slate-950/50 p-3 rounded-lg border border-slate-800 text-xs text-slate-300 mb-3 space-y-1">
+              <p>• Calcolate la componente della Forza Peso parallela al piano <strong>F<sub>p∥</sub></strong>.</p>
+              <p class="text-slate-400 italic">(Assumete g = 9.8 N/kg per i calcoli standard).</p>
+            </div>
+
+            <p class="text-xs text-slate-400 mb-3">
+              Quale valore di forza elastica (in Newton) deve esercitare una molla in modulo per evitare lo scivolamento del carrello?
+            </p>
+          </div>
+
+          <!-- Input & Hints -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <div class="flex gap-2">
+              <input type="number" step="0.1" id="input-3-2" placeholder="Valore in N (es. 58.8)" class="bg-slate-950 border border-slate-700 focus:border-emerald-500 focus:outline-none rounded-lg px-3 py-2 text-sm text-white font-mono tracking-widest flex-1">
+              <button onclick="verifyAnswer('3.2')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold rounded-lg text-sm transition">Verifica</button>
+            </div>
+            <div id="feedback-3-2" class="hidden text-xs p-2 rounded-lg"></div>
+
+            <!-- Hint Trigger -->
+            <div class="flex justify-between items-center text-xs pt-1">
+              <button onclick="showHint('3.2')" class="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium">
+                <i class="fa-regular fa-lightbulb"></i> Richiedi Suggerimento (<span id="hint-count-3-2">0</span>/2)
+              </button>
+            </div>
+            <div id="hint-box-3-2" class="hidden text-xs bg-amber-950/30 border border-amber-500/30 text-amber-200 p-3 rounded-lg space-y-1"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Victory Screen Banner -->
+      <div id="victory-banner" class="hidden glass-panel p-8 rounded-2xl border-cyan-500/60 bg-gradient-to-b from-cyan-950/40 to-slate-900 text-center space-y-4 shadow-glow-cyan">
+        <div class="w-20 h-20 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto text-4xl border border-cyan-500/40 animate-bounce">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="text-3xl font-extrabold font-tech text-white">COMPLIMENTI! SIETE EVASI DAL LABORATORIO!</h2>
+        <p class="text-slate-300 max-w-xl mx-auto text-sm leading-relaxed">
+          Avete applicato con successo i principi fondamentali di misure, incertezze, vettori ed equilibri statici. La porta principale si spalanca e l'allarme tace.
+        </p>
+        <div class="pt-2">
+          <span class="inline-block bg-slate-900 border border-cyan-500/30 px-4 py-2 rounded-lg text-xs font-mono text-cyan-300">
+            Tempo di evasione rimasto: <strong id="victory-time-left">--:--</strong>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL: Scratchpad & Scientific Calculator -->
+  <div id="modal-scratchpad" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-2xl rounded-2xl border-slate-700 p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2 text-cyan-400 font-bold font-tech">
+          <i class="fa-solid fa-calculator"></i>
+          <span>FOGLIO CALCOLI & APPUNTI</span>
+        </div>
+        <button onclick="toggleScratchpad()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Scratchpad textarea -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Area Appunti</label>
+          <textarea id="scratchpad-text" rows="8" placeholder="Scrivi qui i tuoi calcoli o passaggi intermedi..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+        </div>
+
+        <!-- Built-in Mini Calculator -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-2">Calcolatrice Veloce</label>
+            <input type="text" id="calc-display" readonly placeholder="0" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-right font-mono text-base text-cyan-400 mb-3 focus:outline-none">
+            
+            <div class="grid grid-cols-4 gap-1.5 text-xs font-mono">
+              <button onclick="calcInput('C')" class="p-2 bg-red-900/40 text-red-300 rounded hover:bg-red-900/60">C</button>
+              <button onclick="calcInput('(')" class="p-2 bg-slate-800 text-slate-300 rounded hover:bg-slate-700">(</button>
+              <button onclick="calcInput(')')" class="p-2 bg-slate-800 text-slate-300 rounded hover:bg-slate-700">)</button>
+              <button onclick="calcInput('/')" class="p-2 bg-cyan-900/40 text-cyan-300 rounded hover:bg-cyan-900/60">/</button>
+              
+              <button onclick="calcInput('7')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">7</button>
+              <button onclick="calcInput('8')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">8</button>
+              <button onclick="calcInput('9')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">9</button>
+              <button onclick="calcInput('*')" class="p-2 bg-cyan-900/40 text-cyan-300 rounded hover:bg-cyan-900/60">*</button>
+
+              <button onclick="calcInput('4')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">4</button>
+              <button onclick="calcInput('5')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">5</button>
+              <button onclick="calcInput('6')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">6</button>
+              <button onclick="calcInput('-')" class="p-2 bg-cyan-900/40 text-cyan-300 rounded hover:bg-cyan-900/60">-</button>
+
+              <button onclick="calcInput('1')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">1</button>
+              <button onclick="calcInput('2')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">2</button>
+              <button onclick="calcInput('3')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">3</button>
+              <button onclick="calcInput('+')" class="p-2 bg-cyan-900/40 text-cyan-300 rounded hover:bg-cyan-900/60">+</button>
+
+              <button onclick="calcInput('0')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700 col-span-2">0</button>
+              <button onclick="calcInput('.')" class="p-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700">.</button>
+              <button onclick="calcCompute()" class="p-2 bg-cyan-600 text-slate-950 font-bold rounded hover:bg-cyan-500">=</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: Game Master Console -->
+  <div id="modal-gm" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-3xl rounded-2xl border-purple-500/40 p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-purple-900/50 pb-3">
+        <div class="flex items-center gap-2 text-purple-400 font-bold font-tech text-lg">
+          <i class="fa-solid fa-user-shield"></i>
+          <span>CONSOLE GAME MASTER</span>
+        </div>
+        <button onclick="toggleGameMasterModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <!-- GM Password Protection Prompt -->
+      <div id="gm-auth-section" class="space-y-3">
+        <p class="text-xs text-slate-300">Inserisci la password docente per accedere ai comandi riservati:</p>
+        <div class="flex gap-2">
+          <input type="password" id="gm-pass-input" placeholder="Password GM (default: FISICA)" class="bg-slate-950 border border-slate-700 focus:border-purple-500 focus:outline-none rounded-lg px-3 py-2 text-sm text-white flex-1 font-mono">
+          <button onclick="unlockGM()" class="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white font-semibold rounded-lg text-sm transition">Accedi</button>
+        </div>
+        <p id="gm-auth-error" class="hidden text-xs text-red-400">Password errata!</p>
+      </div>
+
+      <!-- GM Admin Panel (Hidden until authorized) -->
+      <div id="gm-panel-content" class="hidden space-y-6">
+        
+        <!-- Quick Overrides -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+          <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">Sblocco Manuale Stanze</h4>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="gmForceUnlockRoom(1)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded border border-slate-700">Sblocca Stanza 1</button>
+            <button onclick="gmForceUnlockRoom(2)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded border border-slate-700">Sblocca Stanza 2</button>
+            <button onclick="gmForceUnlockRoom(3)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded border border-slate-700">Sblocca Stanza 3</button>
+          </div>
+        </div>
+
+        <!-- Timer Controls -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+          <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">Gestione Tempo Missione</h4>
+          <div class="flex items-center gap-3">
+            <button onclick="addTimerMinutes(5)" class="px-3 py-1.5 bg-purple-900/50 hover:bg-purple-900/80 text-xs text-purple-200 rounded border border-purple-700">+5 Minuti</button>
+            <button onclick="addTimerMinutes(-5)" class="px-3 py-1.5 bg-purple-900/50 hover:bg-purple-900/80 text-xs text-purple-200 rounded border border-purple-700">-5 Minuti</button>
+            <button onclick="resetTimer()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded">Reset 45m</button>
+          </div>
+        </div>
+
+        <!-- Key Cheat Sheet for GM -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+          <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">Soluzioni & Registro Soluzioni</h4>
+          
+          <div class="space-y-2 text-xs font-mono">
+            <div class="p-2 bg-slate-900 rounded border border-slate-800">
+              <span class="text-cyan-400">1.1:</span> CD (Fiala C = 3.5kg, Fiala D = 293.15K)
+            </div>
+            <div class="p-2 bg-slate-900 rounded border border-slate-800">
+              <span class="text-cyan-400">1.2:</span> 422 (X=4 cifre sig, Y=2 cm, Z=2% err rel)
+            </div>
+            <div class="p-2 bg-slate-900 rounded border border-slate-800">
+              <span class="text-amber-400">2.1:</span> 30 N (8 kg * 3.71 N/kg = 29.68 N → ~30)
+            </div>
+            <div class="p-2 bg-slate-900 rounded border border-slate-800">
+              <span class="text-amber-400">2.2:</span> 10 10 (|R| = √(6²+8²) = 10, |D| = 10)
+            </div>
+            <div class="p-2 bg-slate-900 rounded border border-slate-800">
+              <span class="text-emerald-400">3.1:</span> 150 cm (12*0.5 = 4*d2 → d2 = 1.5m = 150cm)
+            </div>
+            <div class="p-2 bg-slate-900 rounded border border-slate-800">
+              <span class="text-emerald-400">3.2:</span> 58.8 N (o 59 con approssimazioni)
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Application State */
+    const state = {
+      activeRoom: 1,
+      unlockedRooms: [1],
+      completedEnigmas: {
+        '1.1': false,
+        '1.2': false,
+        '2.1': false,
+        '2.2': false,
+        '3.1': false,
+        '3.2': false
+      },
+      hintsRequested: {
+        '1.1': 0,
+        '1.2': 0,
+        '2.1': 0,
+        '2.2': 0,
+        '3.1': 0,
+        '3.2': 0
+      },
+      timerSeconds: 45 * 60,
+      timerRunning: true,
+      timerInterval: null,
+      gmAuthorized: false
+    };
+
+    /* Hints database (Progressive) */
+    const hintData = {
+      '1.1': [
+        "Ricordate la differenza tra grandezze FONDAMENTALI (lunghezza, massa, tempo, temperatura, corrente, quantità di sostanza, intensità luminosa) e DERIVATE (forza, velocità, volume...).",
+        "La forza (Newton) e la velocità (m/s) e il volume (cm³) sono derivate da altre unità. Le fiale relative alle uniche grandezze fondamentali sono la C (massa in kg) e la D (temperatura in K)."
+      ],
+      '1.2': [
+        "X: Gli zeri a sinistra del primo numero non nullo NON contano, ma gli zeri finali a destra della virgola contano! Y: Converti 0.02 m in centimetri. Z: L'errore relativo è e_r = (incertezza / valore) = 1/50.",
+        "X = 4 cifre significative (4, 0, 5, 0). Y = 0.02 m = 2 cm. Z = (1/50)*100 = 2%. Il codice a tre cifre è 422."
+      ],
+      '2.1': [
+        "La relazione per la Forza Peso è F_p = m · g. Utilizza l'accelerazione di gravità di Marte (g = 3.71 N/kg).",
+        "Esegui il calcolo: F_p = 8 kg · 3.71 N/kg = 29.68 N. Arrotondato all'intero più vicino ottieni 30 N."
+      ],
+      '2.2': [
+        "Essendo i vettori perpendicolari (uno verso Est e uno verso Nord), per trovare il modulo del vettore risultante si applica il Teorema di Pitagora: √(6² + 8²).",
+        "Sia per la somma |A + B| che per la differenza |A - B| di due vettori ortogonali, la lunghezza del modulo è √(36 + 64) = √100 = 10. Inserisci: 10 10."
+      ],
+      '3.1': [
+        "Per l'equilibrio rotazionale della leva, il momento antiorario deve eguagliare quello orario: M1 · d1 = M2 · d2.",
+        "Calcola: 12 kg · 0.5 m = 4 kg · d2. Quindi d2 = 6 / 4 = 1.5 metri. Converti 1.5 metri in centimetri (150 cm)."
+      ],
+      '3.2': [
+        "La componente della forza peso parallela al piano inclinato si ottiene con la formula: F_p∥ = m · g · (h / l).",
+        "Sostituisci i dati: F_p∥ = 10 kg · 9.8 N/kg · (3 / 5) = 98 · 0.6 = 58.8 N. Per contrastarla occorre una forza uguale in modulo."
+      ]
+    };
+
+    /* Correct Answers validation rules */
+    function checkAnswerCorrectness(enigmaId, inputVal) {
+      const clean = inputVal.trim().toUpperCase().replace(/\s+/g, ' ');
+      
+      switch(enigmaId) {
+        case '1.1':
+          return clean === 'CD' || clean === 'C D' || clean === 'C,D' || clean === 'C, D';
+        case '1.2':
+          return clean === '422' || clean === '4 2 2';
+        case '2.1':
+          return clean === '30' || clean === '30N' || clean === '30 N';
+        case '2.2':
+          return clean === '10 10' || clean === '10, 10' || clean === '10,10';
+        case '3.1':
+          return clean === '150' || clean === '150CM' || clean === '150 CM';
+        case '3.2':
+          const num = parseFloat(clean.replace(',', '.'));
+          return (num >= 58.5 && num <= 59.5); // Accepts 58.8 or rounded 59
+        default:
+          return false;
+      }
+    }
+
+    /* Web Audio API Beeps for Feedback */
+    function playAudioTone(freq, type, duration) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch(e) { /* Audio context not allowed or supported */ }
+    }
+
+    function verifyAnswer(enigmaId) {
+      const domId = enigmaId.replace('.', '-');
+      const inputEl = document.getElementById(`input-${domId}`);
+      const feedbackEl = document.getElementById(`feedback-${domId}`);
+      
+      if (!inputEl) {
+        console.error(`Input element for enigma ${enigmaId} not found.`);
+        return;
+      }
+
+      const val = inputEl.value;
+
+      if (!val || val.trim() === '') {
+        showFeedback(feedbackEl, 'Inserisci una risposta prima di verificare.', 'warn');
+        return;
+      }
+
+      const isCorrect = checkAnswerCorrectness(enigmaId, val);
+
+      if (isCorrect) {
+        state.completedEnigmas[enigmaId] = true;
+        playAudioTone(587.33, 'triangle', 0.2); // D5
+        setTimeout(() => playAudioTone(880, 'triangle', 0.3), 150); // A5
+
+        showFeedback(feedbackEl, '✓ Corretto! Il codice è stato accettato.', 'success');
+        inputEl.disabled = true;
+        inputEl.classList.add('border-emerald-500', 'bg-emerald-950/20');
+
+        checkRoomCompletion();
+      } else {
+        playAudioTone(220, 'sawtooth', 0.25); // A3 error
+        showFeedback(feedbackEl, '✗ Risposta errata. Riprova o consulta un suggerimento.', 'error');
+      }
+    }
+
+    function showFeedback(el, msg, type) {
+      if (!el) return;
+      el.classList.remove('hidden', 'bg-red-950/50', 'text-red-300', 'border-red-800', 'bg-emerald-950/50', 'text-emerald-300', 'border-emerald-800', 'bg-amber-950/50', 'text-amber-300', 'border-amber-800');
+      
+      el.classList.add('border');
+      if (type === 'success') {
+        el.classList.add('bg-emerald-950/50', 'text-emerald-300', 'border-emerald-800');
+      } else if (type === 'error') {
+        el.classList.add('bg-red-950/50', 'text-red-300', 'border-red-800');
+      } else {
+        el.classList.add('bg-amber-950/50', 'text-amber-300', 'border-amber-800');
+      }
+      el.innerText = msg;
+    }
+
+    /* Hint System */
+    function showHint(enigmaId) {
+      const current = state.hintsRequested[enigmaId];
+      if (current >= 2) return;
+
+      const domId = enigmaId.replace('.', '-');
+      state.hintsRequested[enigmaId] += 1;
+      const countEl = document.getElementById(`hint-count-${domId}`);
+      const hintBox = document.getElementById(`hint-box-${domId}`);
+
+      if (countEl) countEl.innerText = state.hintsRequested[enigmaId];
+      if (hintBox) {
+        hintBox.classList.remove('hidden');
+
+        const hints = hintData[enigmaId];
+        let html = '';
+        for (let i = 0; i < state.hintsRequested[enigmaId]; i++) {
+          html += `<p><strong>Suggerimento ${i+1}:</strong> ${hints[i]}</p>`;
+        }
+        hintBox.innerHTML = html;
+      }
+    }
+
+    function checkRoomCompletion() {
+      // Room 1
+      if (state.completedEnigmas['1.1'] && state.completedEnigmas['1.2']) {
+        document.getElementById('room-1-complete-banner').classList.remove('hidden');
+        unlockRoom(2);
+      }
+      // Room 2
+      if (state.completedEnigmas['2.1'] && state.completedEnigmas['2.2']) {
+        document.getElementById('room-2-complete-banner').classList.remove('hidden');
+        unlockRoom(3);
+      }
+      // Room 3 (Victory)
+      if (state.completedEnigmas['3.1'] && state.completedEnigmas['3.2']) {
+        triggerVictory();
+      }
+    }
+
+    function unlockRoom(roomNum) {
+      if (!state.unlockedRooms.includes(roomNum)) {
+        state.unlockedRooms.push(roomNum);
+      }
+
+      const tab = document.getElementById(`tab-room-${roomNum}`);
+      const badge = document.getElementById(`room-${roomNum}-badge`);
+      const statusIcon = document.getElementById(`room-${roomNum}-status`);
+
+      tab.classList.remove('opacity-60', 'cursor-not-allowed');
+      tab.classList.add('hover:border-cyan-400');
+      
+      badge.classList.remove('bg-slate-800', 'text-slate-400');
+      badge.classList.add('bg-cyan-500', 'text-slate-950');
+
+      statusIcon.classList.remove('fa-lock', 'text-slate-600');
+      statusIcon.classList.add('fa-unlock', 'text-cyan-400');
+    }
+
+    function switchRoom(roomNum) {
+      if (!state.unlockedRooms.includes(roomNum) && !state.gmAuthorized) return;
+
+      state.activeRoom = roomNum;
+
+      // Update tabs UI
+      [1, 2, 3].forEach(n => {
+        const panel = document.getElementById(`room-${n}-panel`);
+        const tab = document.getElementById(`tab-room-${n}`);
+        
+        if (n === roomNum) {
+          panel.classList.remove('hidden');
+          tab.classList.add('border-cyan-500/50', 'bg-cyan-950/20');
+        } else {
+          panel.classList.add('hidden');
+          tab.classList.remove('border-cyan-500/50', 'bg-cyan-950/20');
+        }
+      });
+
+      if (roomNum === 2) {
+        drawVectorCanvas();
+      }
+    }
+
+    function triggerVictory() {
+      state.timerRunning = false;
+      document.getElementById('victory-banner').classList.remove('hidden');
+      document.getElementById('victory-time-left').innerText = formatTime(state.timerSeconds);
+      playAudioTone(523.25, 'sine', 0.2); // C5
+      setTimeout(() => playAudioTone(659.25, 'sine', 0.2), 200); // E5
+      setTimeout(() => playAudioTone(783.99, 'sine', 0.4), 400); // G5
+    }
+
+    /* Interactive Vector Canvas */
+    function drawVectorCanvas() {
+      const canvas = document.getElementById('vector-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      const startX = 60;
+      const startY = 100;
+      const scale = 12; // 1m = 12px
+
+      // Grid
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 20) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 20) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      // Vector A (East - 6m)
+      const ax = startX + 6 * scale;
+      const ay = startY;
+      drawArrow(ctx, startX, startY, ax, ay, '#06b6d4', 'A (6m)');
+
+      // Vector B (North - 8m)
+      const bx = ax;
+      const by = ay - 8 * scale;
+      drawArrow(ctx, ax, ay, bx, by, '#f59e0b', 'B (8m)');
+
+      // Resultant R (Diagonal)
+      drawArrow(ctx, startX, startY, bx, by, '#10b981', 'R');
+    }
+
+    function drawArrow(ctx, fromx, fromy, tox, toy, color, label) {
+      const headlen = 8;
+      const dx = tox - fromx;
+      const dy = toy - fromy;
+      const angle = Math.atan2(dy, dx);
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2.5;
+
+      ctx.beginPath();
+      ctx.moveTo(fromx, fromy);
+      ctx.lineTo(tox, toy);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(tox, toy);
+      ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.fill();
+
+      // Label
+      if (label) {
+        ctx.font = '10px Fira Code';
+        ctx.fillStyle = color;
+        ctx.fillText(label, (fromx + tox)/2 + 5, (fromy + toy)/2 - 5);
+      }
+    }
+
+    /* Timer Logic */
+    function formatTime(totalSec) {
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function startTimer() {
+      state.timerInterval = setInterval(() => {
+        if (!state.timerRunning) return;
+
+        if (state.timerSeconds > 0) {
+          state.timerSeconds--;
+          document.getElementById('timer-display').innerText = formatTime(state.timerSeconds);
+        } else {
+          clearInterval(state.timerInterval);
+          document.getElementById('timer-display').innerText = '00:00';
+          document.getElementById('timer-display').classList.add('text-red-500', 'animate-pulse');
+        }
+      }, 1000);
+    }
+
+    function toggleTimer() {
+      state.timerRunning = !state.timerRunning;
+      const icon = document.getElementById('timer-icon');
+      if (state.timerRunning) {
+        icon.classList.remove('fa-play');
+        icon.classList.add('fa-pause');
+      } else {
+        icon.classList.remove('fa-pause');
+        icon.classList.add('fa-play');
+      }
+    }
+
+    function addTimerMinutes(mins) {
+      state.timerSeconds = Math.max(0, state.timerSeconds + mins * 60);
+      document.getElementById('timer-display').innerText = formatTime(state.timerSeconds);
+    }
+
+    function resetTimer() {
+      state.timerSeconds = 45 * 60;
+      document.getElementById('timer-display').innerText = formatTime(state.timerSeconds);
+    }
+
+    /* Scratchpad Modal Toggle */
+    function toggleScratchpad() {
+      const modal = document.getElementById('modal-scratchpad');
+      modal.classList.toggle('hidden');
+    }
+
+    /* Calculator Helper */
+    function calcInput(val) {
+      const disp = document.getElementById('calc-display');
+      if (val === 'C') {
+        disp.value = '';
+      } else {
+        disp.value += val;
+      }
+    }
+
+    function calcCompute() {
+      const disp = document.getElementById('calc-display');
+      try {
+        disp.value = eval(disp.value.replace(/[^0-9+\-*/().]/g, ''));
+      } catch(e) {
+        disp.value = 'Error';
+      }
+    }
+
+    /* Game Master Modal & Actions */
+    function toggleGameMasterModal() {
+      const modal = document.getElementById('modal-gm');
+      modal.classList.toggle('hidden');
+    }
+
+    function unlockGM() {
+      const pass = document.getElementById('gm-pass-input').value;
+      const err = document.getElementById('gm-auth-error');
+
+      if (pass.trim().toUpperCase() === 'FISICA' || pass.trim() === '1234') {
+        state.gmAuthorized = true;
+        document.getElementById('gm-auth-section').classList.add('hidden');
+        document.getElementById('gm-panel-content').classList.remove('hidden');
+        err.classList.add('hidden');
+      } else {
+        err.classList.remove('hidden');
+      }
+    }
+
+    function gmForceUnlockRoom(roomNum) {
+      unlockRoom(roomNum);
+      switchRoom(roomNum);
+      toggleGameMasterModal();
+    }
+
+    window.onload = function() {
+      startTimer();
+      drawVectorCanvas();
+    };
+  </script>
+</body>
+</html>
