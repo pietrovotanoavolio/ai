@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuga dal Laboratorio Metrologico - Escape Room di Fisica</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX for rendering math formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        tech: ['Chakra Petch', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyanCustom: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            900: '#083344',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+        }
+        .glow-green {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.35);
+        }
+        .glow-red {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+        }
+        /* KaTeX dark mode styling & contrast fixes */
+        .katex {
+            color: #f8fafc !important; /* High contrast slate-50 */
+            font-size: 1.08em;
+        }
+        .katex-display {
+            margin: 0.6em 0 !important;
+            padding: 0.4rem 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        @media print {
+            header, aside, #room-controls, .no-print {
+                display: none !important;
+            }
+            body, main {
+                background: white !important;
+                color: black !important;
+            }
+            #victory-screen {
+                border: 2px solid #10b981 !important;
+                box-shadow: none !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- HEADER NAVBAR -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-cyan-950/80 border border-cyan-500/40 rounded-lg text-cyan-400">
+                    <i data-lucide="atom" class="w-6 h-6 animate-spin" style="animation-duration: 12s;"></i>
+                </div>
+                <div>
+                    <h1 class="font-tech text-lg font-bold tracking-wide text-slate-100 flex items-center gap-2">
+                        LABORATORIO METROLOGICO <span class="text-xs font-normal px-2 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-800 rounded">Fisica 2° Liceo</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Escape Room Didattica - Test Diagnostico d'Ingresso</p>
+                </div>
+            </div>
+
+            <!-- CONTROLS & TIMER -->
+            <div class="flex items-center gap-3 sm:gap-6">
+                <!-- TIMER -->
+                <div class="flex items-center gap-2 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-200">
+                    <i data-lucide="timer" class="w-4 h-4 text-cyan-400"></i>
+                    <span id="timer-display" class="font-mono text-sm font-semibold tracking-wider">00:00</span>
+                </div>
+
+                <!-- FORMULARIO MODAL TRIGGER -->
+                <button onclick="toggleModal('formula-modal')" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition-colors">
+                    <i data-lucide="book-open" class="w-4 h-4 text-amber-400"></i>
+                    <span>Formulario</span>
+                </button>
+
+                <!-- CALCULATOR TRIGGER -->
+                <button onclick="toggleModal('calc-modal')" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition-colors">
+                    <i data-lucide="calculator" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Calcolatrice</span>
+                </button>
+
+                <!-- SOUND TOGGLE -->
+                <button id="sound-btn" onclick="toggleSound()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors" title="Attiva/Disattiva Suono">
+                    <i data-lucide="volume-2" id="sound-icon" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
+
+        <!-- SIDEBAR: ROOM TRACKER & MAP -->
+        <aside class="w-full md:w-64 flex-shrink-0 flex flex-col gap-4">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>Mappa del Laboratorio</span>
+                    <span id="progress-text" class="text-cyan-400 font-mono">0 / 6</span>
+                </h2>
+
+                <!-- ROOM PROGRESS PIPELINE -->
+                <nav class="space-y-2" id="room-nav-list">
+                    <!-- Populated dynamically via JS -->
+                </nav>
+            </div>
+
+            <!-- QUICK TOOLS FOR MOBILE -->
+            <div class="grid grid-cols-2 gap-2 sm:hidden">
+                <button onclick="toggleModal('formula-modal')" class="flex items-center justify-center gap-2 p-2.5 bg-slate-900 border border-slate-800 rounded-lg text-xs font-medium text-slate-200">
+                    <i data-lucide="book-open" class="w-4 h-4 text-amber-400"></i> Formulario
+                </button>
+                <button onclick="toggleModal('calc-modal')" class="flex items-center justify-center gap-2 p-2.5 bg-slate-900 border border-slate-800 rounded-lg text-xs font-medium text-slate-200">
+                    <i data-lucide="calculator" class="w-4 h-4 text-emerald-400"></i> Calcolatrice
+                </button>
+            </div>
+
+            <!-- RESET PROGRESS BUTTON -->
+            <div class="mt-auto pt-2">
+                <button onclick="resetApp()" class="w-full flex items-center justify-center gap-2 p-2 text-xs text-slate-500 hover:text-red-400 border border-slate-800/60 hover:border-red-900/50 rounded-lg transition-colors">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Riparti da capo
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN DISPLAY AREA -->
+        <section class="flex-1 flex flex-col min-w-0">
+
+            <!-- ACTIVE ROOM CONTAINER -->
+            <div id="room-container" class="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between flex-1 relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- ROOM CONTENT GOES HERE VIA JS -->
+                <div id="room-content" class="space-y-6 relative z-10">
+                    <!-- Dynamic Loading State or Room Content -->
+                </div>
+
+                <!-- ROOM FOOTER: UNLOCK CONTROLS & HINTS -->
+                <div id="room-controls" class="mt-8 pt-6 border-t border-slate-800/80 relative z-10">
+                    <!-- Dynamic Input & Hints Controls -->
+                </div>
+            </div>
+
+            <!-- VICTORY OVERLAY / SCREEN (Hidden initially) -->
+            <div id="victory-screen" class="hidden bg-slate-900 border border-emerald-500/40 rounded-xl p-8 flex flex-col items-center text-center space-y-6 glow-green relative overflow-hidden">
+                <div class="w-20 h-20 bg-emerald-950 border border-emerald-500/50 rounded-full flex items-center justify-center text-emerald-400 animate-bounce">
+                    <i data-lucide="trophy" class="w-10 h-10"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-mono tracking-widest text-emerald-400 uppercase bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-800">Missione Compiuta</span>
+                    <h2 class="font-tech text-3xl font-bold text-slate-100 mt-2">SEI FUORI DAL LABORATORIO!</h2>
+                    <p class="text-slate-300 max-w-lg mx-auto text-sm mt-2">
+                        Hai superato con successo tutte le 6 stanze della metrologia, dimostrando un'ottima padronanza dei concetti chiave del primo anno di Fisica.
+                    </p>
+                </div>
+
+                <!-- BOX PAROLA CHIAVE PREMIO -->
+                <div class="p-5 bg-gradient-to-r from-emerald-950/80 via-slate-900 to-emerald-950/80 border-2 border-amber-400/80 rounded-2xl max-w-md w-full shadow-lg glow-green text-center">
+                    <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-widest block mb-1">
+                        🏆 Parola Chiave Premio 🏆
+                    </span>
+                    <div class="font-tech text-4xl font-black tracking-widest text-emerald-300 drop-shadow-md py-1">
+                        CULTURA
+                    </div>
+                    <p class="text-xs text-slate-300 mt-1">
+                        Comunica o trascrivi questa parola al docente per attestare il completamento della missione!
+                    </p>
+                </div>
+
+                <!-- STATS DASHBOARD -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-lg bg-slate-950 border border-slate-800 p-4 rounded-xl">
+                    <div class="p-3 bg-slate-900/60 rounded-lg">
+                        <span class="text-xs text-slate-400 block">Tempo totale</span>
+                        <span id="final-time" class="text-lg font-mono font-bold text-cyan-400">00:00</span>
+                    </div>
+                    <div class="p-3 bg-slate-900/60 rounded-lg">
+                        <span class="text-xs text-slate-400 block">Indizi richiesti</span>
+                        <span id="final-hints" class="text-lg font-mono font-bold text-amber-400">0</span>
+                    </div>
+                    <div class="p-3 bg-slate-900/60 rounded-lg">
+                        <span class="text-xs text-slate-400 block">Tentativi errati</span>
+                        <span id="final-attempts" class="text-lg font-mono font-bold text-purple-400">0</span>
+                    </div>
+                </div>
+
+                <!-- VERIFICATION & PRINT REPORT -->
+                <div class="flex flex-wrap justify-center gap-4 w-full">
+                    <button onclick="window.print()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold rounded-lg text-sm flex items-center gap-2 transition-colors">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Stampa / Salva Certificato PDF
+                    </button>
+                    <button onclick="resetApp()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold rounded-lg text-sm flex items-center gap-2 transition-colors">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Gioca di Nuovo
+                    </button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- FORMULA MODAL -->
+    <div id="formula-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl p-6 shadow-2xl max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+                <h3 class="font-tech text-xl font-bold text-slate-100 flex items-center gap-2">
+                    <i data-lucide="book-open" class="text-amber-400"></i> Formulario di Fisica (Ripasso 1° Anno)
+                </h3>
+                <button onclick="toggleModal('formula-modal')" class="p-1 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="formula-modal-body" class="overflow-y-auto space-y-6 py-4 pr-2 text-sm text-slate-300 flex-1">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h4 class="font-semibold text-cyan-400 mb-2">1. Unità SI & Conversioni</h4>
+                    <ul class="list-disc list-inside space-y-1 text-xs">
+                        <li><strong>Velocità:</strong> $1 \text{ m/s} = 3,6 \text{ km/h} \quad \Rightarrow \quad v(\text{m/s}) = \frac{v(\text{km/h})}{3,6}$</li>
+                        <li><strong>Massa:</strong> $1 \text{ kg} = 1000 \text{ g}$</li>
+                        <li><strong>Lunghezza:</strong> $1 \text{ km} = 1000 \text{ m}$</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h4 class="font-semibold text-cyan-400 mb-2">2. Teoria degli Errori</h4>
+                    <ul class="list-disc list-inside space-y-1 text-xs">
+                        <li><strong>Valore Medio:</strong> $\bar{x} = \frac{x_1 + x_2 + \dots + x_N}{N}$</li>
+                        <li><strong>Errore Assoluto (Semidispersione):</strong> $\Delta x = \frac{x_{max} - x_{min}}{2}$</li>
+                        <li><strong>Errore Relativo e Percentuale:</strong> $e_r = \frac{\Delta x}{\bar{x}}, \quad e_p = e_r \cdot 100\%$</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h4 class="font-semibold text-cyan-400 mb-2">3. Vettori, Piano Inclinato, Attrito e Forza Elastica</h4>
+                    <ul class="list-disc list-inside space-y-1 text-xs">
+                        <li><strong>Somma Vettori Perpendicolari:</strong> $F_{tot} = \sqrt{F_1^2 + F_2^2}$</li>
+                        <li><strong>Componente Parallela (Piano Inclinato):</strong> $F_p = P \cdot \frac{h}{L}$</li>
+                        <li><strong>Componente Perpendicolare (Piano Inclinato):</strong> $F_\perp = P \cdot \frac{b}{L}$</li>
+                        <li><strong>Forza d'Attrito Radente:</strong> $F_a = \mu \cdot F_N \quad (\text{su piano orizzontale } F_N = P, \text{ su piano inclinato } F_N = F_\perp)$</li>
+                        <li><strong>Legge di Hooke (Forza Elastica):</strong> $F_e = k \cdot \Delta x \quad \Rightarrow \quad \Delta x = \frac{F_e}{k}$</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h4 class="font-semibold text-cyan-400 mb-2">4. Momento e Leve</h4>
+                    <ul class="list-disc list-inside space-y-1 text-xs">
+                        <li><strong>Momento di una forza:</strong> $M = F \cdot d$</li>
+                        <li><strong>Equilibrio rotazionale:</strong> $\sum M = 0 \quad \Rightarrow \quad M_{orario} = M_{antiorario}$</li>
+                        <li><strong>Equilibrio della Leva:</strong> $F_m \cdot b_m = F_r \cdot b_r$</li>
+                        <li><strong>Guadagno/Vantaggio Leva:</strong> $K = \frac{F_r}{F_m} = \frac{b_m}{b_r}$</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALCULATOR MODAL -->
+    <div id="calc-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-5 shadow-2xl flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <h3 class="font-tech text-lg font-bold text-slate-100 flex items-center gap-2">
+                    <i data-lucide="calculator" class="text-emerald-400"></i> Calcolatrice Rapida
+                </h3>
+                <button onclick="toggleModal('calc-modal')" class="p-1 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="mt-4 space-y-3">
+                <input type="text" id="calc-screen" readonly class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-right font-mono text-xl text-emerald-400 tracking-wider shadow-inner" value="0">
+                
+                <div class="grid grid-cols-4 gap-2 text-sm font-semibold">
+                    <button onclick="calcClear()" class="p-3 bg-red-950/80 hover:bg-red-900 text-red-300 rounded-lg border border-red-800/50">C</button>
+                    <button onclick="calcInput('/')" class="p-3 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg">÷</button>
+                    <button onclick="calcInput('*')" class="p-3 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg">×</button>
+                    <button onclick="calcInput('-')" class="p-3 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg">-</button>
+
+                    <button onclick="calcInput('7')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">7</button>
+                    <button onclick="calcInput('8')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">8</button>
+                    <button onclick="calcInput('9')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">9</button>
+                    <button onclick="calcInput('+')" class="p-3 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg">+</button>
+
+                    <button onclick="calcInput('4')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">4</button>
+                    <button onclick="calcInput('5')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">5</button>
+                    <button onclick="calcInput('6')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">6</button>
+                    <button onclick="calcSqrt()" class="p-3 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg">√</button>
+
+                    <button onclick="calcInput('1')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">1</button>
+                    <button onclick="calcInput('2')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">2</button>
+                    <button onclick="calcInput('3')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">3</button>
+                    <button onclick="calcEquals()" class="row-span-2 p-3 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-lg flex items-center justify-center text-lg">=</button>
+
+                    <button onclick="calcInput('0')" class="col-span-2 p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">0</button>
+                    <button onclick="calcInput('.')" class="p-3 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg">.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           GAME DATA & ROOM CONFIGURATION
+           ========================================================================== */
+        const ROOMS_DATA = [
+            {
+                id: 1,
+                title: "Il Caveau Unificato delle Unità",
+                category: "Grandezze & Unità SI",
+                narrative: "Siete rimasti chiusi nell'archivio storico della metrologia. Per aprire la prima porta blindata dovete inserire un codice di 3 cifre nella consolle del sistema di sicurezza. La consolle mostra tre valori espressi in unità non standard e richiede la loro conversione esatta nel Sistema Internazionale (SI) per verificare la vostra preparazione.",
+                puzzle: `Per ottenere la combinazione di sblocco a 3 cifre $[A][B][C]$, convertite le seguenti grandezze nelle rispettive unità del **Sistema Internazionale**:
+- **Cifra A:** Una velocità di $18\\text{ km/h}$ espressa in $\\text{m/s}$.
+- **Cifra B:** Una massa di $3000\\text{ g}$ espressa in $\\text{kg}$.
+- **Cifra C:** Convertite una lunghezza di $0,008\\text{ km}$ nella corrispondente unità fondamentale SI (metri).
+
+IL CODICE FINALE È: $[A][B][C]$`,
+                acceptedCodes: ["538"],
+                hints: [
+                    "Ricordate quali sono le unità fondamentali SI per velocità, massa e lunghezza, e la regola per passare da km/h a m/s.",
+                    "Per passare da km/h a m/s devi dividere per 3,6. Per passare da grammi a kg dividi per 1000. Per passare da km a m moltiplica per 1000.",
+                    "Calcoli completi: A = 18 / 3,6 = 5; B = 3000 / 1000 = 3; C = 0,008 × 1000 = 8. Inserisci 538!"
+                ]
+            },
+            {
+                id: 2,
+                title: "La Stanza di Calibrazione del Sensore",
+                category: "Calcolo degli Errori",
+                narrative: "Un sensore laser ottico sbarra il passaggio. Un cartello avvisa che il sensore è starato a causa di fluttuazioni casuali. Per disattivarlo dovete analizzare le misurazioni effettuate su un cilindro di calibrazione ed estrarre il valore medio e l'errore per comporre il codice a 3 cifre.",
+                puzzle: `Tre studenti hanno misurato il diametro $d$ di un cilindro ottenendo i seguenti valori:
+$$d_1 = 20,2\\text{ cm}, \\quad d_2 = 19,8\\text{ cm}, \\quad d_3 = 20,0\\text{ cm}$$
+
+Calcolate:
+- **Cifra 1:** La prima cifra del valore medio $\\bar{d}$ (espresso in $\\text{cm}$).
+- **Cifra 2:** L'errore assoluto $\\Delta d$ (calcolato come semidispersione massima) moltiplicato per $10$.
+- **Cifra 3:** L'errore relativo $e_r$ espresso in percentuale ($\\%$).
+
+Inserite le 3 cifre in ordine: $[C1][C2][C3]$`,
+                acceptedCodes: ["221"],
+                hints: [
+                    "Il valore medio è la somma dei dati divisa per il loro numero. L'errore assoluto con la semidispersione è (d_max - d_min) / 2.",
+                    "La media è 20,0 cm (prima cifra: 2). L'errore assoluto è (20,2 - 19,8) / 2 = 0,2 cm. Moltiplicato per 10 fa 2.",
+                    "L'errore relativo % è (0,2 / 20,0) * 100 = 1%. Il codice completo è 221."
+                ]
+            },
+            {
+                id: 3,
+                title: "Il Labirinto delle Forze Concorrenti",
+                category: "Vettori & Forze",
+                narrative: "Siete in una stanza con una piattaforma mobile. Per azionare i carrelli di trasporto verso la porta d'uscita dovete bilanciare due propulsori magnetici perpendicolari. Il display mostra due forze vettoriali applicate nello stesso punto: calcolate la risultante per programmare la resistenza del freno automatizzato.",
+                puzzle: `Due forze $\\vec{F}_1$ e $\\vec{F}_2$ sono applicate contemporaneamente a un corpo:
+- $\\vec{F}_1 = 60\\text{ N}$ verso Est
+- $\\vec{F}_2 = 80\\text{ N}$ verso Nord
+
+Determinare:
+- **Cifre 1 e 2:** Le prime due cifre del modulo della forza risultante $\\vec{F}_{tot}$ in Newton.
+- **Cifra 3:** Se aggiungiamo una terza forza $\\vec{F}_3$ opposta a $\\vec{F}_{tot}$ di modulo pari alla metà di $\\vec{F}_{tot}$, qual è il modulo della forza netta finale diviso 10?
+
+Codice a 3 cifre: $[F_{tot} \\text{ (prime 2 cifre)}][\\text{Cifra 3}]$`,
+                acceptedCodes: ["105", "1005"],
+                hints: [
+                    "Le due forze formano un angolo di 90°. Per la risultante di vettori perpendicolari usa il Teorema di Pitagora.",
+                    "F_tot = sqrt(60^2 + 80^2) = sqrt(3600 + 6400) = sqrt(10000) = 100 N. Le prime 2 cifre sono 10.",
+                    "La forza opposta misura 50 N. La forza netta è 100 - 50 = 50 N. Divisa per 10 fa 5. Codice: 105."
+                ]
+            },
+            {
+                id: 4,
+                title: "La Rampa con Attrito e Molla",
+                category: "Piano Inclinato, Attrito & Legge di Hooke",
+                narrative: "Siete davanti al vano ascensore. Una cassa pesante $P = 500\\text{ N}$ si trova su una rampa inclinata lunga $L = 5\\text{ m}$, alta $h = 3\\text{ m}$ e con base $b = 4\\text{ m}$. La superficie presenta attrito statico con coefficiente $\\mu_s = 0,25$. Per evitare lo scivolamento e mantenere la cassa in perfetto equilibrio statico, viene collegata una molla di costante elastica $k = 100\\text{ N/cm}$.",
+                puzzle: `Calcolate le seguenti grandezze per trovare il codice di sblocco $[F_a][\\Delta x]$:
+- **Forza d'Attrito Statico ($F_a$):** Calcolate $F_a = \\mu_s \\cdot F_\\perp$ (in Newton), sapendo che la forza normale sul piano inclinato è $F_\\perp = P \\cdot \\frac{b}{L}$.
+- **Allungamento Molla ($\Delta x$):** La componente del peso verso il basso è $F_p = P \\cdot \\frac{h}{L} = 300\\text{ N}$. L'attrito $F_a$ aiuta a contrastare lo scivolamento. La forza residua sostenuta dalla molla è $F_e = F_p - F_a$. Calcolate di quanti centimetri $\\Delta x$ si allunga la molla secondo la **Legge di Hooke** ($F_e = k \\cdot \\Delta x$).
+
+Codice finale unendo $[F_a][\\Delta x]$ (es. se $F_a = 100\\text{ N}$ e $\\Delta x = 2\\text{ cm} \\rightarrow 1002$).`,
+                acceptedCodes: ["1002"],
+                hints: [
+                    "Sulla rampa: $F_\\perp = P \\cdot (b / L) = 500 \\cdot (4 / 5) = 400\\text{ N}$. L'attrito statico è $F_a = \\mu_s \\cdot F_\\perp$.",
+                    "Forza d'attrito: $F_a = 0,25 \\cdot 400 = 100\\text{ N}$. La forza parallela al piano verso il basso è $F_p = 500 \\cdot (3 / 5) = 300\\text{ N}$.",
+                    "La molla deve bilanciare la differenza $F_e = 300 - 100 = 200\\text{ N}$. Per la legge di Hooke $\\Delta x = F_e / k = 200 / 100 = 2\\text{ cm}$. Codice: 1002!"
+                ]
+            },
+            {
+                id: 5,
+                title: "La Sala delle Valvole Rotanti",
+                category: "Momento di una Forza",
+                narrative: "Per accedere all'ultima sezione dovete disattivare la pressione del vapore. La valvola principale è una ruota di raggio $R = 2\\text{ m}$. Un braccio meccanico guasto applica una forza oraria. Dovete applicare una seconda forza antioraria per azzerare il momento totale e fermare la fuga di gas.",
+                puzzle: `- Il braccio guasto applica $F_1 = 40\\text{ N}$ a distanza $d_1 = 1,5\\text{ m}$ dal perno (senso orario).
+- Voi applicate una forza $F_2$ all'estremità della ruota ($d_2 = 2,0\\text{ m}$, senso antiorario).
+
+Calcolate:
+- **Cifre A e B:** Il valore del momento della prima forza $M_1 = F_1 \\cdot d_1$ in $\\text{N}\\cdot\\text{m}$.
+- **Cifre C e D:** Il valore della forza $F_2$ (in Newton) necessaria per garantire l'equilibrio rotazionale.
+
+Codice di 4 cifre: $[M_1][F_2]$`,
+                acceptedCodes: ["6030"],
+                hints: [
+                    "Il momento di una forza è M = F * d. Per l'equilibrio rotazionale, Momento Orario = Momento Antiorario.",
+                    "M1 = 40 * 1,5 = 60 N·m. Per l'equilibrio, M2 deve valere anch'esso 60 N·m.",
+                    "F2 * d2 = 60 -> F2 * 2 = 60 -> F2 = 30 N. Codice: 60 (M1) + 30 (F2) = 6030."
+                ]
+            },
+            {
+                id: 6,
+                title: "Il Meccanismo d'Uscita",
+                category: "Leve e Macchine Semplici",
+                narrative: "Siete giunti all'ultima porta dell'Escape Room. Un enorme portone in pietra è bloccato da un sistema a leva di secondo genere. Per sollevare il chiavistello di resistenza $F_r = 800\\text{ N}$ a distanza $b_r = 0,5\\text{ m}$ dal fulcro, dovete azionare l'asta spingendo all'estremità opposta situata a $b_m = 2,0\\text{ m}$ dal fulcro.",
+                puzzle: `Trovate la combinazione finale identificando:
+- **Cifra 1:** Il genere della leva descritta ($1$, $2$ o $3$).
+- **Cifre centrali:** Il valore della forza motrice $F_m$ (in Newton) da applicare.
+- **Ultima cifra:** Il guadagno della leva $K = \\frac{b_m}{b_r}$.
+
+Codice finale: $[\\text{Genere}][F_m][K]$`,
+                acceptedCodes: ["22004"],
+                hints: [
+                    "La condizione di equilibrio della leva è F_m * b_m = F_r * b_r.",
+                    "Il genere è indicato nello scenario (2° genere). F_m = (F_r * b_r) / b_m = (800 * 0,5) / 2,0 = 200 N.",
+                    "Il guadagno K = 2,0 / 0,5 = 4. Codice: 2 (genere) + 200 (forza) + 4 (guadagno) = 22004."
+                ]
+            }
+        ];
+
+        /* ==========================================================================
+           STATE MANAGEMENT
+           ========================================================================== */
+        let gameState = {
+            currentRoom: 1,
+            completedRooms: [],
+            unlockedHints: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 },
+            attempts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 },
+            secondsElapsed: 0,
+            timerActive: false,
+            soundEnabled: true
+        };
+
+        let timerInterval = null;
+
+        /* ==========================================================================
+           AUDIO SYNTHESIZER (Web Audio API)
+           ========================================================================== */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!gameState.soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                }
+            } catch (e) {
+                console.log("Audio play blocked by browser.");
+            }
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (gameState.soundEnabled) {
+                icon.setAttribute('data-lucide', 'volume-2');
+            } else {
+                icon.setAttribute('data-lucide', 'volume-x');
+            }
+            lucide.createIcons();
+            saveLocal();
+        }
+
+        /* ==========================================================================
+           TIMER CONTROLLER
+           ========================================================================== */
+        function startTimer() {
+            if (gameState.timerActive) return;
+            gameState.timerActive = true;
+            timerInterval = setInterval(() => {
+                gameState.secondsElapsed++;
+                updateTimerDisplay();
+                if (gameState.secondsElapsed % 5 === 0) saveLocal();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            gameState.timerActive = false;
+            clearInterval(timerInterval);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(gameState.secondsElapsed / 60).toString().padStart(2, '0');
+            const secs = (gameState.secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+        }
+
+        /* ==========================================================================
+           CORE GAME LOGIC & UI RENDERERS
+           ========================================================================== */
+        function renderNav() {
+            const container = document.getElementById('room-nav-list');
+            container.innerHTML = '';
+
+            ROOMS_DATA.forEach((room) => {
+                const isCompleted = gameState.completedRooms.includes(room.id);
+                const isActive = gameState.currentRoom === room.id;
+                const isUnlocked = room.id === 1 || gameState.completedRooms.includes(room.id - 1) || isCompleted;
+
+                const btn = document.createElement('button');
+                btn.disabled = !isUnlocked;
+                btn.onclick = () => { playSound('click'); selectRoom(room.id); };
+
+                let bgClass = "bg-slate-950 border-slate-800 text-slate-500 opacity-60 cursor-not-allowed";
+                if (isActive) {
+                    bgClass = "bg-cyan-950/80 border-cyan-500 text-cyan-300 font-semibold glow-cyan";
+                } else if (isCompleted) {
+                    bgClass = "bg-emerald-950/40 border-emerald-800/80 text-emerald-400 hover:bg-emerald-900/50";
+                } else if (isUnlocked) {
+                    bgClass = "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700";
+                }
+
+                btn.className = `w-full text-left p-3 rounded-xl border flex items-center justify-between transition-all text-xs font-medium ${bgClass}`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-6 h-6 rounded-lg font-mono flex items-center justify-center font-bold text-xs ${isCompleted ? 'bg-emerald-800 text-emerald-100' : isActive ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                            ${room.id}
+                        </span>
+                        <span class="truncate">${room.title}</span>
+                    </div>
+                    ${isCompleted ? '<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>' : !isUnlocked ? '<i data-lucide="lock" class="w-3.5 h-3.5 text-slate-600 shrink-0"></i>' : ''}
+                `;
+
+                container.appendChild(btn);
+            });
+
+            document.getElementById('progress-text').innerText = `${gameState.completedRooms.length} / 6`;
+            lucide.createIcons();
+        }
+
+        function renderRoomContent() {
+            const room = ROOMS_DATA.find(r => r.id === gameState.currentRoom);
+            if (!room) return;
+
+            const isCompleted = gameState.completedRooms.includes(room.id);
+            const roomContainer = document.getElementById('room-content');
+            const roomControls = document.getElementById('room-controls');
+
+            roomContainer.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <span class="text-xs font-mono text-cyan-400 uppercase tracking-widest bg-cyan-950 border border-cyan-800 px-2.5 py-0.5 rounded-full">
+                            Stanza ${room.id} • ${room.category}
+                        </span>
+                        <h2 class="font-tech text-2xl font-bold text-slate-100 mt-1">${room.title}</h2>
+                    </div>
+                    ${isCompleted ? `
+                        <span class="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-3 py-1 rounded-full">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i> Stanza Sbloccata
+                        </span>
+                    ` : ''}
+                </div>
+
+                <div class="bg-slate-950/80 border border-cyan-900/40 p-4 rounded-xl text-xs sm:text-sm text-cyan-100/90 leading-relaxed flex gap-3 items-start">
+                    <i data-lucide="terminal" class="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong class="text-cyan-400 uppercase font-mono block text-xs mb-1">Diario della Missione:</strong>
+                        ${room.narrative}
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 p-5 rounded-xl space-y-3">
+                    <h3 class="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="brain-circuit" class="w-4 h-4 text-amber-400"></i> L'Enigma da Risolvere
+                    </h3>
+                    <div id="math-puzzle-text" class="text-sm text-slate-200 leading-relaxed whitespace-pre-line font-sans">
+                        ${room.puzzle}
+                    </div>
+                </div>
+            `;
+
+            let unlockedCount = gameState.unlockedHints[room.id] || 0;
+
+            roomControls.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    
+                    <div class="space-y-3">
+                        <label class="block text-xs font-mono font-semibold text-slate-400 uppercase">
+                            Inserisci Codice di Sblocco
+                        </label>
+                        
+                        ${isCompleted ? `
+                            <div class="p-4 bg-emerald-950/50 border border-emerald-800 rounded-xl text-center space-y-1">
+                                <p class="text-xs text-emerald-400 font-mono">PORTA SBLOCCATA</p>
+                                <p class="font-mono text-xl font-bold text-emerald-300 tracking-widest">${room.acceptedCodes[0]}</p>
+                            </div>
+                        ` : `
+                            <div class="flex gap-2">
+                                <input type="text" id="code-input" placeholder="Codice..." 
+                                    class="flex-1 bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 font-mono text-lg tracking-widest text-cyan-400 placeholder-slate-600 outline-none transition-colors uppercase"
+                                    onkeydown="if(event.key==='Enter') verifyCode(${room.id})" autocomplete="off" />
+                                
+                                <button onclick="verifyCode(${room.id})" 
+                                    class="px-5 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm flex items-center gap-2 transition-all glow-cyan shrink-0">
+                                    <i data-lucide="key-round" class="w-4 h-4"></i> Sblocca
+                                </button>
+                            </div>
+                            <div id="feedback-msg" class="text-xs font-mono min-h-[20px]"></div>
+                        `}
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono font-semibold text-slate-400 uppercase flex items-center gap-1.5">
+                                <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-amber-400"></i> Indizi Progressivi
+                            </span>
+                            <span class="text-xs font-mono text-slate-500">${unlockedCount} / 3 Sbloccati</span>
+                        </div>
+
+                        <div class="space-y-2">
+                            ${room.hints.map((hintText, idx) => {
+                                const isUnlocked = idx < unlockedCount;
+                                const levelLabel = idx === 0 ? 'Indizio 1 (Lieve)' : idx === 1 ? 'Indizio 2 (Medio)' : 'Indizio 3 (Forte)';
+                                const levelColor = idx === 0 ? 'text-blue-400' : idx === 1 ? 'text-amber-400' : 'text-emerald-400';
+
+                                if (isUnlocked) {
+                                    return `
+                                        <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs space-y-1 animate-fadeIn">
+                                            <span class="font-mono font-bold ${levelColor}">${levelLabel}:</span>
+                                            <p class="text-slate-300 leading-relaxed">${hintText}</p>
+                                        </div>
+                                    `;
+                                } else {
+                                    return '';
+                                }
+                            }).join('')}
+
+                            ${unlockedCount < 3 ? `
+                                <button onclick="unlockHint(${room.id})" 
+                                    class="w-full py-2.5 px-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 border-dashed rounded-xl text-xs font-medium text-slate-400 hover:text-amber-300 transition-colors flex items-center justify-center gap-2">
+                                    <i data-lucide="help-circle" class="w-3.5 h-3.5 text-amber-400"></i>
+                                    Sblocca Prossimo Indizio (${unlockedCount === 0 ? 'Lieve' : unlockedCount === 1 ? 'Medio' : 'Forte'})
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                </div>
+            `;
+
+            lucide.createIcons();
+
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError : false
+                });
+            }
+        }
+
+        function verifyCode(roomId) {
+            startTimer();
+            const input = document.getElementById('code-input');
+            if (!input) return;
+
+            const code = input.value.trim().replaceAll(' ', '');
+            const room = ROOMS_DATA.find(r => r.id === roomId);
+            const msgEl = document.getElementById('feedback-msg');
+
+            gameState.attempts[roomId] = (gameState.attempts[roomId] || 0) + 1;
+
+            if (room.acceptedCodes.includes(code)) {
+                playSound('success');
+                msgEl.className = "text-xs font-mono text-emerald-400 flex items-center gap-1 mt-1";
+                msgEl.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Codice esatto! Porta sbloccata.`;
+
+                if (!gameState.completedRooms.includes(roomId)) {
+                    gameState.completedRooms.push(roomId);
+                }
+
+                saveLocal();
+
+                setTimeout(() => {
+                    if (gameState.completedRooms.length === 6) {
+                        showVictoryScreen();
+                    } else if (roomId < 6) {
+                        selectRoom(roomId + 1);
+                    } else {
+                        renderNav();
+                        renderRoomContent();
+                    }
+                }, 1000);
+
+            } else {
+                playSound('error');
+                msgEl.className = "text-xs font-mono text-red-400 flex items-center gap-1 mt-1 animate-bounce";
+                msgEl.innerHTML = `<i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Codice errato. Riprova o consulta un indizio!`;
+            }
+            lucide.createIcons();
+        }
+
+        function unlockHint(roomId) {
+            startTimer();
+            if ((gameState.unlockedHints[roomId] || 0) < 3) {
+                gameState.unlockedHints[roomId] = (gameState.unlockedHints[roomId] || 0) + 1;
+                playSound('click');
+                saveLocal();
+                renderRoomContent();
+            }
+        }
+
+        function selectRoom(roomId) {
+            gameState.currentRoom = roomId;
+            saveLocal();
+            renderNav();
+            renderRoomContent();
+        }
+
+        function showVictoryScreen() {
+            stopTimer();
+            document.getElementById('room-container').classList.add('hidden');
+            const vic = document.getElementById('victory-screen');
+            vic.classList.remove('hidden');
+
+            const totalMins = Math.floor(gameState.secondsElapsed / 60).toString().padStart(2, '0');
+            const totalSecs = (gameState.secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('final-time').innerText = `${totalMins}:${totalSecs}`;
+
+            let hintSum = 0;
+            Object.values(gameState.unlockedHints).forEach(val => hintSum += val);
+            document.getElementById('final-hints').innerText = hintSum;
+
+            let attemptSum = 0;
+            Object.values(gameState.attempts).forEach(val => attemptSum += val);
+            document.getElementById('final-attempts').innerText = attemptSum;
+
+            saveLocal();
+            lucide.createIcons();
+        }
+
+        function resetApp() {
+            if (confirm("Sei sicuro di voler resettare tutti i progressi dell'Escape Room?")) {
+                localStorage.removeItem('escape_room_fisica_state');
+                location.reload();
+            }
+        }
+
+        /* ==========================================================================
+           MODAL & CALCULATOR UTILITIES
+           ========================================================================== */
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.toggle('hidden');
+                // Render KaTeX formulas when formula modal is opened
+                if (!modal.classList.contains('hidden') && window.renderMathInElement) {
+                    renderMathInElement(modal, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ],
+                        throwOnError : false
+                    });
+                }
+            }
+        }
+
+        let calcExpr = "";
+        function calcInput(char) {
+            calcExpr += char;
+            document.getElementById('calc-screen').value = calcExpr;
+        }
+        function calcClear() {
+            calcExpr = "";
+            document.getElementById('calc-screen').value = "0";
+        }
+        function calcSqrt() {
+            try {
+                const res = Math.sqrt(eval(calcExpr || "0"));
+                calcExpr = res.toString();
+                document.getElementById('calc-screen').value = calcExpr;
+            } catch(e) {
+                document.getElementById('calc-screen').value = "Errore";
+            }
+        }
+        function calcEquals() {
+            try {
+                const res = eval(calcExpr || "0");
+                calcExpr = res.toString();
+                document.getElementById('calc-screen').value = calcExpr;
+            } catch(e) {
+                document.getElementById('calc-screen').value = "Errore";
+            }
+        }
+
+        /* ==========================================================================
+           LOCAL STORAGE PERSISTENCE
+           ========================================================================== */
+        function saveLocal() {
+            localStorage.setItem('escape_room_fisica_state', JSON.stringify(gameState));
+        }
+
+        function loadLocal() {
+            const saved = localStorage.getItem('escape_room_fisica_state');
+            if (saved) {
+                try {
+                    gameState = { ...gameState, ...JSON.parse(saved) };
+                    updateTimerDisplay();
+                } catch(e) {
+                    console.log("Error loading state");
+                }
+            }
+        }
+
+        /* ==========================================================================
+           INITIALIZATION ON WINDOW LOAD
+           ========================================================================== */
+        window.onload = function() {
+            loadLocal();
+            renderNav();
+
+            if (gameState.completedRooms.length === 6) {
+                showVictoryScreen();
+            } else {
+                renderRoomContent();
+            }
+
+            // Global KaTeX render pass
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError : false
+                });
+            }
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('formula-modal').classList.add('hidden');
+                    document.getElementById('calc-modal').classList.add('hidden');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
