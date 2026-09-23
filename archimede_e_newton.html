@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Spaziotemporale: Archimede, Newton & Bernoulli</title>
+    <!-- Tailwind CSS for modern responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-sans { font-family: 'Inter', sans-serif; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+        
+        .speaking-pulse {
+            animation: pulse-border 1.5s infinite;
+        }
+        
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); border-color: rgba(245, 158, 11, 0.9); }
+            70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); border-color: rgba(245, 158, 11, 0.4); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); border-color: rgba(245, 158, 11, 0.2); }
+        }
+
+        .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .purple-gradient { background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); }
+        .emerald-gradient { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+        
+        .gold-text {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-900">
+
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-purple-600 to-cyan-500 border border-amber-300/40 flex items-center justify-center text-slate-950 font-cinzel font-black text-xl shadow-lg">
+                    <i class="fa-solid fa-atom text-slate-950 text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-cinzel font-bold text-lg gold-text leading-tight">Masterclass Spaziotemporale: Archimede, Newton & Bernoulli</h1>
+                    <p class="text-xs text-slate-400">Leve • Principio di Archimede • 3 Principi di Newton • Bernoulli & Volo</p>
+                </div>
+            </div>
+
+            <!-- Global Player Controls -->
+            <div class="flex items-center gap-3">
+                <div id="audioStatusBadge" class="hidden flex items-center gap-2 bg-amber-500/10 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-medium">
+                    <i id="audioStatusIcon" class="fa-solid fa-spinner fa-spin text-amber-400"></i>
+                    <span id="audioStatusText">Caricamento...</span>
+                </div>
+
+                <!-- Fullscreen Toggle Button -->
+                <button onclick="toggleFullscreen()" id="btnFullscreen" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl border border-slate-700 transition flex items-center gap-1.5 text-xs" title="Attiva/Disattiva Schermo Intero">
+                    <i class="fa-solid fa-expand" id="iconFullscreen"></i>
+                    <span class="hidden sm:inline">Schermo Intero</span>
+                </button>
+
+                <!-- Play Speed Selector -->
+                <select id="playbackRateSelect" onchange="changePlaybackRate(this.value)" class="bg-slate-800 border border-slate-700 text-xs text-slate-300 rounded-xl px-2 py-2 focus:outline-none focus:border-amber-500">
+                    <option value="1">Velocità 1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                </select>
+
+                <button id="btnPlayAll" onclick="startFullPodcast()" class="flex items-center gap-2 gold-gradient hover:opacity-90 text-slate-950 font-bold px-4 py-2 rounded-xl transition shadow-lg text-sm">
+                    <i class="fa-solid fa-play" id="iconPlayAll"></i>
+                    <span id="textPlayAll">Ascolta Lezione Integrale</span>
+                </button>
+
+                <button id="btnStopAudio" onclick="stopAudio()" class="hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3 py-2 rounded-xl transition text-sm border border-slate-700">
+                    <i class="fa-solid fa-square text-amber-500"></i>
+                    <span>Stop</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Audio Script & AI Archimedes/Newton Assistant -->
+        <section class="lg:col-span-6 flex flex-col space-y-4">
+            
+            <!-- Dialogue Header Bar -->
+            <div class="flex items-center justify-between bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                <div class="flex items-center gap-2 text-sm text-slate-200 font-medium">
+                    <i class="fa-solid fa-microphone-lines text-amber-400"></i>
+                    <span>Trascrizione del Triello Scientifico</span>
+                </div>
+                <div class="flex items-center gap-2.5 text-xs text-slate-400">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Archimede</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block"></span> Newton</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Marco</span>
+                </div>
+            </div>
+
+            <div id="transcriptContainer" class="space-y-3.5 max-h-[580px] overflow-y-auto pr-1">
+                
+                <!-- Dialogue Line 0 -->
+                <div id="line-0" class="dialogue-card p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/40 transition relative group">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex-shrink-0 flex items-center justify-center text-indigo-400 font-bold text-sm shadow">M</div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-indigo-400">Marco (Studente)</span>
+                                <button onclick="playLineDirectly(0)" class="text-slate-400 hover:text-amber-400 p-1 rounded-lg transition text-xs flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Ascolta
+                                </button>
+                            </div>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                Salve Archimede! Oggi vorrei spingere il nostro viaggio nella fisica ancora più a fondo. Partiamo dalle leve, ma come si collegano ai fluidi e al movimento delle grandi macchine?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialogue Line 1 -->
+                <div id="line-1" class="dialogue-card p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition relative group">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex-shrink-0 flex items-center justify-center text-amber-400 font-cinzel font-bold text-sm shadow">A</div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-amber-400">Archimede di Siracusa</span>
+                                <button onclick="playLineDirectly(1)" class="text-slate-400 hover:text-amber-400 p-1 rounded-lg transition text-xs flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Ascolta
+                                </button>
+                            </div>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                Salve Marco! Tutto parte dall'equilibrio delle forze. Con le leve amplifichiamo le forze meccaniche ($P \cdot b_p = R \cdot b_r$). Ma le forze non agiscono solo su aste rigide: agiscono anche dentro l'acqua e nell'aria!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialogue Line 2 -->
+                <div id="line-2" class="dialogue-card p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition relative group">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/40 flex-shrink-0 flex items-center justify-center text-purple-400 font-cinzel font-bold text-sm shadow">N</div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-purple-400">Sir Isaac Newton</span>
+                                <button onclick="playLineDirectly(2)" class="text-slate-400 hover:text-purple-400 p-1 rounded-lg transition text-xs flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Ascolta
+                                </button>
+                            </div>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                Permettetemi di intervenire! Salve Archimede, salve Marco! Saluto il grande maestro di Siracusa. Ricordate che le forze d'equilibrio sulla vostra leva non sono altro che un caso particolare della mia Seconda Legge della Dinamica: quando la forza netta è zero, l'accelerazione è zero!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialogue Line 3 -->
+                <div id="line-3" class="dialogue-card p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/40 transition relative group">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex-shrink-0 flex items-center justify-center text-indigo-400 font-bold text-sm shadow">M</div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-indigo-400">Marco (Studente)</span>
+                                <button onclick="playLineDirectly(3)" class="text-slate-400 hover:text-amber-400 p-1 rounded-lg transition text-xs flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Ascolta
+                                </button>
+                            </div>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                Un onore accoglierla Sir Isaac! Quindi le sue leggi del moto e la gravità spiegano sia le leve che il galleggiamento di Archimede?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialogue Line 4 -->
+                <div id="line-4" class="dialogue-card p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition relative group">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex-shrink-0 flex items-center justify-center text-amber-400 font-cinzel font-bold text-sm shadow">A</div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-amber-400">Archimede di Siracusa</span>
+                                <button onclick="playLineDirectly(4)" class="text-slate-400 hover:text-amber-400 p-1 rounded-lg transition text-xs flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Ascolta
+                                </button>
+                            </div>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                Esattamente! La mia spinta idrostatica ($S = \rho_f \cdot V_{imm} \cdot g$) nasce proprio perché la gravità di Newton attrae verso il basso il fluido, creando una gradiente di pressione che spinge l'oggetto verso l'alto!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialogue Line 5 -->
+                <div id="line-5" class="dialogue-card p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 transition relative group">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/40 flex-shrink-0 flex items-center justify-center text-purple-400 font-cinzel font-bold text-sm shadow">N</div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-purple-400">Sir Isaac Newton</span>
+                                <button onclick="playLineDirectly(5)" class="text-slate-400 hover:text-purple-400 p-1 rounded-lg transition text-xs flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Ascolta
+                                </button>
+                            </div>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                E non dimentichiamo il volo degli aerei! Daniel Bernoulli ha mostrato che dove l'aria va più veloce la pressione cala. Ma la mia Terza Legge completa l'opera: l'ala spinge l'aria verso il basso, e per Azione e Reazione l'aria spinge l'ala verso l'alto!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialogue Line 6 -->
+                <div id="line-6" class="dialogue-card p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/40 transition relative group">
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex-shrink-0 flex items-center justify-center text-indigo-400 font-bold text-sm shadow">M</div>
+                        <div class="flex-grow space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-indigo-400">Marco (Studente)</span>
+                                <button onclick="playLineDirectly(6)" class="text-slate-400 hover:text-amber-400 p-1 rounded-lg transition text-xs flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 border border-slate-700">
+                                    <i class="fa-solid fa-play text-[10px]"></i> Ascolta
+                                </button>
+                            </div>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                Fenomenale! Quindi il volo è una perfetta collaborazione tra il Principio di Bernoulli e il Terzo Principio di Newton!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialogue Line 7 -->
+            <div id="line-7" class="dialogue-card p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition relative group">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex-shrink-0 flex items-center justify-center text-amber-400 font-cinzel font-bold text-sm shadow">A</div>
+                    <div class="flex-grow space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-amber-400">Archimede & Newton</span>
+                            <button onclick="playLineDirectly(7)" class="text-slate-400 hover:text-amber-400 p-1 rounded-lg transition text-xs flex items-center gap-1 bg-slate-800/80 px-2 py-0.5 border border-slate-700">
+                                <i class="fa-solid fa-play text-[10px]"></i> Ascolta
+                            </button>
+                        </div>
+                        <p class="text-sm text-slate-200 leading-relaxed">
+                            Esatto Marco! Dalle leve della Sicilia antica fino ai razzi spaziali e agli aerei moderni, le leggi della fisica sono un unico meraviglioso linguaggio universale!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+                            <p class="text-sm text-slate-200 leading-relaxed">
+                                Esatto Marco! Dalle leve della Sicilia antica fino ai razzi spaziali e agli aerei moderni, le leggi della fisica sono un unico meraviglioso linguaggio universale!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Interactive AI Question Box -->
+            <div class="bg-slate-900 border border-amber-500/30 p-4 rounded-2xl space-y-3 shadow-xl relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-amber-300 flex items-center gap-2">
+                        <i class="fa-solid fa-feather-pointed text-amber-400"></i> Fai una domanda ad Archimede e Newton
+                    </h3>
+                    <span class="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-medium">IA & Sintesi Vocale</span>
+                </div>
+
+                <!-- Sample prompt chips -->
+                <div class="flex flex-wrap gap-1.5 text-xs text-slate-300">
+                    <span class="text-slate-400 text-[11px] self-center">Esempi:</span>
+                    <button onclick="setQuickQuestion('Newton, come spieghi la differenza tra gravità e spinta di Archimede?')" class="bg-slate-800 hover:bg-slate-700 hover:text-amber-300 px-2.5 py-1 rounded-xl border border-slate-700 transition text-xs">Gravità vs Archimede</button>
+                    <button onclick="setQuickQuestion('Come si applica la terza legge di Newton alla portanza alare?')" class="bg-slate-800 hover:bg-slate-700 hover:text-purple-300 px-2.5 py-1 rounded-xl border border-slate-700 transition text-xs">Newton & Portanza</button>
+                    <button onclick="setQuickQuestion('In che modo la leva di Archimede rispetta F = m * a?')" class="bg-slate-800 hover:bg-slate-700 hover:text-amber-300 px-2.5 py-1 rounded-xl border border-slate-700 transition text-xs">Leve & F=m*a</button>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="customPrompt" placeholder="Chiedi ad Archimede o Newton su leve, fluidi, gravità o volo..." class="flex-grow bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+                    <button onclick="askPhysicsMasters()" id="btnAsk" class="gold-gradient hover:opacity-90 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-1.5 flex-shrink-0 shadow-md">
+                        <i class="fa-solid fa-paper-plane"></i> Chiedi
+                    </button>
+                </div>
+
+                <div id="aiAnswerContainer" class="hidden p-3.5 bg-slate-950/90 border border-amber-500/40 rounded-xl space-y-2">
+                    <div class="flex items-center justify-between text-xs text-amber-400 font-semibold border-b border-slate-800 pb-1.5">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-scroll"></i> Risposta dei Maestri:</span>
+                        <button onclick="playCustomAudio()" id="btnPlayCustom" class="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-volume-high"></i> Ascolta Voce
+                        </button>
+                    </div>
+                    <p id="aiAnswerText" class="text-xs text-slate-200 italic leading-relaxed pt-0.5"></p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Column: Multi-tab Interactive Physics Visualizer -->
+        <section class="lg:col-span-6 flex flex-col space-y-4">
+            
+            <!-- Navigation Tabs for Simulators -->
+            <div class="flex bg-slate-900 p-1.5 rounded-2xl border border-slate-800 text-xs font-semibold gap-1 overflow-x-auto">
+                <button onclick="switchTab('lever')" id="tabBtn-lever" class="flex-1 py-2 px-3 rounded-xl transition text-center bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    <i class="fa-solid fa-balance-scale mr-1"></i> Leve
+                </button>
+                <button onclick="switchTab('archimedes')" id="tabBtn-archimedes" class="flex-1 py-2 px-3 rounded-xl transition text-center text-slate-400 hover:text-slate-200">
+                    <i class="fa-solid fa-water mr-1"></i> Archimede
+                </button>
+                <button onclick="switchTab('bernoulli')" id="tabBtn-bernoulli" class="flex-1 py-2 px-3 rounded-xl transition text-center text-slate-400 hover:text-slate-200">
+                    <i class="fa-solid fa-plane mr-1"></i> Bernoulli & Volo
+                </button>
+                <button onclick="switchTab('newton')" id="tabBtn-newton" class="flex-1 py-2 px-3 rounded-xl transition text-center text-slate-400 hover:text-slate-200">
+                    <i class="fa-solid fa-rocket mr-1"></i> 3 Principi Newton
+                </button>
+            </div>
+
+            <!-- TAB 1: LEVER LAB -->
+            <div id="tab-lever" class="tab-content bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-flask-vial text-amber-400"></i> Laboratorio delle Leve (Archimede & Statica)
+                    </h2>
+                    <span id="leverClassBadge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        1ª Classe (F al centro)
+                    </span>
+                </div>
+
+                <div class="relative w-full h-44 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center overflow-hidden shadow-inner">
+                    <canvas id="leverCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setLeverClass(1)" id="btnClass1" class="py-2 px-1 text-xs font-semibold rounded-xl border border-amber-500/50 bg-amber-500/20 text-amber-300 text-center transition">1ª Classe (P-F-R)</button>
+                    <button onclick="setLeverClass(2)" id="btnClass2" class="py-2 px-1 text-xs font-semibold rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 text-center transition">2ª Classe (F-R-P)</button>
+                    <button onclick="setLeverClass(3)" id="btnClass3" class="py-2 px-1 text-xs font-semibold rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 text-center transition">3ª Classe (F-P-R)</button>
+                </div>
+
+                <div class="space-y-3 pt-2 text-xs border-t border-slate-800">
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>Posizione Fulcro/Bracci:</span>
+                            <span id="valBracciInfo" class="text-amber-400 font-semibold">bp: 120cm | br: 60cm</span>
+                        </div>
+                        <input type="range" id="sliderFulcrum" min="20" max="80" value="66" class="w-full accent-amber-500 cursor-pointer">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <span class="text-slate-400 block mb-1">Forza $P$: <strong id="valFp" class="text-indigo-400">50 N</strong></span>
+                            <input type="range" id="sliderFp" min="10" max="200" value="50" class="w-full accent-indigo-500 cursor-pointer">
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block mb-1">Resistenza $R$: <strong id="valFr" class="text-rose-400">100 N</strong></span>
+                            <input type="range" id="sliderFr" min="10" max="200" value="100" class="w-full accent-rose-500 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                        <span class="text-slate-400 font-medium">Stato Leva:</span>
+                        <span id="leverStatusText" class="font-bold text-emerald-400">VANTAGGIOSA ($b_p > b_r$)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ARCHIMEDES PRINCIPLE LAB -->
+            <div id="tab-archimedes" class="tab-content hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-water text-cyan-400"></i> Laboratorio Principio di Archimede & Gravità
+                    </h2>
+                    <span class="text-xs font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded">
+                        $S = \rho_f \cdot V_{imm} \cdot g$
+                    </span>
+                </div>
+
+                <div class="relative w-full h-44 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center overflow-hidden shadow-inner">
+                    <canvas id="archimedesCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>Densità Oggetto ($\rho_{og}$): <strong id="valObjDensity" class="text-amber-400">0.80 g/cm³</strong></span>
+                            <span id="fluidNameText" class="text-cyan-400 font-semibold">Fluido: Acqua (1.00 g/cm³)</span>
+                        </div>
+                        <input type="range" id="sliderObjDensity" min="0.2" max="2.5" step="0.05" value="0.80" class="w-full accent-amber-500 cursor-pointer">
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setFluid('water')" class="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 text-xs">💧 Acqua</button>
+                        <button onclick="setFluid('oil')" class="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 text-xs">🌻 Olio</button>
+                        <button onclick="setFluid('mercury')" class="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 text-xs">🧪 Mercurio</button>
+                    </div>
+
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Forza Peso Newtoniana ($F_g = m \cdot g$):</span>
+                            <span id="valFgText" class="font-semibold text-rose-400">7.84 N</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Spinta di Archimede ($S$):</span>
+                            <span id="valBuoyancyText" class="font-semibold text-cyan-400">7.84 N</span>
+                        </div>
+                        <div class="flex justify-between pt-1 border-t border-slate-800">
+                            <span class="text-slate-400">Condizione d'Equilibrio:</span>
+                            <span id="archimedesStatusText" class="font-bold text-emerald-400">GALLEGGIA (Equilibrio)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: BERNOULLI & AIRPLANE LIFT LAB -->
+            <div id="tab-bernoulli" class="tab-content hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-plane-departure text-sky-400"></i> Galleria del Vento: Bernoulli & Newton
+                    </h2>
+                    <span class="text-xs font-mono bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded">
+                        $P + \frac{1}{2}\rho v^2 = \text{cost}$
+                    </span>
+                </div>
+
+                <div class="relative w-full h-44 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center overflow-hidden shadow-inner">
+                    <canvas id="bernoulliCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">
+                            <span>Velocità dell'Aria ($v$): <strong id="valAirSpeed" class="text-sky-400">240 km/h</strong></span>
+                            <span>Angolo d'Attacco ($\alpha$): <strong id="valAttackAngle" class="text-amber-400">8°</strong></span>
+                        </div>
+                        <input type="range" id="sliderAirSpeed" min="50" max="400" value="240" class="w-full accent-sky-500 cursor-pointer">
+                    </div>
+
+                    <div>
+                        <input type="range" id="sliderAngle" min="0" max="20" value="8" class="w-full accent-amber-500 cursor-pointer">
+                    </div>
+
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">Depressione Dorsale (Bernoulli):</span>
+                            <span id="valPressTop" class="font-semibold text-sky-300">BASSA PRESSIONE</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[10px]">Reazione d'Aria (3° Legge Newton):</span>
+                            <span id="valPressBottom" class="font-semibold text-purple-300">SPINTA DAL BASSO</span>
+                        </div>
+                        <div class="col-span-2 pt-1 border-t border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400 font-medium">Forza di Portanza Totale ($L$):</span>
+                            <span id="valLiftForce" class="font-bold text-emerald-400 text-sm">42,500 N (DECOLLO)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: NEWTON'S 3 LAWS OF MOTION -->
+            <div id="tab-newton" class="tab-content hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-rocket text-purple-400"></i> Laboratorio dei 3 Principi di Newton
+                    </h2>
+                </div>
+
+                <div class="relative w-full h-40 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center overflow-hidden shadow-inner">
+                    <canvas id="newtonCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                    <button onclick="setNewtonLaw(1)" id="btnLaw1" class="py-2 px-1 bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded-xl font-semibold text-center">1° Inerzia</button>
+                    <button onclick="setNewtonLaw(2)" id="btnLaw2" class="py-2 px-1 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl font-semibold text-center hover:text-slate-200">2° $F = m \cdot a$</button>
+                    <button onclick="setNewtonLaw(3)" id="btnLaw3" class="py-2 px-1 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl font-semibold text-center hover:text-slate-200">3° Azione-Reazione</button>
+                </div>
+
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2 text-xs">
+                    <h4 id="newtonTitle" class="font-bold text-purple-300">1° Principio: Legge d'Inerzia</h4>
+                    <p id="newtonDesc" class="text-slate-300 text-[11px] leading-relaxed">
+                        Un corpo rimane nel suo stato di quiete o di moto rettilineo uniforme a meno che non intervenga una forza esterna netta a modificarlo.
+                    </p>
+                    <div id="newtonControls" class="pt-2 border-t border-slate-800 flex items-center justify-between">
+                        <button onclick="triggerNewtonSim()" id="btnSimTrigger" class="purple-gradient text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow">
+                            Applica Forza / Lancia
+                        </button>
+                        <span id="newtonMetrics" class="font-mono text-slate-400 text-xs">
+                            $v = \text{costante}$
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explanatory Cheat Sheet -->
+            <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl text-xs space-y-2 shadow-md">
+                <div class="flex items-center gap-2 font-bold text-amber-400">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Sintesi Scientifica Integrata</span>
+                </div>
+                <p class="text-slate-300 text-[11px] leading-relaxed">
+                    <strong>Sintesi Newton-Archimede-Bernoulli:</strong> L'equilibrio statico della leva ($P \cdot b_p = R \cdot b_r$) e della spinta di galleggiamento ($S = \rho_f \cdot V \cdot g$) derivano dalla Seconda Legge di Newton ($\sum F = 0 \implies a = 0$). Il volo degli aerei unisce la depressione alare di <em>Bernoulli</em> e l'Azione-Reazione di <em>Newton</em>.
+                </p>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800 bg-slate-900/50 py-3 text-center text-xs text-slate-500">
+        <p>Masterclass Integrata di Fisica • Archimede, Isaac Newton & Daniel Bernoulli • Laboratorio Didattico Interattivo</p>
+    </footer>
+
+    <script>
+        const scriptLines = [
+            { speaker: "Marco", text: "Salve Archimede! Oggi vorrei spingere il nostro viaggio nella fisica ancora più a fondo. Partiamo dalle leve, ma come si collegano ai fluidi e al movimento delle grandi macchine?" },
+            { speaker: "Archimede", text: "Salve Marco! Tutto parte dall'equilibrio delle forze. Con le leve amplifichiamo le forze meccaniche. Ma le forze non agiscono solo su aste rigide: agiscono anche dentro l'acqua e nell'aria!" },
+            { speaker: "Newton", text: "Permettetemi di intervenire! Salve Archimede, salve Marco! Ricordate che le forze d'equilibrio sulla vostra leva non sono altro che un caso particolare della mia Seconda Legge della Dinamica: quando la forza netta è zero, l'accelerazione è zero!" },
+            { speaker: "Marco", text: "Un onore accoglierla Sir Isaac! Quindi le sue leggi del moto e la gravità spiegano sia le leve che il galleggiamento di Archimede?" },
+            { speaker: "Archimede", text: "Esattamente! La mia spinta idrostatica nasce proprio perché la gravità di Newton attrae verso il basso il fluido, creando una pressione che spinge l'oggetto verso l'alto!" },
+            { speaker: "Newton", text: "E non dimentichiamo il volo degli aerei! Daniel Bernoulli ha mostrato che dove l'aria va più veloce la pressione cala. Ma la mia Terza Legge completa l'opera: l'ala spinge l'aria verso il basso, e per Azione e Reazione l'aria spinge l'ala verso l'alto!" },
+            { speaker: "Marco", text: "Fenomenale! Quindi il volo è una perfetta collaborazione tra il Principio di Bernoulli e il Terzo Principio di Newton!" },
+            { speaker: "Archimede", text: "Esatto Marco! Dalle leve della Sicilia antica fino ai razzi spaziali e agli aerei moderni, le leggi della fisica sono un unico meraviglioso linguaggio universale!" }
+        ];
+
+        let currentLineIndex = -1;
+        let isPlayingPodcast = false;
+        let currentCustomText = "";
+        let audioContext = null;
+        let globalPlaybackRate = 1;
+        let activeTab = 'lever';
+
+        // Simulation States
+        let leverClass = 1;
+        let fluidType = 'water';
+        let fluidDensity = 1.0;
+        let newtonLaw = 1;
+        let newtonSimRunning = false;
+        let newtonPosX = 50;
+        let newtonVelX = 0;
+
+        function renderAllMath() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function toggleFullscreen() {
+            const icon = document.getElementById('iconFullscreen');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    if (icon) icon.className = "fa-solid fa-compress";
+                }).catch(err => console.log("Fullscreen error:", err));
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().then(() => {
+                        if (icon) icon.className = "fa-solid fa-expand";
+                    });
+                }
+            }
+        }
+
+        function unlockAudio() {
+            if (!audioContext) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) audioContext = new AudioContextClass();
+            }
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.resume();
+                window.speechSynthesis.getVoices();
+            }
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
+        }
+
+        function getNaturalVoice(speaker) {
+            if (!('speechSynthesis' in window)) return null;
+            const voices = window.speechSynthesis.getVoices();
+            const itVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('it'));
+            if (itVoices.length === 0) return null;
+
+            const naturalVoices = itVoices.filter(v => 
+                v.name.includes('Natural') || 
+                v.name.includes('Google') || 
+                v.name.includes('Neural') || 
+                v.name.includes('Online') || 
+                v.name.includes('Premium') ||
+                v.name.includes('Enhanced')
+            );
+
+            const listToUse = naturalVoices.length > 0 ? naturalVoices : itVoices;
+
+            if (speaker === "Archimede") {
+                return listToUse.find(v => v.name.includes('Cosimo') || v.name.includes('Diego') || v.name.includes('Male')) || listToUse[0];
+            } else if (speaker === "Newton") {
+                return listToUse.find(v => v.name.includes('Giuseppe') || v.name.includes('Gianni') || v.name.includes('Male')) || listToUse[Math.min(1, listToUse.length - 1)];
+            } else {
+                return listToUse.find(v => v.name.includes('Elsa') || v.name.includes('Isabella') || v.name.includes('Alice') || v.name.includes('Female')) || listToUse[listToUse.length - 1];
+            }
+        }
+
+        function showAudioStatus(show, text = "", loading = false) {
+            const badge = document.getElementById('audioStatusBadge');
+            const icon = document.getElementById('audioStatusIcon');
+            const txt = document.getElementById('audioStatusText');
+            
+            if (!badge) return;
+
+            if (show) {
+                badge.classList.remove('hidden');
+                txt.innerText = text;
+                icon.className = loading ? "fa-solid fa-spinner fa-spin text-amber-400" : "fa-solid fa-volume-high text-amber-400 animate-pulse";
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function speakWithWebSpeech(text, speaker, onEnd) {
+            stopCurrentAudioOnly();
+            unlockAudio();
+
+            if (!('speechSynthesis' in window)) {
+                showAudioStatus(false);
+                if (onEnd) onEnd();
+                return;
+            }
+
+            const cleanText = text
+                .replace(/\$\$/g, '')
+                .replace(/\$/g, '')
+                .replace(/\\cdot/g, ' per ')
+                .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 fratto $2')
+                .replace(/\\rho/g, 'ro')
+                .replace(/\*\*/g, '')
+                .replace(/\*/g, '');
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'it-IT';
+
+            const naturalVoice = getNaturalVoice(speaker);
+            if (naturalVoice) {
+                utterance.voice = naturalVoice;
+            }
+
+            if (speaker === "Archimede") {
+                utterance.pitch = 0.90;
+                utterance.rate = 0.94 * globalPlaybackRate;
+            } else if (speaker === "Newton") {
+                utterance.pitch = 0.98;
+                utterance.rate = 1.0 * globalPlaybackRate;
+            } else {
+                utterance.pitch = 1.08;
+                utterance.rate = 1.04 * globalPlaybackRate;
+            }
+
+            let hasEnded = false;
+            const handleEnd = () => {
+                if (hasEnded) return;
+                hasEnded = true;
+                showAudioStatus(false);
+                if (onEnd) onEnd();
+            };
+
+            const safetyTimeout = setTimeout(() => {
+                if (!hasEnded) handleEnd();
+            }, 18000);
+
+            utterance.onstart = () => {
+                showAudioStatus(true, `${speaker} parla...`, false);
+            };
+
+            utterance.onend = () => {
+                clearTimeout(safetyTimeout);
+                handleEnd();
+            };
+
+            utterance.onerror = () => {
+                clearTimeout(safetyTimeout);
+                handleEnd();
+            };
+
+            const keepAliveInterval = setInterval(() => {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.resume();
+                } else {
+                    clearInterval(keepAliveInterval);
+                }
+            }, 4000);
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function startFullPodcast() {
+            unlockAudio();
+            isPlayingPodcast = true;
+            currentLineIndex = 0;
+
+            document.getElementById('btnPlayAll').classList.add('hidden');
+            document.getElementById('btnStopAudio').classList.remove('hidden');
+
+            playNextInSequence();
+        }
+
+        function playNextInSequence() {
+            if (!isPlayingPodcast || currentLineIndex >= scriptLines.length) {
+                stopAudio();
+                return;
+            }
+
+            const idx = currentLineIndex;
+            highlightLineCard(idx);
+
+            const line = scriptLines[idx];
+            speakWithWebSpeech(line.text, line.speaker, () => {
+                if (isPlayingPodcast) {
+                    currentLineIndex++;
+                    setTimeout(playNextInSequence, 300);
+                }
+            });
+        }
+
+        function playLineDirectly(index) {
+            unlockAudio();
+            isPlayingPodcast = false;
+            currentLineIndex = index;
+
+            document.getElementById('btnPlayAll').classList.remove('hidden');
+            document.getElementById('btnStopAudio').classList.remove('hidden');
+
+            highlightLineCard(index);
+            const line = scriptLines[index];
+            speakWithWebSpeech(line.text, line.speaker, () => {
+                unhighlightAllCards();
+                document.getElementById('btnStopAudio').classList.add('hidden');
+            });
+        }
+
+        function playCustomAudio() {
+            if (!currentCustomText) return;
+            stopAudio();
+            speakWithWebSpeech(currentCustomText, "Newton", () => {
+                showAudioStatus(false);
+            });
+        }
+
+        function stopAudio() {
+            isPlayingPodcast = false;
+            currentLineIndex = -1;
+            stopCurrentAudioOnly();
+            unhighlightAllCards();
+            showAudioStatus(false);
+
+            document.getElementById('btnPlayAll').classList.remove('hidden');
+            document.getElementById('btnStopAudio').classList.add('hidden');
+        }
+
+        function stopCurrentAudioOnly() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function changePlaybackRate(val) {
+            globalPlaybackRate = parseFloat(val) || 1.0;
+        }
+
+        function highlightLineCard(index) {
+            unhighlightAllCards();
+            const card = document.getElementById(`line-${index}`);
+            if (card) {
+                card.classList.add('speaking-pulse', 'border-amber-400');
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function unhighlightAllCards() {
+            for (let i = 0; i < scriptLines.length; i++) {
+                const card = document.getElementById(`line-${i}`);
+                if (card) {
+                    card.classList.remove('speaking-pulse', 'border-amber-400');
+                }
+            }
+        }
+
+        function setQuickQuestion(text) {
+            document.getElementById('customPrompt').value = text;
+            askPhysicsMasters();
+        }
+
+        async function fetchPhysicsAIResponse(question) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = `Sei un duo di scienziati formato da Archimede di Siracusa e Sir Isaac Newton. 
+Rispondi in modo appassionante, chiaro e sintetico (massimo 50-60 parole, 3 frasi).
+Fai parlare Isaac Newton o Archimede in prima persona ("Io, Newton..." oppure "Io, Archimede..."). Spiega la domanda dell'utente collegando leve, idrostatica, leggi del moto (F=m*a, Azione-Reazione) o portanza alare. Usa formule in formato LaTeX racchiuse tra $ (es. $F = m \\cdot a$).`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: question }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Offline");
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (text) return text.trim();
+                throw new Error("Empty response");
+            } catch (err) {
+                const qLower = question.toLowerCase();
+                if (qLower.includes("newton") || qLower.includes("gravità")) {
+                    return "Io, Sir Isaac Newton, ti rispondo: la spinta di Archimede $S = \\rho \\cdot V \\cdot g$ esiste proprio perché la mia gravità attrae il fluido verso il basso, creando una pressione crescente che spinge il corpo verso l'alto!";
+                } else if (qLower.includes("portanza") || qLower.includes("volo")) {
+                    return "Io, Newton, assieme ad Archimede ti spiego che l'ala curva devia la massa d'aria verso il basso. Per la mia Terza Legge di Azione e Reazione, l'aria spinge l'ala verso l'alto con pari intensità!";
+                } else if (qLower.includes("leva") || qLower.includes("f=m*a")) {
+                    return "Io, Archimede, con Sir Isaac Newton confermo: sulla leva le forze si bilanciano in momento statico $P \\cdot b_p = R \\cdot b_r$; quando il momento risultante è zero, l'accelerazione angolare è nulla come vuole $F = m \\cdot a$!";
+                }
+                return "Io, Newton, ed io, Archimede, vi ricordiamo che ogni fenomeno fisico, dalla mela che cade fino alla nave che galleggia, obbedisce a principi matematici universali!";
+            }
+        }
+
+        async function askPhysicsMasters() {
+            const promptInput = document.getElementById('customPrompt');
+            const question = promptInput.value.trim();
+            if (!question) return;
+
+            stopAudio();
+
+            const btnAsk = document.getElementById('btnAsk');
+            const answerContainer = document.getElementById('aiAnswerContainer');
+            const answerText = document.getElementById('aiAnswerText');
+
+            btnAsk.disabled = true;
+            btnAsk.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rispondo...`;
+            answerContainer.classList.remove('hidden');
+            answerText.innerText = "I Maestri stanno formulando la risposta...";
+
+            const answer = await fetchPhysicsAIResponse(question);
+            currentCustomText = answer;
+            answerText.innerText = `"${answer}"`;
+            
+            renderAllMath();
+
+            btnAsk.disabled = false;
+            btnAsk.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Chiedi`;
+
+            playCustomAudio();
+        }
+
+        function switchTab(tabName) {
+            activeTab = tabName;
+            ['lever', 'archimedes', 'bernoulli', 'newton'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tabBtn-${t}`);
+                if (t === tabName) {
+                    el.classList.remove('hidden');
+                    btn.className = "flex-1 py-2 px-3 rounded-xl transition text-center bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "flex-1 py-2 px-3 rounded-xl transition text-center text-slate-400 hover:text-slate-200 font-semibold";
+                }
+            });
+            resizeAllCanvases();
+        }
+
+        function setLeverClass(cls) {
+            leverClass = cls;
+            document.getElementById('leverClassBadge').innerText = `${cls}ª Classe`;
+            ['btnClass1', 'btnClass2', 'btnClass3'].forEach((id, i) => {
+                const btn = document.getElementById(id);
+                if (i + 1 === cls) {
+                    btn.className = "py-2 px-1 text-xs font-semibold rounded-xl border border-amber-500/50 bg-amber-500/20 text-amber-300 text-center transition";
+                } else {
+                    btn.className = "py-2 px-1 text-xs font-semibold rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 text-center transition";
+                }
+            });
+        }
+
+        function setFluid(type) {
+            fluidType = type;
+            const textEl = document.getElementById('fluidNameText');
+            if (type === 'water') {
+                fluidDensity = 1.0;
+                textEl.innerText = "Fluido: Acqua (1.00 g/cm³)";
+            } else if (type === 'oil') {
+                fluidDensity = 0.8;
+                textEl.innerText = "Fluido: Olio (0.80 g/cm³)";
+            } else if (type === 'mercury') {
+                fluidDensity = 13.6;
+                textEl.innerText = "Fluido: Mercurio (13.6 g/cm³)";
+            }
+        }
+
+        function setNewtonLaw(law) {
+            newtonLaw = law;
+            newtonPosX = 50;
+            newtonVelX = 0;
+            newtonSimRunning = false;
+
+            const title = document.getElementById('newtonTitle');
+            const desc = document.getElementById('newtonDesc');
+            const metrics = document.getElementById('newtonMetrics');
+
+            ['btnLaw1', 'btnLaw2', 'btnLaw3'].forEach((id, i) => {
+                const btn = document.getElementById(id);
+                if (i + 1 === law) {
+                    btn.className = "py-2 px-1 bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded-xl font-semibold text-center";
+                } else {
+                    btn.className = "py-2 px-1 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl font-semibold text-center hover:text-slate-200";
+                }
+            });
+
+            if (law === 1) {
+                title.innerText = "1° Principio: Legge d'Inerzia";
+                desc.innerText = "Un corpo mantiene il suo stato di quiete o moto rettilineo uniforme a meno che non agisca una forza netta.";
+                metrics.innerText = "$v = \\text{costante}$";
+            } else if (law === 2) {
+                title.innerText = "2° Principio: $F = m \\cdot a$";
+                desc.innerText = "La forza netta su un corpo produce un'accelerazione direttamente proporzionale alla forza e inversamente proporzionale alla massa.";
+                metrics.innerText = "$F = 20\\text{ N} \\implies a = 2\\text{ m/s}^2$";
+            } else {
+                title.innerText = "3° Principio: Azione e Reazione";
+                desc.innerText = "Ad ogni azione corrisponde una reazione uguale e contraria: il razzo espelle gas verso sinistra e riceve una spinta verso destra.";
+                metrics.innerText = "$F_{\\text{spinta}} = -F_{\\text{gas}}$";
+            }
+            renderAllMath();
+        }
+
+        function triggerNewtonSim() {
+            newtonSimRunning = true;
+            if (newtonLaw === 1) {
+                newtonVelX = 3;
+            } else if (newtonLaw === 2) {
+                newtonVelX = 0.5;
+            } else {
+                newtonVelX = 4;
+            }
+        }
+
+        function resizeAllCanvases() {
+            ['leverCanvas', 'archimedesCanvas', 'bernoulliCanvas', 'newtonCanvas'].forEach(id => {
+                const canvas = document.getElementById(id);
+                if (canvas && canvas.parentElement) {
+                    canvas.width = canvas.parentElement.clientWidth;
+                    canvas.height = canvas.parentElement.clientHeight;
+                }
+            });
+        }
+
+        function animateLoops() {
+            if (activeTab === 'lever') drawLeverCanvas();
+            else if (activeTab === 'archimedes') drawArchimedesCanvas();
+            else if (activeTab === 'bernoulli') drawBernoulliCanvas();
+            else if (activeTab === 'newton') drawNewtonCanvas();
+
+            requestAnimationFrame(animateLoops);
+        }
+
+        function drawLeverCanvas() {
+            const canvas = document.getElementById('leverCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const fulcrumPosRatio = parseFloat(document.getElementById('sliderFulcrum').value) / 100;
+            const Fp = parseFloat(document.getElementById('sliderFp').value);
+            const Fr = parseFloat(document.getElementById('sliderFr').value);
+
+            document.getElementById('valFp').innerText = `${Fp} N`;
+            document.getElementById('valFr').innerText = `${Fr} N`;
+
+            const barY = h / 2 + 10;
+            const fulcrumX = w * fulcrumPosRatio;
+
+            // Draw base stand & fulcrum
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.moveTo(fulcrumX, barY);
+            ctx.lineTo(fulcrumX - 15, barY + 30);
+            ctx.lineTo(fulcrumX + 15, barY + 30);
+            ctx.closePath();
+            ctx.fill();
+
+            // Torque balance calculation
+            const bp = Math.round(fulcrumPosRatio * 180);
+            const br = Math.round((1 - fulcrumPosRatio) * 180);
+            document.getElementById('valBracciInfo').innerText = `bp: ${bp}cm | br: ${br}cm`;
+
+            const torqueP = Fp * bp;
+            const torqueR = Fr * br;
+            let angle = 0;
+            if (torqueP > torqueR) angle = -0.12;
+            else if (torqueR > torqueP) angle = 0.12;
+
+            const statusEl = document.getElementById('leverStatusText');
+            if (bp > br) {
+                statusEl.innerText = "VANTAGGIOSA (bp > br)";
+                statusEl.className = "font-bold text-emerald-400";
+            } else if (bp < br) {
+                statusEl.innerText = "SVANTAGGIOSA (bp < br)";
+                statusEl.className = "font-bold text-rose-400";
+            } else {
+                statusEl.innerText = "INDIFFERENTE (bp = br)";
+                statusEl.className = "font-bold text-amber-400";
+            }
+
+            ctx.save();
+            ctx.translate(fulcrumX, barY);
+            ctx.rotate(angle);
+
+            // Lever Beam
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(-fulcrumX + 30, -6, w - 60, 12);
+
+            // Force Arrows
+            // Power P (left)
+            ctx.fillStyle = '#6366f1';
+            ctx.fillRect(-fulcrumX + 40, -35, 20, 25);
+            ctx.fillText('P', -fulcrumX + 46, -40);
+
+            // Resistance R (right)
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(w - fulcrumX - 60, -35, 20, 25);
+            ctx.fillText('R', w - fulcrumX - 54, -40);
+
+            ctx.restore();
+        }
+
+        function drawArchimedesCanvas() {
+            const canvas = document.getElementById('archimedesCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const objDensity = parseFloat(document.getElementById('sliderObjDensity').value);
+            document.getElementById('valObjDensity').innerText = `${objDensity.toFixed(2)} g/cm³`;
+
+            const waterY = h * 0.4;
+
+            // Water Fluid
+            ctx.fillStyle = fluidType === 'mercury' ? '#94a3b8' : (fluidType === 'oil' ? 'rgba(234, 179, 8, 0.5)' : 'rgba(14, 165, 233, 0.4)');
+            ctx.fillRect(0, waterY, w, h - waterY);
+
+            // Container outlines
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(w * 0.2, waterY - 20, w * 0.6, h - waterY + 15);
+
+            // Object depth based on density relative to fluid
+            const densityRatio = objDensity / fluidDensity;
+            let blockY = waterY - 20 + densityRatio * 50;
+            if (densityRatio > 1) blockY = h - 50;
+
+            const blockX = w / 2 - 25;
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(blockX, blockY, 50, 40);
+            ctx.strokeStyle = '#fbbf24';
+            ctx.strokeRect(blockX, blockY, 50, 40);
+
+            // Forces
+            const Fg = (objDensity * 9.81).toFixed(2);
+            const S = (Math.min(densityRatio, 1.0) * fluidDensity * 9.81).toFixed(2);
+
+            document.getElementById('valFgText').innerText = `${Fg} N`;
+            document.getElementById('valBuoyancyText').innerText = `${S} N`;
+
+            const statusEl = document.getElementById('archimedesStatusText');
+            if (densityRatio < 0.98) {
+                statusEl.innerText = "GALLEGGIA (S = Fg)";
+                statusEl.className = "font-bold text-emerald-400";
+            } else if (densityRatio > 1.02) {
+                statusEl.innerText = "AFFONDA (Fg > S)";
+                statusEl.className = "font-bold text-rose-400";
+            } else {
+                statusEl.innerText = "IN EQUILIBRIO SOSPESO";
+                statusEl.className = "font-bold text-cyan-400";
+            }
+        }
+
+        function drawBernoulliCanvas() {
+            const canvas = document.getElementById('bernoulliCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const speed = parseInt(document.getElementById('sliderAirSpeed').value);
+            const angle = parseInt(document.getElementById('sliderAngle').value);
+
+            document.getElementById('valAirSpeed').innerText = `${speed} km/h`;
+            document.getElementById('valAttackAngle').innerText = `${angle}°`;
+
+            const lift = Math.round(speed * speed * (angle + 2) * 0.4);
+            document.getElementById('valLiftForce').innerText = `${lift.toLocaleString()} N (${lift > 25000 ? 'DECOLLO' : 'STAZIONARIO'})`;
+
+            // Airflow Streamlines
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            const time = Date.now() * 0.003 * (speed / 100);
+
+            for (let i = 0; i < 6; i++) {
+                ctx.beginPath();
+                const yBase = 30 + i * 22;
+                ctx.moveTo(0, yBase);
+                for (let x = 0; x < w; x += 20) {
+                    const wave = Math.sin(x * 0.02 + time) * 3;
+                    const deflect = (x > w * 0.3 && x < w * 0.7) ? -Math.sin((x - w * 0.3) / (w * 0.4) * Math.PI) * (angle * 1.5) : 0;
+                    ctx.lineTo(x, yBase + wave + deflect);
+                }
+                ctx.stroke();
+            }
+
+            // Airfoil shape
+            ctx.save();
+            ctx.translate(w / 2, h / 2 + 10);
+            ctx.rotate(-angle * Math.PI / 180);
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.beginPath();
+            ctx.moveTo(-60, 0);
+            ctx.bezierCurveTo(-20, -35, 40, -25, 70, 0);
+            ctx.bezierCurveTo(30, 10, -20, 5, -60, 0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawNewtonCanvas() {
+            const canvas = document.getElementById('newtonCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            // Ground line
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(20, h - 30);
+            ctx.lineTo(w - 20, h - 30);
+            ctx.stroke();
+
+            if (newtonSimRunning) {
+                if (newtonLaw === 2) newtonVelX += 0.05;
+                newtonPosX += newtonVelX;
+                if (newtonPosX > w - 60) {
+                    newtonPosX = 40;
+                    if (newtonLaw === 1) newtonVelX = 3;
+                }
+            }
+
+            // Cart or Object
+            ctx.fillStyle = '#a855f7';
+            ctx.fillRect(newtonPosX, h - 60, 40, 25);
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(newtonPosX + 10, h - 30, 6, 0, Math.PI * 2);
+            ctx.arc(newtonPosX + 30, h - 30, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Thrust or Force Arrow
+            if (newtonLaw === 3 && newtonSimRunning) {
+                // Exhaust gas left
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.moveTo(newtonPosX, h - 48);
+                ctx.lineTo(newtonPosX - 25, h - 55);
+                ctx.lineTo(newtonPosX - 25, h - 40);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        window.addEventListener('resize', resizeAllCanvases);
+
+        window.onload = () => {
+            resizeAllCanvases();
+            unlockAudio();
+            renderAllMath();
+            requestAnimationFrame(animateLoops);
+        };
+    </script>
+</body>
+</html>
