@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room: Il Laboratorio di Fisica</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-color: #58a6ff;
+            --text-color: #c9d1d9;
+            --success-color: #2ea043;
+            --error-color: #da3633;
+            --warning-color: #d29922;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 750px;
+            background-color: var(--card-bg);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        h1, h2 {
+            color: #ffffff;
+            text-align: center;
+        }
+
+        h1 {
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .narrative {
+            font-style: italic;
+            background-color: #0d1117;
+            padding: 15px;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .puzzle-box {
+            background-color: #21262d;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #30363d;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #ffffff;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #238636;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--success-color);
+        }
+
+        .hint-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .hint-1 {
+            background-color: rgba(210, 153, 34, 0.15);
+            border: 1px solid var(--warning-color);
+            color: #f0883e;
+        }
+
+        .hint-2 {
+            background-color: rgba(218, 54, 51, 0.15);
+            border: 1px solid var(--error-color);
+            color: #ff7b72;
+        }
+
+        .room {
+            display: none;
+        }
+
+        .room.active {
+            display: block;
+        }
+
+        .completion-screen {
+            text-align: center;
+        }
+
+        .completion-screen h2 {
+            color: var(--success-color);
+        }
+
+        strong {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ESCAPE ROOM: IL LABORATORIO SEGRETO DI FISICA</h1>
+
+    <!-- STANZA 1 -->
+    <div id="room1" class="room active">
+        <h2>Stanza 1: La Porta della Misura</h2>
+        <div class="narrative">
+            "Ti risvegli bloccato nel laboratorio di analisi dati del Professor Newton. La porta d'uscita ha un tastierino numerico bloccato. Sulla cattedra trovi un taccuino con delle annotazioni su una misurazione e una targhetta luminosa."
+        </div>
+        <div class="puzzle-box">
+            <p><strong>L'ENIGMA:</strong></p>
+            <p>Un esperimento di laboratorio fornisce il seguente risultato per una lunghezza $L$:</p>
+            <p style="text-align: center; font-size: 1.2rem; color: var(--accent-color);"><strong>L = (12,0 ± 0,6) m</strong></p>
+            <p>Per sbloccare il primo blocco della porta, inserisci il valore dell'<strong>errore percentuale ($\epsilon_\%$)</strong> associato a questa misura (inserisci solo il numero intero, senza il simbolo %).</p>
+            
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Inserisci il codice intero...">
+                <button onclick="checkAnswer(1, '5')">Sblocca Porta</button>
+            </div>
+            
+            <div id="hint1_1" class="hint-box hint-1">
+                <strong>Suggerimento 1:</strong> Ricorda che l'errore relativo è definito come il rapporto tra l'errore assoluto e il valore attendibile ($\epsilon = e / \bar{x}$).
+            </div>
+            <div id="hint1_2" class="hint-box hint-2">
+                <strong>Suggerimento 2:</strong> Calcola prima l'errore relativo: $0,6 / 12,0 = 0,05$. Per trovare l'errore percentuale moltiplica questo valore per 100.
+            </div>
+        </div>
+    </div>
+
+    <!-- STANZA 2 -->
+    <div id="room2" class="room">
+        <h2>Stanza 2: Il Corridoio delle Forze</h2>
+        <div class="narrative">
+            "Sei uscito dal laboratorio ma ti trovi in un lungo corridoio vettoriale. Due bracci meccanici difettosi stanno tirando un anello metallico al centro della stanza. Per disattivare il sistema di sicurezza dovrai calcolare la forza risultante."
+        </div>
+        <div class="puzzle-box">
+            <p><strong>L'ENIGMA:</strong></p>
+            <p>Due forze orizzontali agiscono sullo stesso punto dell'anello:</p>
+            <ul>
+                <li>Forma 1: $\vec{F}_1 = 30\text{ N}$ verso Est</li>
+                <li>Forma 2: $\vec{F}_2 = 40\text{ N}$ verso Nord</li>
+            </ul>
+            <p>Qual è il modulo della <strong>forza risultante ($\vec{R}$)</strong> applicata all'anello? (Inserisci solo il valore numerico in Newton, senza decimali).</p>
+            
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Inserisci il valore numerico...">
+                <button onclick="checkAnswer(2, '50')">Disattiva Bracci</button>
+            </div>
+
+            <div id="hint2_1" class="hint-box hint-1">
+                <strong>Suggerimento 1:</strong> Poiché una forza è diretta verso Est (asse x) e l'altra verso Nord (asse y), le due forze sono perpendicolari tra loro.
+            </div>
+            <div id="hint2_2" class="hint-box hint-2">
+                <strong>Suggerimento 2:</strong> Applica il teorema di Pitagora per la somma vettoriale di componenti ortogonali: $R = \sqrt{F_1^2 + F_2^2} = \sqrt{30^2 + 40^2}$.
+            </div>
+        </div>
+    </div>
+
+    <!-- STANZA 3 -->
+    <div id="room3" class="room">
+        <h2>Stanza 3: La Chiusa dell'Equilibrio</h2>
+        <div class="narrative">
+            "Ti trovi di fronte all'ultima porta per la libertà. Un grosso blocco in metallo ostruisce l'uscita. C'è una leva di primo genere regolabile a disposizione. Per sollevare l'ostacolo devi bilanciare esattamente i momenti delle forze per raggiungere l'equilibrio rotazionale!"
+        </div>
+        <div class="puzzle-box">
+            <p><strong>L'ENIGMA:</strong></p>
+            <p>Sulla leva è posizionato un peso resistente $F_R = 600\text{ N}$ a una distanza dal fulcro $b_R = 0,5\text{ m}$.</p>
+            <p>A quale distanza dal fulcro ($b_M$, espressa in metri) devi applicare una forza motrice $F_M = 150\text{ N}$ affinché la leva sia in perfetto equilibrio statico?</p>
+            
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Inserisci la distanza in metri...">
+                <button onclick="checkAnswer(3, '2')">Piazza la Leva</button>
+            </div>
+
+            <div id="hint3_1" class="hint-box hint-1">
+                <strong>Suggerimento 1:</strong> La condizione di equilibrio per le leve stabilisce che il momento della forza motrice deve essere uguale al momento della forza resistente: $b_R \cdot F_R = b_M \cdot F_M$.
+            </div>
+            <div id="hint3_2" class="hint-box hint-2">
+                <strong>Suggerimento 2:</strong> Sostituisci i dati nell'equazione: $0,5 \cdot 600 = b_M \cdot 150 \rightarrow 300 = b_M \cdot 150$. Risolvi rispetto a $b_M$.
+            </div>
+        </div>
+    </div>
+
+    <!-- SCHERMATA FINALE -->
+    <div id="completion" class="room completion-screen">
+        <h2> COMPLIMENTI! SEI EVASO/A!</h2>
+        <p class="narrative">Hai applicato con successo i principi fondamentali della fisica: hai gestito gli errori di misura, calcolato la combinazione dei vettori forza e padroneggiato l'equilibrio dei corpi rigidamente collegati.</p>
+        <p>Tutti i sistemi di sicurezza sono disattivati. Il laboratorio è libero!</p>
+        <button onclick="location.reload()">Rigioca</button>
+    </div>
+</div>
+
+<script>
+    // Tracciamento dei tentativi errati per stanza
+    const attempts = { 1: 0, 2: 0, 3: 0 };
+
+    function checkAnswer(roomNumber, correctAnswer) {
+        const inputElement = document.getElementById(`ans${roomNumber}`);
+        const userAnswer = inputElement.value.trim().replace(',', '.');
+
+        if (userAnswer === correctAnswer) {
+            // Risposta Corretta: Passa alla stanza successiva
+            document.getElementById(`room${roomNumber}`).classList.remove('active');
+            
+            if (roomNumber < 3) {
+                document.getElementById(`room${roomNumber + 1}`).classList.add('active');
+            } else {
+                document.getElementById('completion').classList.add('active');
+            }
+        } else {
+            // Risposta Errata: Incrementa i tentativi e mostra i suggerimenti
+            attempts[roomNumber]++;
+            
+            if (attempts[roomNumber] === 1) {
+                document.getElementById(`hint${roomNumber}_1`).style.display = 'block';
+            } else if (attempts[roomNumber] >= 2) {
+                document.getElementById(`hint${roomNumber}_2`).style.display = 'block';
+            }
+            
+            // Effetto visivo di errore
+            inputElement.style.borderColor = 'var(--error-color)';
+            setTimeout(() => {
+                inputElement.style.borderColor = '#30363d';
+            }, 1000);
+        }
+    }
+</script>
+
+</body>
+</html>
