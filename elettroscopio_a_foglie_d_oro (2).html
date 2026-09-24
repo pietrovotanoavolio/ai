@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ELETTROSCOPIO - Simulazione Interattiva a Foglie d'Oro</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col overflow-hidden text-sm select-none">
+
+  <!-- TOP NAVBAR -->
+  <header class="h-14 border-b border-slate-800 bg-slate-950/90 px-4 flex items-center justify-between shrink-0 z-20">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-lg shadow-lg shadow-amber-500/10">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-base tracking-wide text-slate-100 flex items-center gap-2">
+          ELETTROSCOPIO <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-normal border border-amber-500/30">Fisica 2D Interattiva</span>
+        </h1>
+        <p class="text-[11px] text-slate-400 hidden sm:block">Laboratorio Elettrostatico: Induzione, Conduzione e Messa a Terra</p>
+      </div>
+    </div>
+
+    <!-- Quick Mode Toggle & Controls -->
+    <div class="flex items-center space-x-2">
+      <button id="btn-sound-toggle" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Attiva/Disattiva Audio">
+        <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+      </button>
+      <button id="btn-reset-all" class="px-3 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 transition text-xs font-medium flex items-center gap-1.5">
+        <i class="fa-solid fa-rotate-left"></i> <span>Reset Simulazione</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE CONTAINER -->
+  <div class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+
+    <!-- LEFT SIDE: INTERACTIVE CANVAS SIMULATION -->
+    <div class="flex-1 relative bg-slate-950 flex flex-col justify-between overflow-hidden min-h-[350px]">
+      
+      <!-- Overlay Controls (Top Left Canvas) -->
+      <div class="absolute top-3 left-3 z-10 flex flex-col gap-2">
+        <div class="glass-panel p-2 rounded-xl flex items-center gap-3 text-xs text-slate-200 shadow-xl">
+          <label class="flex items-center gap-1.5 cursor-pointer hover:text-white transition">
+            <input type="checkbox" id="toggle-charges" checked class="rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900">
+            <span>Mostra Cariche (<i class="fa-solid fa-minus text-sky-400 font-bold"></i> / <i class="fa-solid fa-plus text-rose-400 font-bold"></i>)</span>
+          </label>
+          <div class="w-px h-4 bg-slate-700"></div>
+          <label class="flex items-center gap-1.5 cursor-pointer hover:text-white transition">
+            <input type="checkbox" id="toggle-forces" checked class="rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-900">
+            <span>Vettori Forza ($F_e$)</span>
+          </label>
+        </div>
+
+        <!-- Touch/Drag Status Indicator -->
+        <div id="status-badge" class="glass-panel px-3 py-1.5 rounded-lg text-xs text-amber-300 border border-amber-500/30 flex items-center gap-2 max-w-xs shadow-lg">
+          <i class="fa-solid fa-hand-pointer animate-pulse"></i>
+          <span id="status-text">Trascina la bacchetta o usa i pulsanti per interagire</span>
+        </div>
+      </div>
+
+      <!-- Canvas Container -->
+      <div class="flex-1 w-full h-full relative cursor-grab active:cursor-grabbing" id="canvas-container">
+        <canvas id="sim-canvas" class="w-full h-full block"></canvas>
+      </div>
+
+      <!-- Quick Action Toolbar at Canvas Bottom -->
+      <div class="p-3 bg-slate-900/95 border-t border-slate-800 flex flex-wrap items-center justify-center gap-2 z-10 shrink-0">
+        <button id="btn-rub-rod" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs transition shadow-md shadow-amber-500/20 flex items-center gap-2">
+          <i class="fa-solid fa-hand-sparkles"></i> 1. Strofina (Carica Bacchetta)
+        </button>
+
+        <button id="btn-approach-rod" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow-md shadow-indigo-600/20 flex items-center gap-2">
+          <i class="fa-solid fa-arrows-to-dot"></i> 2. Avvicina (Induzione)
+        </button>
+
+        <button id="btn-touch-rod" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs transition shadow-md shadow-cyan-600/20 flex items-center gap-2">
+          <i class="fa-solid fa-plug-circle-bolt"></i> 3. Tocca (Conduzione)
+        </button>
+
+        <button id="btn-grounding" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition shadow-md shadow-emerald-600/20 flex items-center gap-2">
+          <i class="fa-solid fa-hand"></i> 4. Messa a Terra
+        </button>
+
+        <button id="btn-separate-rod" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-left"></i> Allontana Bacchetta
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: DASHBOARD & EXPLANATION PANEL -->
+    <div class="w-full lg:w-96 bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-auto lg:h-full overflow-y-auto z-10 shrink-0">
+      
+      <!-- Section 1: Dynamic Explanation Card -->
+      <div class="p-4 border-b border-slate-800 bg-gradient-to-br from-slate-900 to-indigo-950/50">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-brain"></i> Stato Elettrostatico
+          </span>
+          <span id="phenomenon-tag" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono">
+            Equilibrio
+          </span>
+        </div>
+        <h3 id="phenomenon-title" class="font-bold text-slate-100 text-sm mb-1.5">Elettroscopio in Equilibrio</h3>
+        <p id="phenomenon-desc" class="text-xs text-slate-300 leading-relaxed">
+          L'elettroscopio ha carica netta nulla. Le cariche positive e negative si bilanciano ed entrambe le lamine d'oro rimangono verticali ed aderenti per gravità.
+        </p>
+      </div>
+
+      <!-- Section 2: Physics Metrics & Telemetry -->
+      <div class="p-4 border-b border-slate-800 space-y-3">
+        <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-chart-line text-indigo-400"></i> Telemetria in Tempo Reale
+        </h4>
+
+        <!-- Leaf Separation Angle Gauge -->
+        <div class="bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+          <div class="flex justify-between items-center mb-1 text-xs">
+            <span class="text-slate-300">Divergenza Lamine (&theta;)</span>
+            <span id="metric-angle" class="font-mono font-bold text-amber-400 text-sm">0.0°</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700/50">
+            <div id="bar-angle" class="bg-gradient-to-r from-amber-500 to-amber-300 h-full transition-all duration-200 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Net Charges Breakdown -->
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
+            <div class="text-slate-400 text-[11px]">Carica Bacchetta</div>
+            <div id="metric-rod-charge" class="font-mono font-bold text-sky-400 mt-0.5">0.0 nC</div>
+          </div>
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
+            <div class="text-slate-400 text-[11px]">Carica Elettroscopio</div>
+            <div id="metric-elec-charge" class="font-mono font-bold text-rose-400 mt-0.5">0.0 nC</div>
+          </div>
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
+            <div class="text-slate-400 text-[11px]">Sfera Superiore</div>
+            <div id="metric-knob-charge" class="font-mono font-bold text-emerald-400 mt-0.5">0.0 nC</div>
+          </div>
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
+            <div class="text-slate-400 text-[11px]">Lamine d'Oro</div>
+            <div id="metric-leaves-charge" class="font-mono font-bold text-amber-400 mt-0.5">0.0 nC</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Fine Control Sliders -->
+      <div class="p-4 border-b border-slate-800 space-y-3">
+        <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-sliders text-sky-400"></i> Parametri di Controllo
+        </h4>
+
+        <!-- Rub Intensity Slider -->
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-300">Intensità Carica Bacchetta</span>
+            <span id="slider-rub-val" class="font-mono text-sky-400">0%</span>
+          </div>
+          <input type="range" id="slider-rub" min="0" max="100" value="0" class="w-full accent-amber-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+        </div>
+
+        <!-- Rod Distance Slider -->
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-300">Distanza Sfera-Bacchetta</span>
+            <span id="slider-dist-val" class="font-mono text-indigo-400">30 cm</span>
+          </div>
+          <input type="range" id="slider-dist" min="0" max="40" value="30" class="w-full accent-indigo-500 bg-slate-800 rounded-lg h-2 cursor-pointer">
+        </div>
+      </div>
+
+      <!-- Section 4: Educational Guided Steps -->
+      <div id="tutorial-card" class="p-4 flex-1 flex flex-col justify-between bg-slate-950/40">
+        <div>
+          <h4 class="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-list-check"></i> Guida all'Esperimento
+          </h4>
+          <ol class="text-xs text-slate-300 space-y-2" id="tutorial-steps">
+            <li id="step-1" class="p-2 rounded-lg bg-slate-800/90 border border-amber-500/50 flex items-start gap-2 shadow-md">
+              <span class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-bold flex items-center justify-center shrink-0 text-[10px]">1</span>
+              <span>Clicca su <strong>1. Strofina</strong> per caricare la bacchetta di plastica negativamente con il panno di lana.</span>
+            </li>
+            <li id="step-2" class="p-2 rounded-lg bg-slate-900 border border-slate-800 opacity-60 flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0 text-[10px]">2</span>
+              <span>Clicca su <strong>2. Avvicina</strong>: osserva la migrazione degli elettroni e la divergenza per induzione.</span>
+            </li>
+            <li id="step-3" class="p-2 rounded-lg bg-slate-900 border border-slate-800 opacity-60 flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0 text-[10px]">3</span>
+              <span>Clicca su <strong>3. Tocca</strong> per trasferire elettroni per conduzione diretta nell'elettroscopio.</span>
+            </li>
+            <li id="step-4" class="p-2 rounded-lg bg-slate-900 border border-slate-800 opacity-60 flex items-start gap-2">
+              <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0 text-[10px]">4</span>
+              <span>Esegui la <strong>4. Messa a Terra</strong> per scaricare la carica accumulata verso il suolo.</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+          <span>ELETTROSCOPIO v2.0</span>
+          <span class="text-amber-400/90 font-medium"><i class="fa-solid fa-atom"></i> Fisica Elettrostatica</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // --- SAFE CROSS-BROWSER CANVAS DRAWING HELPER ---
+    // Custom rounded rectangle drawing method (replaces standard ctx.roundRect to prevent crashes on older browsers)
+    function drawRoundedRect(ctx, x, y, width, height, radius) {
+      let r = { tl: 0, tr: 0, br: 0, bl: 0 };
+      if (typeof radius === 'number') {
+        r = { tl: radius, tr: radius, br: radius, bl: radius };
+      } else if (Array.isArray(radius)) {
+        r = { tl: radius[0] || 0, tr: radius[1] || 0, br: radius[2] || 0, bl: radius[3] || 0 };
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + r.tl, y);
+      ctx.lineTo(x + width - r.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r.tr);
+      ctx.lineTo(x + width, y + height - r.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - r.br, y + height);
+      ctx.lineTo(x + r.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - r.bl);
+      ctx.lineTo(x, y + r.tl);
+      ctx.quadraticCurveTo(x, y, x + r.tl, y);
+      ctx.closePath();
+    }
+
+    // --- AUDIO SYNTHESIZER (Web Audio API) ---
+    class AudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playSpark() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.15);
+        } catch (e) { console.warn(e); }
+      }
+      playRub() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const bufferSize = this.ctx.sampleRate * 0.1;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 1000;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+          noise.start();
+        } catch (e) { console.warn(e); }
+      }
+      playGround() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(60, this.ctx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.3);
+        } catch (e) { console.warn(e); }
+      }
+    }
+
+    const sound = new AudioEngine();
+
+    // --- SIMULATION STATE ---
+    const state = {
+      rodCharge: 0,          // Net negative charge on plastic rod (0 to -100)
+      electroscopeCharge: 0, // Permanent net charge on electroscope
+      
+      // Rod & Cloth interactive elements
+      rod: { x: 0, y: 0, targetX: 0, targetY: 0, isDragging: false, width: 150, height: 28 },
+      cloth: { opacity: 0, isRubbing: false },
+      hand: { active: false, opacity: 0 },
+      
+      // Electroscope Physical Parameters
+      electroscope: {
+        knobX: 0, knobY: 0, knobRadius: 38,
+        stemLength: 170,
+        leafLength: 100,
+        leafAngle: 0,
+        targetLeafAngle: 0,
+        knobNetCharge: 0,
+        leavesNetCharge: 0
+      },
+      
+      // Visual Toggles
+      showCharges: true,
+      showForces: true,
+      
+      // Active State & Step
+      phenomenon: 'equilibrium',
+      currentStep: 1
+    };
+
+    // --- CANVAS SETUP ---
+    const canvas = document.getElementById('sim-canvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvas-container');
+
+    let cssWidth = 0;
+    let cssHeight = 0;
+
+    function resizeCanvas() {
+      const rect = container.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      
+      cssWidth = rect.width;
+      cssHeight = rect.height;
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = cssWidth * dpr;
+      canvas.height = cssHeight * dpr;
+      
+      // Update electroscope center coordinates
+      state.electroscope.knobX = cssWidth * 0.45;
+      state.electroscope.knobY = Math.max(130, cssHeight * 0.28);
+
+      // Initialize rod position if at default
+      if (!state.rod.isDragging && state.rod.x === 0) {
+        state.rod.x = state.electroscope.knobX + 220;
+        state.rod.y = state.electroscope.knobY - 60;
+        state.rod.targetX = state.rod.x;
+        state.rod.targetY = state.rod.y;
+      }
+    }
+
+    function updatePhysics() {
+      const elec = state.electroscope;
+      const rod = state.rod;
+
+      // 1. Smoothly interpolate Rod Position towards target
+      rod.x += (rod.targetX - rod.x) * 0.15;
+      rod.y += (rod.targetY - rod.y) * 0.15;
+
+      // 2. Compute distance between tip of plastic rod and center of metal sphere
+      const rodTipX = rod.x - rod.width / 2;
+      const rodTipY = rod.y;
+      const dx = rodTipX - elec.knobX;
+      const dy = rodTipY - elec.knobY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Telemetry UI Slider sync
+      const distSliderVal = Math.min(40, Math.round(distance / 10));
+      const distSliderEl = document.getElementById('slider-dist');
+      if (distSliderEl) distSliderEl.value = distSliderVal;
+      const distValEl = document.getElementById('slider-dist-val');
+      if (distValEl) distValEl.innerText = distSliderVal + ' cm';
+
+      // 3. Electrostatic Induction Calculation
+      let inducedShift = 0;
+      if (Math.abs(state.rodCharge) > 0) {
+        const minDistance = 40;
+        const maxEffectDist = 320;
+        if (distance < maxEffectDist) {
+          const factor = Math.pow((maxEffectDist - Math.max(minDistance, distance)) / maxEffectDist, 2);
+          inducedShift = state.rodCharge * factor * 0.75; // Negative electrons forced down
+        }
+      }
+
+      // Conduction check (contact between rod tip and metallic sphere)
+      const contactThreshold = elec.knobRadius + 20;
+      const isTouching = distance <= contactThreshold && Math.abs(state.rodCharge) > 5;
+
+      if (isTouching) {
+        // Transfer electrons from rod to electroscope
+        const transfer = (state.rodCharge - state.electroscopeCharge) * 0.08;
+        if (Math.abs(transfer) > 0.1) {
+          state.electroscopeCharge += transfer;
+          state.rodCharge -= transfer;
+          sound.playSpark();
+          triggerPhenomenon('conduction');
+          updateStep(3);
+        }
+      } else if (distance < 320 && Math.abs(state.rodCharge) > 5) {
+        triggerPhenomenon('induction');
+        updateStep(2);
+      } else if (state.hand.active) {
+        triggerPhenomenon('grounding');
+        updateStep(4);
+      } else if (state.cloth.isRubbing) {
+        triggerPhenomenon('rubbing');
+      } else if (Math.abs(state.electroscopeCharge) < 1 && Math.abs(state.rodCharge) < 1) {
+        triggerPhenomenon('equilibrium');
+      }
+
+      // Grounding process (hand touches top knob)
+      if (state.hand.active) {
+        if (Math.abs(state.electroscopeCharge) > 0.1) {
+          state.electroscopeCharge *= 0.82; // Rapid discharge to earth
+          sound.playGround();
+        } else {
+          state.electroscopeCharge = 0;
+        }
+      }
+
+      // 4. Net Charges Distribution on Electroscope
+      elec.knobNetCharge = (state.electroscopeCharge * 0.4) - inducedShift;
+      elec.leavesNetCharge = (state.electroscopeCharge * 0.6) + inducedShift;
+
+      // 5. Leaf Divergence Angle Calculation (&theta; angle based on Coulomb repulsion)
+      const leafChargeMagnitude = Math.abs(elec.leavesNetCharge);
+      elec.targetLeafAngle = Math.min(72, Math.pow(leafChargeMagnitude * 0.95, 0.85));
+
+      // Damped smooth leaf movement
+      elec.leafAngle += (elec.targetLeafAngle - elec.leafAngle) * 0.12;
+
+      // Hand opacity fade
+      state.hand.opacity += ((state.hand.active ? 1 : 0) - state.hand.opacity) * 0.2;
+
+      // Update UI Telemetry
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const angleEl = document.getElementById('metric-angle');
+      if (angleEl) angleEl.innerText = state.electroscope.leafAngle.toFixed(1) + '°';
+      
+      const barEl = document.getElementById('bar-angle');
+      if (barEl) barEl.style.width = Math.min(100, (state.electroscope.leafAngle / 72) * 100) + '%';
+      
+      const rChargeEl = document.getElementById('metric-rod-charge');
+      if (rChargeEl) rChargeEl.innerText = state.rodCharge.toFixed(1) + ' nC';
+      
+      const eChargeEl = document.getElementById('metric-elec-charge');
+      if (eChargeEl) eChargeEl.innerText = state.electroscopeCharge.toFixed(1) + ' nC';
+      
+      const kChargeEl = document.getElementById('metric-knob-charge');
+      if (kChargeEl) kChargeEl.innerText = state.electroscope.knobNetCharge.toFixed(1) + ' nC';
+      
+      const lChargeEl = document.getElementById('metric-leaves-charge');
+      if (lChargeEl) lChargeEl.innerText = state.electroscope.leavesNetCharge.toFixed(1) + ' nC';
+
+      const rubValEl = document.getElementById('slider-rub-val');
+      if (rubValEl) rubValEl.innerText = Math.round(Math.abs(state.rodCharge)) + '%';
+      
+      const rubSliderEl = document.getElementById('slider-rub');
+      if (rubSliderEl && !state.rod.isDragging) rubSliderEl.value = Math.abs(state.rodCharge);
+    }
+
+    function triggerPhenomenon(type) {
+      if (state.phenomenon === type && type !== 'rubbing') return;
+      state.phenomenon = type;
+
+      const titleEl = document.getElementById('phenomenon-title');
+      const descEl = document.getElementById('phenomenon-desc');
+      const tagEl = document.getElementById('phenomenon-tag');
+
+      if (!titleEl || !descEl || !tagEl) return;
+
+      switch (type) {
+        case 'equilibrium':
+          tagEl.innerText = 'Equilibrio';
+          tagEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono';
+          titleEl.innerText = 'Elettroscopio in Equilibrio';
+          descEl.innerText = 'L\'elettroscopio è neutro. Le cariche positive e negative si compensano e le lamine d\'oro rimangono verticali per la forza di gravità.';
+          break;
+        case 'rubbing':
+          tagEl.innerText = 'Elettrizzazione';
+          tagEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono';
+          titleEl.innerText = 'Elettrizzazione per Strofinamento';
+          descEl.innerText = 'Lo strofinamento con il panno di lana trasferisce elettroni alla bacchetta di plastica, che si carica NEGATIVAMENTE (-).';
+          break;
+        case 'induction':
+          tagEl.innerText = 'Induzione Elettrostatica';
+          tagEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-mono';
+          titleEl.innerText = 'Induzione Elettrostatica (Senza Contatto)';
+          descEl.innerText = 'La bacchetta negativa (-) respinge gli elettroni verso il basso. Sulla SFERA si concentrano cariche OPPOSTE (+), mentre le LAMINE D\'ORO si elettrizzano con lo STESSO SEGNO della bacchetta (-) e si respingono a vicenda!';
+          break;
+        case 'conduction':
+          tagEl.innerText = 'Conduzione Diretta';
+          tagEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono';
+          titleEl.innerText = 'Caricamento per Conduzione (Contatto)';
+          descEl.innerText = 'Toccando la sfera, gli elettroni fluiscono direttamente dalla bacchetta all\'elettroscopio. L\'intero elettroscopio (sfera e lamine) si carica dello stesso segno (-) della bacchetta.';
+          break;
+        case 'induction':
+          tagEl.innerText = 'Induzione Elettrostatica';
+          tagEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-mono';
+          titleEl.innerText = 'Induzione Elettrostatica (Senza Contatto)';
+          descEl.innerText = 'La bacchetta negativa respinge gli elettroni della sfera verso il basso. La sfera diventa positiva e le lamine d\'oro negative, facendole divergere per repulsione!';
+          break;
+        case 'conduction':
+          tagEl.innerText = 'Conduzione Diretta';
+          tagEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono';
+          titleEl.innerText = 'Caricamento per Conduzione (Contatto)';
+          descEl.innerText = 'Toccando la sfera, gli elettroni fluiscono direttamente dalla bacchetta all\'elettroscopio. L\'elettroscopio rimane carico negativamente anche allontanando la bacchetta.';
+          break;
+        case 'grounding':
+          tagEl.innerText = 'Messa a Terra';
+          tagEl.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono';
+          titleEl.innerText = 'Messa a Terra (Discarica)';
+          descEl.innerText = 'Il corpo umano funge da conduttore verso terra. Gli elettroni in eccesso defluiscono dall\'elettroscopio a terra, facendo chiudere le lamine d\'oro.';
+          break;
+      }
+    }
+
+    function updateStep(stepNum) {
+      if (stepNum < state.currentStep) return;
+      state.currentStep = stepNum;
+      
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById('step-' + i);
+        if (!el) continue;
+        if (i === stepNum) {
+          el.className = 'p-2 rounded-lg bg-slate-800/90 border border-amber-500/50 text-slate-100 flex items-start gap-2 shadow-md';
+          const badge = el.querySelector('span');
+          if (badge) badge.className = 'w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-bold flex items-center justify-center shrink-0 text-[10px] animate-pulse';
+        } else if (i < stepNum) {
+          el.className = 'p-2 rounded-lg bg-emerald-950/30 border border-emerald-500/30 text-emerald-200 flex items-start gap-2 opacity-80';
+          const badge = el.querySelector('span');
+          if (badge) badge.className = 'w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[10px]';
+        } else {
+          el.className = 'p-2 rounded-lg bg-slate-900 border border-slate-800 opacity-50 flex items-start gap-2';
+          const badge = el.querySelector('span');
+          if (badge) badge.className = 'w-5 h-5 rounded-full bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0 text-[10px]';
+        }
+      }
+    }
+
+    // --- MAIN CANVAS RENDER FUNCTION ---
+    function render() {
+      if (!cssWidth || !cssHeight) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Reset transform and clear
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Scale context for high-DPI crisp rendering
+      ctx.scale(dpr, dpr);
+
+      const elec = state.electroscope;
+
+      // 1. Render Glass Jar Container (Ampolla di Vetro)
+      drawGlassJar(elec.knobX, elec.knobY);
+
+      // 2. Render Metallic Sphere, Stem, and Gold Leaves (Sfera, Asta e Lamine d'Oro)
+      drawElectroscopeAssembly(elec);
+
+      // 3. Render Electrostatic Forces (Vectors)
+      if (state.showForces && elec.leafAngle > 2) {
+        drawForceVectors(elec);
+      }
+
+      // 4. Render Plastic Rod and Wool Cloth
+      drawPlasticRod();
+      if (state.cloth.opacity > 0) {
+        drawWoolCloth();
+      }
+
+      // 5. Render Grounding Hand
+      if (state.hand.opacity > 0) {
+        drawGroundingHand(elec.knobX, elec.knobY, state.hand.opacity);
+      }
+
+      // 6. Render Positive/Negative Charges Overlay
+      if (state.showCharges) {
+        drawChargesOverlay(elec);
+      }
+    }
+
+    function renderLoop() {
+      updatePhysics();
+      render();
+      requestAnimationFrame(renderLoop);
+    }
+
+    function drawGlassJar(knobX, knobY) {
+      const jarWidth = 230;
+      const jarHeight = 270;
+      const jarX = knobX - jarWidth / 2;
+      const jarY = knobY + 55;
+
+      ctx.save();
+
+      // Glass Jar Outer Shadow
+      ctx.shadowColor = 'rgba(56, 189, 248, 0.2)';
+      ctx.shadowBlur = 20;
+
+      // Glass Body Gradient
+      const glassGrad = ctx.createLinearGradient(jarX, jarY, jarX + jarWidth, jarY + jarHeight);
+      glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+      glassGrad.addColorStop(0.3, 'rgba(186, 230, 253, 0.04)');
+      glassGrad.addColorStop(0.8, 'rgba(56, 189, 248, 0.08)');
+      glassGrad.addColorStop(1, 'rgba(255, 255, 255, 0.16)');
+
+      ctx.fillStyle = glassGrad;
+      drawRoundedRect(ctx, jarX, jarY, jarWidth, jarHeight, [16, 16, 28, 28]);
+      ctx.fill();
+
+      // Outer Glass Contour Outline
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.45)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Specular Reflections (Glass Light Highlights)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(jarX + 16, jarY + 25);
+      ctx.lineTo(jarX + 16, jarY + jarHeight - 35);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(jarX + jarWidth - 14, jarY + 40);
+      ctx.lineTo(jarX + jarWidth - 14, jarY + jarHeight - 45);
+      ctx.stroke();
+
+      // Black Rubber / Insulating Stopper (Tappo Isolante)
+      const stopperW = 96;
+      const stopperH = 28;
+      const stopperX = knobX - stopperW / 2;
+      const stopperY = jarY - 12;
+
+      const stopperGrad = ctx.createLinearGradient(stopperX, stopperY, stopperX, stopperY + stopperH);
+      stopperGrad.addColorStop(0, '#475569');
+      stopperGrad.addColorStop(0.5, '#1e293b');
+      stopperGrad.addColorStop(1, '#0f172a');
+
+      ctx.fillStyle = stopperGrad;
+      drawRoundedRect(ctx, stopperX, stopperY, stopperW, stopperH, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Label for Glass Jar & Stopper
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '11px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('Recipiente di Vetro', jarX - 10, jarY + jarHeight * 0.5);
+      
+      ctx.strokeStyle = '#475569';
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(jarX - 8, jarY + jarHeight * 0.5 - 3);
+      ctx.lineTo(jarX + 12, jarY + jarHeight * 0.5 - 3);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.restore();
+    }
+
+    function drawElectroscopeAssembly(elec) {
+      ctx.save();
+
+      const knobX = elec.knobX;
+      const knobY = elec.knobY;
+
+      // 1. Central Metal Conductive Rod (Asta Metallica)
+      const stemTopY = knobY;
+      const stemBottomY = knobY + elec.stemLength;
+
+      const stemGrad = ctx.createLinearGradient(knobX - 5, 0, knobX + 5, 0);
+      stemGrad.addColorStop(0, '#d97706');
+      stemGrad.addColorStop(0.5, '#fef08a');
+      stemGrad.addColorStop(1, '#b45309');
+
+      ctx.fillStyle = stemGrad;
+      ctx.fillRect(knobX - 4, stemTopY, 8, elec.stemLength);
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(knobX - 4, stemTopY, 8, elec.stemLength);
+
+      // 2. Gold Leaf Hinge Pivot Ring
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(knobX, stemBottomY, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Gold Leaves (Lamine d'Oro)
+      const rad = (elec.leafAngle * Math.PI) / 180;
+      const leafLen = elec.leafLength;
+
+      // Left Gold Leaf
+      ctx.save();
+      ctx.translate(knobX, stemBottomY);
+      ctx.rotate(-rad);
+
+      const goldGrad1 = ctx.createLinearGradient(0, 0, -12, leafLen);
+      goldGrad1.addColorStop(0, '#fffbeb');
+      goldGrad1.addColorStop(0.3, '#fde047');
+      goldGrad1.addColorStop(0.7, '#eab308');
+      goldGrad1.addColorStop(1, '#ca8a04');
+
+      ctx.fillStyle = goldGrad1;
+      ctx.beginPath();
+      ctx.moveTo(-1, 0);
+      ctx.quadraticCurveTo(-14, leafLen * 0.5, -2, leafLen);
+      ctx.lineTo(2, leafLen);
+      ctx.lineTo(1, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#854d0e';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+
+      // Right Gold Leaf
+      ctx.save();
+      ctx.translate(knobX, stemBottomY);
+      ctx.rotate(rad);
+
+      const goldGrad2 = ctx.createLinearGradient(0, 0, 12, leafLen);
+      goldGrad2.addColorStop(0, '#fffbeb');
+      goldGrad2.addColorStop(0.3, '#fde047');
+      goldGrad2.addColorStop(0.7, '#eab308');
+      goldGrad2.addColorStop(1, '#ca8a04');
+
+      ctx.fillStyle = goldGrad2;
+      ctx.beginPath();
+      ctx.moveTo(1, 0);
+      ctx.quadraticCurveTo(14, leafLen * 0.5, 2, leafLen);
+      ctx.lineTo(-2, leafLen);
+      ctx.lineTo(-1, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#854d0e';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+
+      // 4. Metallic Top Sphere (Sfera Metallica Superiore)
+      const sphereGrad = ctx.createRadialGradient(
+        knobX - elec.knobRadius * 0.35,
+        knobY - elec.knobRadius * 0.35,
+        elec.knobRadius * 0.1,
+        knobX,
+        knobY,
+        elec.knobRadius
+      );
+      sphereGrad.addColorStop(0, '#ffffff');
+      sphereGrad.addColorStop(0.2, '#fef08a');
+      sphereGrad.addColorStop(0.6, '#f59e0b');
+      sphereGrad.addColorStop(0.9, '#b45309');
+      sphereGrad.addColorStop(1, '#78350f');
+
+      ctx.shadowColor = 'rgba(245, 158, 11, 0.4)';
+      ctx.shadowBlur = 18;
+
+      ctx.fillStyle = sphereGrad;
+      ctx.beginPath();
+      ctx.arc(knobX, knobY, elec.knobRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Label for Metallic Sphere
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('Sfera Metallica', knobX - elec.knobRadius - 15, knobY + 4);
+      
+      ctx.strokeStyle = '#94a3b8';
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(knobX - elec.knobRadius - 12, knobY);
+      ctx.lineTo(knobX - elec.knobRadius + 2, knobY);
+      ctx.stroke();
+
+      // Label for Gold Leaves
+      ctx.textAlign = 'left';
+      ctx.fillText("Lamine d'Oro", knobX + 75, stemBottomY + 40);
+      ctx.beginPath();
+      ctx.moveTo(knobX + 70, stemBottomY + 36);
+      ctx.lineTo(knobX + 25, stemBottomY + 36);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.restore();
+    }
+
+    function drawForceVectors(elec) {
+      ctx.save();
+      const stemBottomY = elec.knobY + elec.stemLength;
+      const leafLen = elec.leafLength * 0.65;
+      const rad = (elec.leafAngle * Math.PI) / 180;
+
+      const leftX = elec.knobX - Math.sin(rad) * leafLen;
+      const leftY = stemBottomY + Math.cos(rad) * leafLen;
+
+      const rightX = elec.knobX + Math.sin(rad) * leafLen;
+      const rightY = stemBottomY + Math.cos(rad) * leafLen;
+
+      const arrowLen = Math.min(50, elec.leafAngle * 0.85);
+
+      drawArrow(leftX, leftY, leftX - arrowLen, leftY, '#f43f5e');
+      drawArrow(rightX, rightY, rightX + arrowLen, rightY, '#f43f5e');
+
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = 'bold 10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Forza Repulsiva Fe', elec.knobX, stemBottomY + leafLen + 22);
+
+      ctx.restore();
+    }
+
+    function drawArrow(fromx, fromy, tox, toy, color) {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2.5;
+
+      const headlen = 8;
+      const dx = tox - fromx;
+      const dy = toy - fromy;
+      const angle = Math.atan2(dy, dx);
+
+      ctx.beginPath();
+      ctx.moveTo(fromx, fromy);
+      ctx.lineTo(tox, toy);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(tox, toy);
+      ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawPlasticRod() {
+      const rod = state.rod;
+      ctx.save();
+
+      ctx.translate(rod.x, rod.y);
+
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 14;
+      ctx.shadowOffsetY = 4;
+
+      // Blue Plastic Rod
+      const rodGrad = ctx.createLinearGradient(-rod.width / 2, -rod.height / 2, rod.width / 2, rod.height / 2);
+      rodGrad.addColorStop(0, '#0284c7');
+      rodGrad.addColorStop(0.3, '#38bdf8');
+      rodGrad.addColorStop(0.7, '#0369a1');
+      rodGrad.addColorStop(1, '#0c4a6e');
+
+      ctx.fillStyle = rodGrad;
+      drawRoundedRect(ctx, -rod.width / 2, -rod.height / 2, rod.width, rod.height, 12);
+      ctx.fill();
+
+      ctx.strokeStyle = '#bae6fd';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Bacchetta Plastica', 0, 4);
+
+      ctx.restore();
+    }
+
+    function drawWoolCloth() {
+      const rod = state.rod;
+      ctx.save();
+      ctx.globalAlpha = state.cloth.opacity;
+
+      const clothX = rod.x - 20;
+      const clothY = rod.y - 25;
+
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.arc(clothX - 16, clothY, 18, 0, Math.PI * 2);
+      ctx.arc(clothX + 16, clothY + 5, 20, 0, Math.PI * 2);
+      ctx.arc(clothX, clothY + 16, 22, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.arc(clothX - 5, clothY - 4, 14, 0, Math.PI * 2);
+      ctx.arc(clothX + 10, clothY, 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Panno Lana (+)', clothX, clothY + 6);
+
+      ctx.restore();
+    }
+
+    function drawGroundingHand(knobX, knobY, opacity) {
+      ctx.save();
+      ctx.globalAlpha = opacity;
+
+      const handX = knobX + 15;
+      const handY = knobY - 10;
+
+      // Glow aura
+      const glowGrad = ctx.createRadialGradient(knobX, knobY, 2, knobX, knobY, 30);
+      glowGrad.addColorStop(0, 'rgba(52, 211, 153, 0.9)');
+      glowGrad.addColorStop(1, 'rgba(52, 211, 153, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(knobX, knobY, 30, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hand shape
+      ctx.fillStyle = '#fca5a5';
+      ctx.beginPath();
+      ctx.arc(handX + 25, handY - 15, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#fca5a5';
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(handX + 28, handY - 10);
+      ctx.lineTo(knobX + 2, knobY - 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#34d199';
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Messa a Terra', knobX + 45, knobY - 30);
+
+      ctx.restore();
+    }
+
+    function drawChargesOverlay(elec) {
+      ctx.save();
+
+      // 1. Charges on Plastic Rod
+      if (Math.abs(state.rodCharge) > 0) {
+        const count = Math.min(14, Math.ceil(Math.abs(state.rodCharge) / 7));
+        const rod = state.rod;
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 15px JetBrains Mono';
+        ctx.textAlign = 'center';
+        for (let i = 0; i < count; i++) {
+          const px = rod.x - rod.width / 2 + 16 + (i * (rod.width - 32)) / count;
+          const py = rod.y + (i % 2 === 0 ? -6 : 6);
+          ctx.fillText('-', px, py + 5);
+        }
+      }
+
+      // 2. Charges on Metal Sphere
+      const knobNet = elec.knobNetCharge;
+      if (Math.abs(knobNet) > 0.8) {
+        const isPos = knobNet > 0; // Positive charge (> 0) = deficiency of electrons (+)
+        const symbol = isPos ? '+' : '-';
+        ctx.fillStyle = isPos ? '#f43f5e' : '#38bdf8';
+        ctx.font = 'bold 16px JetBrains Mono';
+        ctx.textAlign = 'center';
+
+        const numSymbols = Math.min(8, Math.ceil(Math.abs(knobNet) / 3));
+        for (let i = 0; i < numSymbols; i++) {
+          const angle = (i * Math.PI * 2) / numSymbols;
+          const r = elec.knobRadius * 0.65;
+          const px = elec.knobX + Math.cos(angle) * r;
+          const py = elec.knobY + Math.sin(angle) * r;
+          ctx.fillText(symbol, px, py + 5);
+        }
+      }
+
+      // 3. Charges on Gold Leaves
+      const leavesNet = elec.leavesNetCharge;
+      if (Math.abs(leavesNet) > 0.8) {
+        const isPos = leavesNet > 0; // Positive charge (> 0) = (+)
+        const symbol = isPos ? '+' : '-';
+        ctx.fillStyle = isPos ? '#f43f5e' : '#38bdf8';
+        ctx.font = 'bold 14px JetBrains Mono';
+
+        const stemBottomY = elec.knobY + elec.stemLength;
+        const rad = (elec.leafAngle * Math.PI) / 180;
+        const count = Math.min(6, Math.ceil(Math.abs(leavesNet) / 4));
+
+        for (let i = 1; i <= count; i++) {
+          const dist = 20 + i * 12;
+          const lx = elec.knobX - Math.sin(rad) * dist - 6;
+          const ly = stemBottomY + Math.cos(rad) * dist;
+          ctx.fillText(symbol, lx, ly);
+
+          const rx = elec.knobX + Math.sin(rad) * dist + 2;
+          const ry = stemBottomY + Math.cos(rad) * dist;
+          ctx.fillText(symbol, rx, ry);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // --- EVENT LISTENERS & USER CONTROLS ---
+
+    document.getElementById('btn-rub-rod').addEventListener('click', () => {
+      sound.playRub();
+      state.cloth.opacity = 1;
+      state.cloth.isRubbing = true;
+      state.rodCharge = -85;
+      
+      setTimeout(() => {
+        state.cloth.opacity = 0;
+        state.cloth.isRubbing = false;
+      }, 1200);
+
+      updateStep(1);
+      triggerPhenomenon('rubbing');
+    });
+
+    document.getElementById('btn-approach-rod').addEventListener('click', () => {
+      if (state.rodCharge === 0) state.rodCharge = -75;
+      state.rod.targetX = state.electroscope.knobX + state.electroscope.knobRadius + 35;
+      state.rod.targetY = state.electroscope.knobY - 10;
+      state.hand.active = false;
+    });
+
+    document.getElementById('btn-touch-rod').addEventListener('click', () => {
+      if (state.rodCharge === 0) state.rodCharge = -85;
+      state.rod.targetX = state.electroscope.knobX + state.electroscope.knobRadius + 6;
+      state.rod.targetY = state.electroscope.knobY;
+      state.hand.active = false;
+    });
+
+    document.getElementById('btn-grounding').addEventListener('click', () => {
+      state.hand.active = true;
+      setTimeout(() => {
+        state.hand.active = false;
+      }, 1600);
+    });
+
+    document.getElementById('btn-separate-rod').addEventListener('click', () => {
+      state.rod.targetX = state.electroscope.knobX + 230;
+      state.rod.targetY = state.electroscope.knobY - 60;
+      state.hand.active = false;
+    });
+
+    document.getElementById('btn-reset-all').addEventListener('click', () => {
+      state.rodCharge = 0;
+      state.electroscopeCharge = 0;
+      state.hand.active = false;
+      state.rod.targetX = state.electroscope.knobX + 220;
+      state.rod.targetY = state.electroscope.knobY - 60;
+      state.currentStep = 1;
+      updateStep(1);
+      triggerPhenomenon('equilibrium');
+    });
+
+    document.getElementById('slider-rub').addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.rodCharge = -val;
+      if (val > 0) updateStep(1);
+    });
+
+    document.getElementById('toggle-charges').addEventListener('change', (e) => {
+      state.showCharges = e.target.checked;
+    });
+
+    document.getElementById('toggle-forces').addEventListener('change', (e) => {
+      state.showForces = e.target.checked;
+    });
+
+    document.getElementById('btn-sound-toggle').addEventListener('click', () => {
+      sound.enabled = !sound.enabled;
+      const icon = document.getElementById('sound-icon');
+      if (icon) icon.className = sound.enabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark text-rose-400';
+    });
+
+    // Mouse & Touch Dragging on Canvas
+    let isMouseDown = false;
+
+    function handlePointerDown(e) {
+      sound.init();
+      const rect = canvas.getBoundingClientRect();
+      const clickX = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const clickY = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+      const distToRod = Math.hypot(clickX - state.rod.x, clickY - state.rod.y);
+      if (distToRod < 110) {
+        state.rod.isDragging = true;
+        isMouseDown = true;
+      }
+    }
+
+    function handlePointerMove(e) {
+      if (!isMouseDown || !state.rod.isDragging) return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+      if (clientX !== undefined && clientY !== undefined) {
+        state.rod.targetX = clientX - rect.left;
+        state.rod.targetY = clientY - rect.top;
+      }
+    }
+
+    function handlePointerUp() {
+      isMouseDown = false;
+      state.rod.isDragging = false;
+    }
+
+    canvas.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+
+    canvas.addEventListener('touchstart', handlePointerDown, { passive: true });
+    window.addEventListener('touchmove', handlePointerMove, { passive: true });
+    window.addEventListener('touchend', handlePointerUp);
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initialization on window load
+    window.onload = () => {
+      resizeCanvas();
+      renderLoop();
+    };
+  </script>
+</body>
+</html>
