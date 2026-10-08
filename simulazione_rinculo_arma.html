@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conservazione della Quantità di Moto - Rinculo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem;
+            background-color: #ffffff;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+        /* Custom range slider styling for a cleaner look */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .math {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <header class="bg-slate-800 text-white p-4 shadow-md z-10 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold">Conservazione della Quantità di Moto</h1>
+            <p class="text-sm text-slate-300">Simulazione: Rinculo di un'arma da fuoco (Fisica 4° Liceo)</p>
+        </div>
+        <button id="reset-btn" class="bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-4 border border-slate-500 rounded shadow">
+            Resetta Scena
+        </button>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
+        
+        <!-- Canvas Container -->
+        <section class="flex-1 p-4 relative flex flex-col">
+            <div class="flex-1 relative">
+                <canvas id="simulationCanvas"></canvas>
+            </div>
+            
+            <div class="mt-4 bg-white p-4 rounded-lg shadow flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex-1 min-w-[160px]">
+                    <label for="massaProiettile" class="block text-sm font-medium text-slate-700">Massa Proiettile (<span class="math">m<sub>p</sub></span>): <span id="valMassaProiettile" class="font-bold text-blue-600">10</span> g</label>
+                    <input type="range" id="massaProiettile" min="5" max="20" value="10" step="1" class="mt-1 block w-full">
+                </div>
+                
+                <div class="flex-1 min-w-[160px]">
+                    <label for="massaArma" class="block text-sm font-medium text-slate-700">Massa Arma (<span class="math">M<sub>a</sub></span>): <span id="valMassaArma" class="font-bold text-red-600">3.0</span> kg</label>
+                    <input type="range" id="massaArma" min="1.0" max="5.0" value="3.0" step="0.1" class="mt-1 block w-full">
+                </div>
+
+                <div class="flex-1 min-w-[160px]">
+                    <label for="velProiettile" class="block text-sm font-medium text-slate-700">Velocità Proiettile (<span class="math">v<sub>p</sub></span>): <span id="valVelProiettile" class="font-bold text-blue-600">400</span> m/s</label>
+                    <input type="range" id="velProiettile" min="200" max="800" value="400" step="10" class="mt-1 block w-full">
+                </div>
+
+                <div class="flex-1 min-w-[160px]">
+                    <label for="slowMotion" class="block text-sm font-medium text-slate-700">Rallentatore Tempo: <span id="valSlowMotion" class="font-bold text-purple-600">20x</span></label>
+                    <input type="range" id="slowMotion" min="1" max="100" value="20" step="1" class="mt-1 block w-full">
+                </div>
+
+                <button id="spara-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg text-lg transition-transform transform hover:scale-105 active:scale-95">
+                    SPARA!
+                </button>
+            </div>
+        </section>
+
+        <!-- Side Panel for Data -->
+        <aside class="w-full md:w-80 bg-white border-l border-slate-200 shadow-xl flex flex-col z-10 overflow-y-auto">
+            <div class="p-4 bg-slate-100 border-b border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800">Analisi Dati in Tempo Reale</h2>
+            </div>
+            
+            <div class="p-4 flex flex-col gap-6">
+                <!-- Velocità -->
+                <div>
+                    <h3 class="font-semibold text-slate-700 border-b pb-1 mb-2">Velocità Calcolate (<span class="math">v</span>)</h3>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Proiettile (<span class="text-blue-600 math">v<sub>p</sub></span>):</span>
+                        <span id="data-v-proiettile" class="font-mono text-blue-600">+0.00 m/s</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Arma Rinculo (<span class="text-red-600 math">v<sub>a</sub></span>):</span>
+                        <span id="data-v-arma" class="font-mono text-red-600">0.00 m/s</span>
+                    </div>
+                </div>
+
+                <!-- Quantità di Moto -->
+                <div>
+                    <h3 class="font-semibold text-slate-700 border-b pb-1 mb-2">Quantità di Moto (<span class="math">p = m &times; v</span>)</h3>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Proiettile (<span class="text-blue-600 math">p<sub>p</sub></span>):</span>
+                        <span id="data-p-proiettile" class="font-mono text-blue-600">0.00 kg&middot;m/s</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Arma (<span class="text-red-600 math">p<sub>a</sub></span>):</span>
+                        <span id="data-p-arma" class="font-mono text-red-600">0.00 kg&middot;m/s</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-sm mt-2 pt-2 border-t">
+                        <span>Totale (<span class="math">p<sub>tot</sub> = p<sub>p</sub> + p<sub>a</sub></span>):</span>
+                        <span id="data-p-totale" class="font-mono text-green-600">0.00 kg&middot;m/s</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1 italic">La quantità di moto totale si conserva (rimane zero).</p>
+                </div>
+
+                <!-- Energia Cinetica -->
+                <div>
+                    <h3 class="font-semibold text-slate-700 border-b pb-1 mb-2">Energia Cinetica (<span class="math">K = &frac12;mv&sup2;</span>)</h3>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Proiettile (<span class="text-blue-600 math">K<sub>p</sub></span>):</span>
+                        <span id="data-k-proiettile" class="font-mono text-blue-600">0.00 J</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>Arma (<span class="text-red-600 math">K<sub>a</sub></span>):</span>
+                        <span id="data-k-arma" class="font-mono text-red-600">0.00 J</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-sm mt-2 pt-2 border-t">
+                        <span>Totale (<span class="math">K<sub>tot</sub> = K<sub>p</sub> + K<sub>a</sub></span>):</span>
+                        <span id="data-k-totale" class="font-mono text-orange-600">0.00 J</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1 italic">L'energia cinetica aumenta a spese dell'energia chimica esplosiva.</p>
+                </div>
+
+                <!-- Note Teoriche -->
+                <div class="bg-blue-50 p-3 rounded text-sm text-blue-800">
+                    <p class="font-semibold mb-1">Formula del Rinculo:</p>
+                    <p class="math text-center">m<sub>p</sub> &times; v<sub>p</sub> = - M<sub>a</sub> &times; v<sub>a</sub></p>
+                    <p class="mt-2">Quindi la velocità di rinculo dell'arma è:</p>
+                    <p class="math text-center">v<sub>a</sub> = - (m<sub>p</sub> / M<sub>a</sub>) &times; v<sub>p</sub></p>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('simulationCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // DOM Elements for inputs
+            const inputMp = document.getElementById('massaProiettile');
+            const inputMa = document.getElementById('massaArma');
+            const inputVp = document.getElementById('velProiettile');
+            const inputSlow = document.getElementById('slowMotion');
+            
+            const valMp = document.getElementById('valMassaProiettile');
+            const valMa = document.getElementById('valMassaArma');
+            const valVp = document.getElementById('valVelProiettile');
+            const valSlow = document.getElementById('valSlowMotion');
+            
+            const btnSpara = document.getElementById('spara-btn');
+            const btnReset = document.getElementById('reset-btn');
+
+            // DOM Elements for data display
+            const displayVp = document.getElementById('data-v-proiettile');
+            const displayVa = document.getElementById('data-v-arma');
+            const displayPp = document.getElementById('data-p-proiettile');
+            const displayPa = document.getElementById('data-p-arma');
+            const displayPtot = document.getElementById('data-p-totale');
+            const displayKp = document.getElementById('data-k-proiettile');
+            const displayKa = document.getElementById('data-k-arma');
+            const displayKtot = document.getElementById('data-k-totale');
+
+            // State
+            let isAnimating = false;
+            let lastTimestamp = 0;
+            let animationId;
+            let muzzleFlashTimer = 0;
+
+            // Physical params
+            let m_p_kg = parseFloat(inputMp.value) / 1000;
+            let m_a_kg = parseFloat(inputMa.value);
+            let v_p_ms = parseFloat(inputVp.value);
+            let v_a_ms = 0;
+            let slowMoFactor = parseFloat(inputSlow.value);
+
+            // Visual Scale & Physics logic
+            let PIXELS_PER_METER = 50; 
+            
+            // Origins
+            let originX = 0;
+            let originY = 0;
+            let cm_X = 0; // Center of Mass X position
+
+            // Firearm & Bullet setup with motion trails
+            let arma = { x: 0, width: 36, height: 16, color: '#dc2626', trail: [] }; 
+            let proiettile = { x: 0, radius: 6, color: '#f59e0b', trail: [] };
+
+            function resizeCanvas() {
+                const parent = canvas.parentElement;
+                canvas.width = parent.clientWidth;
+                canvas.height = parent.clientHeight;
+                
+                originX = canvas.width / 2;
+                originY = canvas.height / 2;
+                
+                resetSimulation();
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+
+            function updateInputDisplays() {
+                valMp.textContent = inputMp.value;
+                valMa.textContent = inputMa.value;
+                valVp.textContent = inputVp.value;
+                valSlow.textContent = inputSlow.value + "x";
+
+                m_p_kg = parseFloat(inputMp.value) / 1000;
+                m_a_kg = parseFloat(inputMa.value);
+                v_p_ms = parseFloat(inputVp.value);
+                slowMoFactor = parseFloat(inputSlow.value);
+
+                v_a_ms = - (m_p_kg * v_p_ms) / m_a_kg;
+
+                if(!isAnimating) {
+                    updateDataDisplay();
+                }
+            }
+
+            inputMp.addEventListener('input', updateInputDisplays);
+            inputMa.addEventListener('input', updateInputDisplays);
+            inputVp.addEventListener('input', updateInputDisplays);
+            inputSlow.addEventListener('input', updateInputDisplays);
+
+            function updateDataDisplay() {
+                let current_vp = isAnimating || arma.x !== 0 ? v_p_ms : 0;
+                let current_va = isAnimating || arma.x !== 0 ? v_a_ms : 0;
+
+                displayVp.textContent = (current_vp >= 0 ? "+" : "") + current_vp.toFixed(2) + " m/s";
+                displayVa.textContent = current_va.toFixed(2) + " m/s";
+
+                let p_p = m_p_kg * current_vp;
+                let p_a = m_a_kg * current_va;
+                let p_tot = p_p + p_a;
+
+                let k_p = 0.5 * m_p_kg * Math.pow(current_vp, 2);
+                let k_a = 0.5 * m_a_kg * Math.pow(current_va, 2);
+                let k_tot = k_p + k_a;
+
+                displayPp.textContent = p_p.toFixed(2) + " kg\u00B7m/s";
+                displayPa.textContent = p_a.toFixed(2) + " kg\u00B7m/s";
+                displayPtot.textContent = p_tot.toFixed(2) + " kg\u00B7m/s";
+                
+                displayPtot.className = `font-mono ${Math.abs(p_tot) < 0.01 ? 'text-green-600' : 'text-red-600'}`;
+
+                displayKp.textContent = k_p.toFixed(2) + " J";
+                displayKa.textContent = k_a.toFixed(2) + " J";
+                displayKtot.textContent = k_tot.toFixed(2) + " J";
+            }
+
+            function drawScene() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw horizontal axis
+                let axisY = originY + 60;
+                ctx.beginPath();
+                ctx.moveTo(0, axisY);
+                ctx.lineTo(canvas.width, axisY);
+                ctx.strokeStyle = '#94a3b8';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw ticks on axis
+                ctx.fillStyle = '#64748b';
+                ctx.textAlign = 'center';
+                ctx.font = '12px Inter';
+                let metersVisible = Math.ceil(canvas.width / PIXELS_PER_METER);
+                let centerTickIndex = Math.floor(originX / PIXELS_PER_METER);
+                
+                for(let i = -centerTickIndex; i <= metersVisible - centerTickIndex; i++) {
+                    let tickX = originX + i * PIXELS_PER_METER;
+                    if(tickX >= 0 && tickX <= canvas.width) {
+                        ctx.beginPath();
+                        ctx.moveTo(tickX, axisY - 5);
+                        ctx.lineTo(tickX, axisY + 5);
+                        ctx.stroke();
+                        if (i % 2 === 0) {
+                            ctx.fillText(i + 'm', tickX, axisY + 20);
+                        }
+                    }
+                }
+
+                // Draw Center of Mass Marker (fixed at origin)
+                cm_X = (m_p_kg * proiettile.x + m_a_kg * arma.x) / (m_p_kg + m_a_kg);
+                let draw_cm_X = originX + cm_X * PIXELS_PER_METER;
+                
+                ctx.beginPath();
+                ctx.moveTo(draw_cm_X, axisY - 35);
+                ctx.lineTo(draw_cm_X, axisY + 10);
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 2.5;
+                ctx.setLineDash([4, 3]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                ctx.fillStyle = '#10b981';
+                ctx.font = 'bold 13px Inter';
+                ctx.fillText("CM (Fisso)", draw_cm_X, axisY - 40);
+
+                let gunY = originY - 10;
+                let draw_arma_x = originX + arma.x * PIXELS_PER_METER;
+                let barrelTipX = draw_arma_x + arma.width/2 + 12;
+                let draw_proiettile_x = (barrelTipX / PIXELS_PER_METER + proiettile.x) * PIXELS_PER_METER;
+
+                // Draw Gun Recoil Motion Trail
+                if (arma.trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(arma.trail[0], gunY);
+                    for (let i = 1; i < arma.trail.length; i++) {
+                        ctx.lineTo(arma.trail[i], gunY);
+                    }
+                    ctx.strokeStyle = 'rgba(220, 38, 38, 0.35)';
+                    ctx.lineWidth = 12;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
+
+                // Draw Bullet Trajectory Trail
+                if (proiettile.trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(proiettile.trail[0], gunY);
+                    for (let i = 1; i < proiettile.trail.length; i++) {
+                        ctx.lineTo(proiettile.trail[i], gunY);
+                    }
+                    ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                }
+
+                // Draw Muzzle Flash / Explosion Effect
+                if (muzzleFlashTimer > 0) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(barrelTipX, gunY, 18 * (muzzleFlashTimer / 10), 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(245, 158, 11, ${muzzleFlashTimer / 10})`;
+                    ctx.fill();
+                    ctx.restore();
+                    muzzleFlashTimer--;
+                }
+
+                // Draw Arma (Firearm)
+                ctx.fillStyle = arma.color;
+                ctx.fillRect(draw_arma_x - arma.width/2, gunY - arma.height/2, arma.width, arma.height);
+                ctx.fillRect(draw_arma_x - arma.width/2, gunY + arma.height/2, arma.width/3, arma.height*0.8);
+                ctx.fillRect(draw_arma_x + arma.width/2, gunY - arma.height/4, 12, arma.height/2);
+                
+                // Arma Label
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 11px Inter';
+                ctx.fillText("Arma", draw_arma_x, gunY + 4);
+
+                // Draw Proiettile (Bullet)
+                if (draw_proiettile_x <= canvas.width + 10) {
+                    ctx.beginPath();
+                    ctx.arc(draw_proiettile_x, gunY, proiettile.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = proiettile.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                } else {
+                    // Offscreen bullet indicator
+                    ctx.fillStyle = '#2563eb';
+                    ctx.font = 'bold 12px Inter';
+                    ctx.textAlign = 'right';
+                    ctx.fillText("Proiettile \u279D", canvas.width - 15, gunY + 4);
+                }
+
+                // Draw velocity vectors during animation or post-shot
+                if (isAnimating || arma.x !== 0) {
+                    drawVector(draw_arma_x, gunY - 26, v_a_ms, '#ef4444', 'v_a');
+                    if (draw_proiettile_x <= canvas.width - 20) {
+                        drawVector(draw_proiettile_x, gunY - 26, v_p_ms, '#2563eb', 'v_p');
+                    }
+                }
+            }
+
+            function drawVector(x, y, velocity, color, label) {
+                let visualLength = velocity * 0.18; 
+                let sign = Math.sign(velocity);
+                let absLen = Math.abs(visualLength);
+                if (absLen < 20 && absLen > 0) absLen = 20;
+                if (absLen > 140) absLen = 140;
+                visualLength = sign * absLen;
+
+                if (visualLength === 0) return;
+
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + visualLength, y);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                // Arrow head
+                ctx.beginPath();
+                ctx.moveTo(x + visualLength, y);
+                ctx.lineTo(x + visualLength - sign * 6, y - 5);
+                ctx.lineTo(x + visualLength - sign * 6, y + 5);
+                ctx.fillStyle = color;
+                ctx.fill();
+
+                // Label with explicit value in m/s
+                ctx.fillStyle = color;
+                ctx.textAlign = sign > 0 ? 'left' : 'right';
+                let labelX = x + visualLength + (sign * 8);
+                ctx.font = 'bold 13px Inter';
+                let valStr = (velocity > 0 ? "+" : "") + velocity.toFixed(2) + " m/s";
+                ctx.fillText(`${label} = ${valStr}`, labelX, y + 4);
+            }
+
+            function animate(timestamp) {
+                if (!lastTimestamp) lastTimestamp = timestamp;
+                let deltaTime = (timestamp - lastTimestamp) / 1000;
+                lastTimestamp = timestamp;
+
+                if (deltaTime > 0.1) deltaTime = 0.1;
+
+                if (isAnimating) {
+                    let dt_sim = deltaTime / slowMoFactor;
+
+                    arma.x += v_a_ms * dt_sim;
+                    proiettile.x += v_p_ms * dt_sim;
+
+                    let draw_arma_x = originX + arma.x * PIXELS_PER_METER;
+                    let barrelTipX = draw_arma_x + arma.width/2 + 12;
+                    let draw_proiettile_x = (barrelTipX / PIXELS_PER_METER + proiettile.x) * PIXELS_PER_METER;
+
+                    // Record trails for visual trace
+                    arma.trail.push(draw_arma_x);
+                    if (draw_proiettile_x <= canvas.width + 50) {
+                        proiettile.trail.push(draw_proiettile_x);
+                    }
+
+                    updateDataDisplay();
+
+                    // Stop condition: only when the GUN reaches the left margin
+                    if (draw_arma_x < 30) {
+                        isAnimating = false;
+                        btnSpara.disabled = false;
+                        btnSpara.classList.remove('opacity-50', 'cursor-not-allowed');
+                        
+                        drawScene();
+                        
+                        let axisY = originY + 60;
+                        ctx.fillStyle = '#10b981';
+                        ctx.textAlign = 'center';
+                        ctx.font = '13px Inter';
+                        ctx.fillText("Il Centro di Massa (CM) resta immobile nell'origine,", originX, axisY + 45);
+                        ctx.fillText("poiché sulla scena agiscono solo forze interne al sistema.", originX, axisY + 65);
+                        return;
+                    }
+                }
+
+                drawScene();
+
+                if (isAnimating) {
+                    animationId = requestAnimationFrame(animate);
+                }
+            }
+
+            function startSimulation() {
+                if (isAnimating) return;
+                
+                if (arma.x !== 0 || proiettile.x !== 0) {
+                    resetSimulation();
+                }
+
+                isAnimating = true;
+                lastTimestamp = 0;
+                muzzleFlashTimer = 10; // Trigger flash animation
+                
+                btnSpara.disabled = true;
+                btnSpara.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                v_a_ms = - (m_p_kg * v_p_ms) / m_a_kg;
+                
+                let startArmaX = originX + arma.x * PIXELS_PER_METER;
+                let startBulletX = startArmaX + arma.width/2 + 12;
+                arma.trail = [startArmaX];
+                proiettile.trail = [startBulletX];
+
+                animationId = requestAnimationFrame(animate);
+            }
+
+            function resetSimulation() {
+                isAnimating = false;
+                cancelAnimationFrame(animationId);
+                
+                arma.x = 0;
+                proiettile.x = 0; 
+                arma.trail = [];
+                proiettile.trail = [];
+                muzzleFlashTimer = 0;
+                
+                btnSpara.disabled = false;
+                btnSpara.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                updateInputDisplays();
+                drawScene();
+            }
+
+            btnSpara.addEventListener('click', startSimulation);
+            btnReset.addEventListener('click', resetSimulation);
+
+            updateInputDisplays();
+            resizeCanvas(); 
+        });
+    </script>
+</body>
+</html>
