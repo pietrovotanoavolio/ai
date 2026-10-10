@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica di Fisica: Fluidostatica, Vettori & Statica</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- KaTeX CSS e JS per rendering di formule matematiche e fisiche -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .katex { font-size: 1.05em; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- HEADER APP -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow">
+                    <i class="fa-solid fa-atom"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold leading-tight">Verifica di Fisica Online</h1>
+                    <p class="text-xs text-slate-400">Piattaforma Interattiva per Scuole Superiori</p>
+                </div>
+            </div>
+            <div class="text-xs font-semibold bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-indigo-300">
+                <i class="fa-solid fa-graduation-cap mr-1"></i> Prova Studente
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- ==================== SCHERMATA 1: SELEZIONE E AVVIO ==================== -->
+        <section id="screenStart" class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6">
+            <div class="text-center space-y-2 border-b border-slate-100 pb-6">
+                <span class="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 font-bold text-xs rounded-full uppercase tracking-wider">
+                    Anni Scolastici • II & III Anno
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Seleziona la Prova di Fisica</h2>
+                <p class="text-slate-600 text-sm max-w-xl mx-auto">
+                    Scegli l'argomento del quiz, inserisci il tuo nome e avvia la verifica. Le domande, i valori numerici e l'ordine delle risposte cambiano ad ogni tentativo.
+                </p>
+            </div>
+
+            <!-- Selezione Argomenti -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Opzione Fluidostatica -->
+                <div id="cardTopicFluid" onclick="selectTopic('fluidostatica')" class="cursor-pointer p-5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 hover:bg-indigo-50 transition relative flex flex-col justify-between space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center text-xl shadow-md">
+                            <i class="fa-solid fa-water"></i>
+                        </div>
+                        <span class="px-2.5 py-1 bg-indigo-600 text-white font-semibold text-xs rounded-full">Fluidostatica</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">1. Fluidostatica</h3>
+                        <p class="text-xs text-slate-600 mt-1">Pressione, Stevin, Vasi Comunicanti, Principio di Pascal, Torchio Idraulico, Torricelli & Archimede.</p>
+                    </div>
+                    <div id="checkFluid" class="text-indigo-600 font-bold text-xs flex items-center gap-1">
+                        <i class="fa-solid fa-circle-check text-base"></i> Selezionato
+                    </div>
+                </div>
+
+                <!-- Opzione Vettori & Statica -->
+                <div id="cardTopicStatica" onclick="selectTopic('statica')" class="cursor-pointer p-5 rounded-2xl border-2 border-slate-200 hover:border-indigo-300 bg-white hover:bg-slate-50 transition relative flex flex-col justify-between space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 bg-slate-700 text-white rounded-xl flex items-center justify-center text-xl shadow-md">
+                            <i class="fa-solid fa-compass-drafting"></i>
+                        </div>
+                        <span class="px-2.5 py-1 bg-slate-200 text-slate-700 font-semibold text-xs rounded-full">Statica & Leve</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">2. Vettori, Statica & Leve</h3>
+                        <p class="text-xs text-slate-600 mt-1">Grandezze Vettoriali, Forza Peso, Molle, Equilibrio, Attrito, Piano Inclinato, Momento & Leve.</p>
+                    </div>
+                    <div id="checkStatica" class="text-slate-400 font-bold text-xs flex items-center gap-1 hidden">
+                        <i class="fa-solid fa-circle-check text-base"></i> Selezionato
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Dati Studente -->
+            <div class="space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="studentNameInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            <i class="fa-solid fa-user-pen mr-1"></i> Nome / Pseudonimo Studente:
+                        </label>
+                        <input type="text" id="studentNameInput" placeholder="Es. Mario Rossi o Studente_12" 
+                               class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm">
+                    </div>
+                    <div>
+                        <label for="questionCountSelect" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            <i class="fa-solid fa-list-ol mr-1"></i> Numero Quesiti Prova:
+                        </label>
+                        <select id="questionCountSelect" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm font-semibold">
+                            <option value="10">10 Quesiti (Sintetico)</option>
+                            <option value="15" selected>15 Quesiti (Standard)</option>
+                            <option value="20">20 Quesiti (Completo)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5 text-xs text-indigo-800 bg-indigo-50/80 p-3 rounded-xl border border-indigo-100 font-medium">
+                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-600 text-base flex-shrink-0"></i>
+                    <span><strong>Generazione Algoritmica Attiva:</strong> Ad ogni esecuzione il sistema calcola problemi numerici con dati sempre differenti e seleziona domande causali.</span>
+                </div>
+
+                <p class="text-xs text-slate-500">
+                    <i class="fa-solid fa-shield-halved text-amber-500 mr-1"></i>
+                    Durante la prova, è obbligatorio selezionare una risposta prima di passare alla domanda successiva.
+                </p>
+            </div>
+
+            <button onclick="startSelectedQuiz()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                <span>Inizia Nuova Verifica Personalizzata</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </section>
+
+        <!-- ==================== SCHERMATA 2: TEST IN CORSO ==================== -->
+        <section id="screenQuiz" class="hidden space-y-6">
+            
+            <!-- Barra di Avanzamento & Monitor -->
+            <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                    <span id="quizTopicTitleDisplay" class="text-indigo-600 uppercase tracking-wider">
+                        Fluidostatica
+                    </span>
+                    <span id="questionCounterText" class="bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+                        Domanda 1
+                    </span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                    <div id="progressBarFill" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 4%"></div>
+                </div>
+
+                <!-- Anti-cheating Warning Banner -->
+                <div id="warningBanner" class="hidden bg-amber-50 border border-amber-200 text-amber-800 px-3 py-2 rounded-xl text-xs flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 font-medium">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                        Attenzione: Rilevata uscita dalla finestra o cambio scheda.
+                    </span>
+                    <span id="exitStatsBadge" class="bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded text-[11px]">
+                        Uscite: 0
+                    </span>
+                </div>
+            </div>
+
+            <!-- Scheda Quesito Corrente -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6">
+                
+                <!-- Testo della domanda -->
+                <div id="questionContainer" class="text-slate-900 text-base sm:text-lg font-semibold leading-relaxed">
+                    <!-- Inserito dinamicamente -->
+                </div>
+
+                <!-- Opzioni di risposta -->
+                <div id="optionsContainer" class="space-y-3">
+                    <!-- Inserite dinamicamente -->
+                </div>
+
+                <!-- Avanzamento Domande Grid -->
+                <div class="pt-4 border-t border-slate-100 space-y-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Stato Avanzamento:</span>
+                    <div id="questionGridNav" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
+                        <!-- Indicatori di stato inseriti dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Pulsanti Navigazione -->
+                <div class="flex justify-end items-center pt-2 gap-2">
+                    <button id="nextBtn" onclick="navigateQuestion(1)" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition flex items-center gap-2 shadow">
+                        <span>Successiva</span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                    <button id="submitBtn" onclick="openConfirmModal()" disabled class="hidden px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition items-center gap-2 shadow-lg">
+                        <i class="fa-solid fa-paper-plane text-xs"></i> Consegna Prova
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SCHERMATA 3: ESITO FINALE ==================== -->
+        <section id="screenCompleted" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6 text-center">
+                
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Verifica Completata!</h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Risultati ottenuti da: <strong id="completedPseudonym" class="text-indigo-600">Anonimo</strong>
+                    </p>
+                </div>
+
+                <!-- Griglia Statistiche -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Esatte</span>
+                        <span id="resCorrect" class="text-2xl font-black text-emerald-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Errate</span>
+                        <span id="resWrong" class="text-2xl font-black text-rose-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Omesse</span>
+                        <span id="resSkipped" class="text-2xl font-black text-amber-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Accuratezza</span>
+                        <span id="resAccuracy" class="text-2xl font-black text-indigo-600">0%</span>
+                    </div>
+                </div>
+
+                <!-- Dettaglio Sintetico -->
+                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-left space-y-1">
+                    <div class="flex justify-between text-xs text-indigo-900 font-bold">
+                        <span id="resTotalScoreText">0 esatte su 0 quesiti</span>
+                        <span id="completionTimeDisplay" class="text-indigo-600">--:--</span>
+                    </div>
+                    <p id="resCheatingSummary" class="text-xs text-slate-600">
+                        Nessuna anomalia o cambio scheda registrato durante lo svolgimento.
+                    </p>
+                </div>
+
+                <!-- Pulsanti Azione -->
+                <div class="flex flex-wrap gap-3 justify-center pt-2">
+                    <button onclick="toggleReviewMode()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition shadow flex items-center gap-2">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Revisiona Tutte le Risposte</span>
+                    </button>
+                    <button onclick="restartQuiz()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Nuova Prova</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenitore Revisione Dettagliata -->
+            <div id="reviewContainer" class="hidden bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6">
+                <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass text-indigo-600"></i>
+                    Correzione Dettagliata della Prova
+                </h3>
+
+                <div id="reviewList" class="space-y-4">
+                    <!-- Inserito dinamicamente -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALE: CONFERMA CONSEGNA -->
+    <div id="confirmSubmissionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">Confermi la consegna?</h3>
+                <p id="confirmModalText" class="text-xs text-slate-600 mt-1">Stai per inviare e concludere la tua verifica.</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeConfirmModal()" class="w-1/2 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">
+                    Annulla
+                </button>
+                <button onclick="confirmSubmissionAction()" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow">
+                    Conferma
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <p>Verifica di Fisica • Piattaforma Didattica Interattiva • Domande & Opzioni Randomizzate</p>
+    </footer>
+
+    <!-- ==================== LOGICA JAVASCRIPT ==================== -->
+    <script>
+        let activeTopicKey = 'fluidostatica';
+        let activeQuestions = [];
+        let studentAnswers = [];
+        let currentQuestionIndex = 0;
+        let exitCount = 0;
+        let totalAbsenceTime = 0;
+        let absenceStartTime = null;
+        let studentName = '';
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function roundVal(num, decimals = 1) {
+            const factor = Math.pow(10, decimals);
+            return Math.round(num * factor) / factor;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function renderMathInDOM() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError : false
+                });
+            }
+        }
+
+        function selectTopic(topicKey) {
+            activeTopicKey = topicKey;
+            const cardFluid = document.getElementById('cardTopicFluid');
+            const cardStatica = document.getElementById('cardTopicStatica');
+            const checkFluid = document.getElementById('checkFluid');
+            const checkStatica = document.getElementById('checkStatica');
+
+            if (topicKey === 'fluidostatica') {
+                cardFluid.className = "cursor-pointer p-5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 hover:bg-indigo-50 transition relative flex flex-col justify-between space-y-4";
+                cardStatica.className = "cursor-pointer p-5 rounded-2xl border-2 border-slate-200 hover:border-indigo-300 bg-white hover:bg-slate-50 transition relative flex flex-col justify-between space-y-4";
+                checkFluid.classList.remove('hidden');
+                checkStatica.classList.add('hidden');
+            } else {
+                cardStatica.className = "cursor-pointer p-5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 hover:bg-indigo-50 transition relative flex flex-col justify-between space-y-4";
+                cardFluid.className = "cursor-pointer p-5 rounded-2xl border-2 border-slate-200 hover:border-indigo-300 bg-white hover:bg-slate-50 transition relative flex flex-col justify-between space-y-4";
+                checkStatica.classList.remove('hidden');
+                checkFluid.classList.add('hidden');
+            }
+        }
+
+        function generateDynamicFluidQuestions() {
+            const dynamicList = [];
+
+            // 1. Calcolo Pressione Idrostatica (Legge di Stevin)
+            const liquids = [
+                { name: "acqua dolce", density: 1000 },
+                { name: "olio d'oliva", density: 920 },
+                { name: "acqua di mare", density: 1030 },
+                { name: "glicerina", density: 1260 }
+            ];
+            const liq = getRandomElement(liquids);
+            const depth = getRandomInt(3, 45);
+            const g = 9.81;
+            const pHydro = Math.round(liq.density * g * depth);
+            dynamicList.push({
+                question: `Calcola la pressione idrostatica esercitata in ${liq.name} ($\\rho = ${liq.density}\\text{ kg/m}^3$) alla profondità di $h = ${depth}\\text{ m}$. Assumi $g = 9{,}81\\text{ m/s}^2$.`,
+                options: [
+                    `$${pHydro}\\text{ Pa}$`,
+                    `$${Math.round(pHydro / 10)}\\text{ Pa}$`,
+                    `$${Math.round(pHydro * 1.25)}\\text{ Pa}$`,
+                    `$${Math.round(liq.density * depth)}\\text{ Pa}$`
+                ],
+                correctIndex: 0,
+                explanation: `La pressione idrostatica si calcola con la legge di Stevin: $p = \\rho \\cdot g \\cdot h = ${liq.density} \\cdot 9{,}81 \\cdot ${depth} = ${pHydro}\\text{ Pa}$.`
+            });
+
+            // 2. Calcolo Torchio Idraulico
+            const S1 = getRandomElement([2, 4, 5, 10]);
+            const ratio = getRandomElement([10, 20, 25, 50, 100]);
+            const S2 = S1 * ratio;
+            const F1 = getRandomElement([20, 40, 50, 100, 200]);
+            const F2 = F1 * ratio;
+            dynamicList.push({
+                question: `Un torchio idraulico possiede due pistoni di area $S_1 = ${S1}\\text{ cm}^2$ e $S_2 = ${S2}\\text{ cm}^2$. Applicando una forza $F_1 = ${F1}\\text{ N}$ sul primo pistone, quale forza $F_2$ viene esercitata sul secondo?`,
+                options: [
+                    `$${F2}\\text{ N}$`,
+                    `$${roundVal(F1 / ratio)}\\text{ N}$`,
+                    `$${F1 * S1}\\text{ N}$`,
+                    `$${F2 + F1}\\text{ N}$`
+                ],
+                correctIndex: 0,
+                explanation: `Uguagliando le pressioni sui due pistoni ($F_1 / S_1 = F_2 / S_2$), si ottiene $F_2 = F_1 \\cdot (S_2 / S_1) = ${F1} \\cdot ${ratio} = ${F2}\\text{ N}$.`
+            });
+
+            // 3. Spinta di Archimede
+            const volLiters = getRandomInt(2, 25);
+            const volM3 = volLiters / 1000;
+            const fArch = roundVal(1000 * 9.81 * volM3, 1);
+            dynamicList.push({
+                question: `Un oggetto avente volume $V = ${volLiters}\\text{ litri}$ viene immerso completamente in acqua dolce ($\\rho = 1000\\text{ kg/m}^3$). A quanto ammonta la spinta di Archimede ricevuta?`,
+                options: [
+                    `$${fArch}\\text{ N}$`,
+                    `$${roundVal(volLiters * 9.81, 1)}\\text{ N}$`,
+                    `$${roundVal(fArch * 10, 1)}\\text{ N}$`,
+                    `$${roundVal(fArch / 2, 1)}\\text{ N}$`
+                ],
+                correctIndex: 0,
+                explanation: `La spinta di Archimede è pari al peso del fluido spostato: $F_A = \\rho \\cdot V \\cdot g = 1000 \\cdot ${volM3} \\cdot 9{,}81 = ${fArch}\\text{ N}$.`
+            });
+
+            return dynamicList;
+        }
+
+        function generateDynamicStaticaQuestions() {
+            const dynamicList = [];
+
+            // 1. Risultante tra due vettori forza perpendicolari
+            const pythagoreanTriples = [[3, 4, 5], [6, 8, 10], [5, 12, 13], [9, 12, 15], [8, 15, 17], [12, 16, 20]];
+            const triple = getRandomElement(pythagoreanTriples);
+            const F1 = triple[0];
+            const F2 = triple[1];
+            const F_res = triple[2];
+            dynamicList.push({
+                question: `Due forze perpendicolari tra loro hanno modulo $F_1 = ${F1}\\text{ N}$ e $F_2 = ${F2}\\text{ N}$. Qual è il modulo della loro forza risultante?`,
+                options: [
+                    `$${F_res}\\text{ N}$`,
+                    `$${F1 + F2}\\text{ N}$`,
+                    `$${F2 - F1}\\text{ N}$`,
+                    `$${F1 * F2}\\text{ N}$`
+                ],
+                correctIndex: 0,
+                explanation: `Essendo perpendicolari, la risultante si calcola col teorema di Pitagora: $F_{\\text{ris}} = \\sqrt{${F1}^2 + ${F2}^2} = ${F_res}\\text{ N}$.`
+            });
+
+            // 2. Forza Peso su altri pianeti
+            const planets = [
+                { name: "Sulla Luna", g: 1.62 },
+                { name: "Su Marte", g: 3.71 },
+                { name: "Su Giove", g: 24.79 },
+                { name: "Sulla Terra", g: 9.81 }
+            ];
+            const planet = getRandomElement(planets);
+            const mass = getRandomInt(5, 80);
+            const weight = roundVal(mass * planet.g, 1);
+            dynamicList.push({
+                question: `${planet.name} ($g = ${planet.g}\\text{ m/s}^2$), qual è la forza peso esercitata su un corpo con massa $m = ${mass}\\text{ kg}$?`,
+                options: [
+                    `$${weight}\\text{ N}$`,
+                    `$${roundVal(mass * 9.81, 1)}\\text{ N}$`,
+                    `$${roundVal(mass / planet.g, 1)}\\text{ N}$`,
+                    `$${mass}\\text{ N}$`
+                ],
+                correctIndex: 0,
+                explanation: `La forza peso si calcola come $F_p = m \\cdot g = ${mass} \\cdot ${planet.g} = ${weight}\\text{ N}$.`
+            });
+
+            // 3. Legge di Hooke
+            const k = getRandomElement([100, 200, 250, 400, 500]);
+            const xCm = getRandomInt(2, 20);
+            const xM = xCm / 100;
+            const fElastic = roundVal(k * xM, 1);
+            dynamicList.push({
+                question: `Una molla ha una costante elastica $k = ${k}\\text{ N/m}$. Quale forza elastica richiama la molla quando viene allungata di $\\Delta x = ${xCm}\\text{ cm}$?`,
+                options: [
+                    `$${fElastic}\\text{ N}$`,
+                    `$${k * xCm}\\text{ N}$`,
+                    `$${roundVal(k / xCm, 1)}\\text{ N}$`,
+                    `$${roundVal(fElastic / 2, 1)}\\text{ N}$`
+                ],
+                correctIndex: 0,
+                explanation: `In base alla legge di Hooke: $F_e = k \\cdot \\Delta x = ${k} \\cdot ${xM} = ${fElastic}\\text{ N}$.`
+            });
+
+            return dynamicList;
+        }
+
+        const QUIZ_DATA = {
+            fluidostatica: [
+                {
+                    question: "Come è definita la pressione $p$ esercitata da una forza $F$ agente perpendicolarmente su una superficie $S$?",
+                    options: ["$p = F \\cdot S$", "$p = \\frac{F}{S}$", "$p = \\frac{S}{F}$", "$p = F + S$"],
+                    correctIndex: 1,
+                    explanation: "La pressione è definita dal rapporto tra la forza perpendicolare applicata e l'area della superficie $p = F/S$."
+                },
+                {
+                    question: "Nel Sistema Internazionale (SI), a cosa corrisponde l'unità di misura pascal ($\\text{Pa}$)?",
+                    options: ["$1\\text{ N} \\cdot \\text{m}$", "$1\\text{ N/m}^2$", "$1\\text{ kg/m}^3$", "$1\\text{ J/s}$"],
+                    correctIndex: 1,
+                    explanation: "Un pascal corrisponde alla pressione esercitata da una forza di $1\\text{ newton}$ su una superficie di $1\\text{ metro quadrato}$ ($1\\text{ Pa} = 1\\text{ N/m}^2$)."
+                },
+                {
+                    question: "Qual è il valore approssimato della pressione atmosferica standard a livello del mare espresso in pascal?",
+                    options: ["$1013\\text{ Pa}$", "$1{,}013 \\times 10^5\\text{ Pa}$", "$1{,}013 \\times 10^3\\text{ Pa}$", "$9{,}81 \\times 10^4\\text{ Pa}$"],
+                    correctIndex: 1,
+                    explanation: "La pressione atmosferica standard a livello del mare equivale a circa $101325\\text{ Pa} \\approx 1{,}013 \\times 10^5\\text{ Pa}$ ($1\\text{ atm}$)."
+                },
+                {
+                    question: "Secondo la legge di Stevin, da quali fattori dipende la pressione idrostatica all'interno di un liquido omogeneo?",
+                    options: ["Dalla superficie del recipiente e dal volume del liquido", "Dalla densità del liquido e dalla profondità", "Dalla forma del recipiente e dalla massa totale", "Esclusivamente dalla pressione atmosferica"],
+                    correctIndex: 1,
+                    explanation: "La legge di Stevin $p_{idro} = \\rho \\cdot g \\cdot h$ mostra che la pressione idrostatica dipende unicamente dalla densità $\\rho$ del liquido e dalla profondità $h$."
+                },
+                {
+                    question: "In che cosa consiste il cosiddetto 'paradosso idrostatico'?",
+                    options: ["I liquidi pesanti galleggiano sui liquidi leggeri", "La pressione sul fondo dipende solo dall'altezza del liquido e non dalla sua quantità o dalla forma del recipiente", "I corpi immersi non risentono della pressione atmosferica", "La pressione diminuisce all'aumentare della profondità"],
+                    correctIndex: 1,
+                    explanation: "Recipienti con forme e volumi diversi, se riempiti con lo stesso liquido fino alla stessa altezza $h$, sostengono la medesima pressione sul fondo."
+                },
+                {
+                    question: "Cosa afferma il principio di Pascal per un fluido incompressibile racchiuso in un recipiente?",
+                    options: ["La pressione aumenta solo sul fondo del recipiente", "Una variazione di pressione applicata in un punto si trasmette inalterata a ogni punto del fluido e alle pareti", "La spinta è sempre pari al peso del recipiente", "La forza applicata raddoppia la velocità del fluido"],
+                    correctIndex: 1,
+                    explanation: "Il principio di Pascal stabilisce che la pressione esercitata in un punto di un fluido chiuso si trasmette inalterata in tutte le direzioni."
+                },
+                {
+                    question: "Cosa afferma il principio di Archimede per un corpo totalmente o parzialmente immerso in un fluido?",
+                    options: ["Riceve una spinta orizzontale pari all'area di contatto", "Riceve una spinta verticale verso l'alto pari al peso del fluido spostato", "Riceve una spinta verso il basso proporzionale al suo volume", "Non risente di alcuna forza se il fluido è in quiete"],
+                    correctIndex: 1,
+                    explanation: "Ogni corpo immerso in un fluido riceve una spinta verso l'alto pari al peso del volume di fluido che ha spostato."
+                }
+            ],
+            statica: [
+                {
+                    question: "Quale tra le seguenti grandezze fisiche è una grandezza vettoriale?",
+                    options: ["La massa", "La forza", "La temperatura", "Il tempo"],
+                    correctIndex: 1,
+                    explanation: "La forza è definita da modulo, direzione e verso, quindi è una grandezza vettoriale."
+                },
+                {
+                    question: "Nel Sistema Internazionale (SI), qual è l'unità di misura della forza?",
+                    options: ["Il chilogrammo ($\\text{kg}$)", "Il newton ($\\text{N}$)", "Il joule ($\\text{J}$)", "Il watt ($\\text{W}$)"],
+                    correctIndex: 1,
+                    explanation: "Nel SI la forza si misura in newton ($\\text{N}$)."
+                },
+                {
+                    question: "Qual è la prima condizione di equilibrio della statica per un punto materiale?",
+                    options: ["La somma vettoriale di tutte le forze applicate deve essere nulla", "La velocità deve essere sempre massima", "Il momento totale deve essere uguale al peso", "La forza peso deve superare l'attrito"],
+                    correctIndex: 0,
+                    explanation: "Un punto materiale è in equilibrio se e solo se la risultante vettoriale delle forze applicate è nulla: $\\sum \\vec{F} = 0$."
+                },
+                {
+                    question: "Come si calcola il modulo del momento scalare $M$ di una forza $F$ rispetto a un punto quando la forza è perpendicolare al braccio $b$?",
+                    options: ["$M = F \\cdot b$", "$M = \\frac{F}{b}$", "$M = F + b$", "$M = \\frac{b}{F}$"],
+                    correctIndex: 0,
+                    explanation: "Il momento di una forza rispetto a un polo è il prodotto tra il modulo della forza e la lunghezza del braccio: $M = F \\cdot b$."
+                },
+                {
+                    question: "Perché una leva di secondo genere (come la carriola o lo schiaccianoci) è sempre vantaggiosa?",
+                    options: ["Perché il fulcro è sempre al centro", "Perché il braccio della potenza è sempre maggiore del braccio della resistenza", "Perché richiede una forza pari al doppio del peso", "Perché annulla completamente l'attrito"],
+                    correctIndex: 1,
+                    explanation: "In una leva di secondo genere la resistenza si trova tra fulcro e potenza, rendendo il braccio della potenza $b_m$ sempre più lungo di $b_r$ ($b_m > b_r$)."
+                }
+            ]
+        };
+
+        function startSelectedQuiz() {
+            const inputVal = document.getElementById('studentNameInput').value.trim();
+            studentName = inputVal !== "" ? inputVal : "Studente_" + Math.floor(1000 + Math.random() * 9000);
+            const requestedCount = parseInt(document.getElementById('questionCountSelect').value) || 15;
+
+            let baseQuestions = JSON.parse(JSON.stringify(QUIZ_DATA[activeTopicKey]));
+            let dynamicQuestions = activeTopicKey === 'fluidostatica' ? generateDynamicFluidQuestions() : generateDynamicStaticaQuestions();
+
+            let combinedPool = [...baseQuestions, ...dynamicQuestions];
+            shuffleArray(combinedPool);
+
+            let selectedQuestions = combinedPool.slice(0, Math.min(requestedCount, combinedPool.length));
+
+            selectedQuestions.forEach(q => {
+                const correctAnswerText = q.options[q.correctIndex];
+                shuffleArray(q.options);
+                q.correctIndex = q.options.indexOf(correctAnswerText);
+            });
+
+            activeQuestions = selectedQuestions;
+            studentAnswers = new Array(activeQuestions.length).fill(null);
+            currentQuestionIndex = 0;
+            exitCount = 0;
+            totalAbsenceTime = 0;
+
+            document.getElementById('quizTopicTitleDisplay').innerText = 
+                activeTopicKey === 'fluidostatica' ? 'Fluidostatica' : 'Vettori, Statica & Leve';
+
+            document.getElementById('screenStart').classList.add('hidden');
+            document.getElementById('screenQuiz').classList.remove('hidden');
+
+            renderQuestion();
+            buildQuestionGridNav();
+            setupAntiCheatingListeners();
+        }
+
+        function renderQuestion() {
+            const q = activeQuestions[currentQuestionIndex];
+            const total = activeQuestions.length;
+
+            document.getElementById('questionCounterText').innerText = `Domanda ${currentQuestionIndex + 1} di ${total}`;
+            const perc = ((currentQuestionIndex + 1) / total) * 100;
+            document.getElementById('progressBarFill').style.width = `${perc}%`;
+
+            const qContainer = document.getElementById('questionContainer');
+            qContainer.innerHTML = `<span class="text-indigo-600 font-bold mr-2">${currentQuestionIndex + 1}.</span> ${q.question}`;
+
+            const optsContainer = document.getElementById('optionsContainer');
+            optsContainer.innerHTML = '';
+
+            q.options.forEach((optText, optIdx) => {
+                const isSelected = studentAnswers[currentQuestionIndex] === optIdx;
+                const btn = document.createElement('div');
+                btn.onclick = () => selectOption(optIdx);
+                btn.className = `cursor-pointer p-4 rounded-xl border-2 transition flex items-center justify-between ${
+                    isSelected 
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-900 font-semibold shadow-sm' 
+                        : 'border-slate-200 bg-white hover:border-slate-300 text-slate-800'
+                }`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-7 h-7 rounded-full border-2 flex items-center justify-center font-bold text-xs ${
+                            isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300 text-slate-500'
+                        }">
+                            ${String.fromCharCode(65 + optIdx)}
+                        </div>
+                        <span class="text-sm sm:text-base">${optText}</span>
+                    </div>
+                    ${isSelected ? '<i class="fa-solid fa-circle-check text-indigo-600 text-lg"></i>' : ''}
+                `;
+                optsContainer.appendChild(btn);
+            });
+
+            const isAnswered = studentAnswers[currentQuestionIndex] !== null;
+            const isLastQuestion = currentQuestionIndex === total - 1;
+
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (isLastQuestion) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+                submitBtn.classList.add('flex');
+                submitBtn.disabled = !isAnswered;
+            } else {
+                submitBtn.classList.add('hidden');
+                submitBtn.classList.remove('flex');
+                nextBtn.classList.remove('hidden');
+                nextBtn.disabled = !isAnswered;
+            }
+
+            updateGridNavHighlight();
+            renderMathInDOM();
+        }
+
+        function selectOption(optIdx) {
+            studentAnswers[currentQuestionIndex] = optIdx;
+            renderQuestion();
+        }
+
+        function buildQuestionGridNav() {
+            const gridNav = document.getElementById('questionGridNav');
+            gridNav.innerHTML = '';
+
+            activeQuestions.forEach((_, idx) => {
+                const badge = document.createElement('div');
+                badge.id = `gridNavBadge_${idx}`;
+                badge.className = 'w-8 h-8 rounded-lg text-xs font-bold border flex items-center justify-center transition-all';
+                badge.innerText = idx + 1;
+                gridNav.appendChild(badge);
+            });
+
+            updateGridNavHighlight();
+        }
+
+        function updateGridNavHighlight() {
+            activeQuestions.forEach((_, idx) => {
+                const badge = document.getElementById(`gridNavBadge_${idx}`);
+                if (!badge) return;
+
+                const isAnswered = studentAnswers[idx] !== null;
+                const isCurrent = currentQuestionIndex === idx;
+
+                if (isCurrent) {
+                    badge.className = 'w-8 h-8 rounded-lg text-xs font-bold border-2 border-indigo-600 bg-indigo-600 text-white shadow-md scale-105';
+                } else if (isAnswered) {
+                    badge.className = 'w-8 h-8 rounded-lg text-xs font-bold border border-emerald-500 bg-emerald-100 text-emerald-800';
+                } else {
+                    badge.className = 'w-8 h-8 rounded-lg text-xs font-bold border border-slate-200 bg-slate-100 text-slate-400';
+                }
+            });
+        }
+
+        function navigateQuestion(dir) {
+            if (studentAnswers[currentQuestionIndex] === null && dir > 0) return;
+            currentQuestionIndex += dir;
+            if (currentQuestionIndex < 0) currentQuestionIndex = 0;
+            if (currentQuestionIndex >= activeQuestions.length) currentQuestionIndex = activeQuestions.length - 1;
+            renderQuestion();
+        }
+
+        function setupAntiCheatingListeners() {
+            document.addEventListener("visibilitychange", handleVisibilityChange);
+        }
+
+        function handleVisibilityChange() {
+            if (document.hidden) {
+                exitCount++;
+                absenceStartTime = Date.now();
+                updateWarningBanner();
+            } else {
+                if (absenceStartTime) {
+                    const elapsedSecs = Math.round((Date.now() - absenceStartTime) / 1000);
+                    totalAbsenceTime += elapsedSecs;
+                    absenceStartTime = null;
+                }
+            }
+        }
+
+        function updateWarningBanner() {
+            const banner = document.getElementById('warningBanner');
+            const badge = document.getElementById('exitStatsBadge');
+            if (exitCount > 0) {
+                banner.classList.remove('hidden');
+                badge.innerText = `Uscite: ${exitCount}`;
+            }
+        }
+
+        function openConfirmModal() {
+            const answeredCount = studentAnswers.filter(a => a !== null).length;
+            const unanswered = activeQuestions.length - answeredCount;
+
+            let msg = `Hai risposto a ${answeredCount} domande su ${activeQuestions.length}.`;
+            if (unanswered > 0) {
+                msg += ` Attenzione: ${unanswered} domande non sono state ancora svolte.`;
+            }
+
+            document.getElementById('confirmModalText').innerText = msg;
+            document.getElementById('confirmSubmissionModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmSubmissionModal').classList.add('hidden');
+        }
+
+        function confirmSubmissionAction() {
+            closeConfirmModal();
+            calculateAndShowResults();
+        }
+
+        function calculateAndShowResults() {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+
+            let correctCount = 0;
+            let wrongCount = 0;
+            let skippedCount = 0;
+
+            activeQuestions.forEach((q, idx) => {
+                if (studentAnswers[idx] === null) {
+                    skippedCount++;
+                } else if (studentAnswers[idx] === q.correctIndex) {
+                    correctCount++;
+                } else {
+                    wrongCount++;
+                }
+            });
+
+            const attemptedCount = correctCount + wrongCount;
+            const accuracyPercent = attemptedCount > 0 
+                ? parseFloat(((correctCount / activeQuestions.length) * 100).toFixed(1)) 
+                : 0;
+
+            document.getElementById('screenQuiz').classList.add('hidden');
+            document.getElementById('completedPseudonym').innerText = studentName;
+            document.getElementById('resCorrect').innerText = correctCount;
+            document.getElementById('resWrong').innerText = wrongCount;
+            document.getElementById('resSkipped').innerText = skippedCount;
+            document.getElementById('resAccuracy').innerText = `${accuracyPercent}%`;
+            document.getElementById('resTotalScoreText').innerText = `${correctCount} esatte su ${activeQuestions.length} quesiti totali`;
+            document.getElementById('completionTimeDisplay').innerText = new Date().toLocaleTimeString('it-IT');
+            
+            const cheatedText = exitCount > 0 
+                ? `Rilevate ${exitCount} uscite dalla scheda per un totale di ${totalAbsenceTime}s di assenza.`
+                : `Nessuna anomalia o cambio scheda registrato durante lo svolgimento.`;
+            document.getElementById('resCheatingSummary').innerText = cheatedText;
+
+            buildReviewList();
+            document.getElementById('screenCompleted').classList.remove('hidden');
+            renderMathInDOM();
+        }
+
+        function buildReviewList() {
+            const listContainer = document.getElementById('reviewList');
+            listContainer.innerHTML = '';
+
+            activeQuestions.forEach((q, idx) => {
+                const userAns = studentAnswers[idx];
+                const isCorrect = userAns === q.correctIndex;
+                const isSkipped = userAns === null;
+
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-xl border ${
+                    isCorrect ? 'border-emerald-200 bg-emerald-50/50' : (isSkipped ? 'border-amber-200 bg-amber-50/50' : 'border-rose-200 bg-rose-50/50')
+                } space-y-2`;
+
+                let statusBadge = isCorrect 
+                    ? '<span class="px-2 py-0.5 bg-emerald-600 text-white font-bold text-[10px] rounded">CORRETTA</span>'
+                    : (isSkipped ? '<span class="px-2 py-0.5 bg-amber-600 text-white font-bold text-[10px] rounded">OMESSA</span>' : '<span class="px-2 py-0.5 bg-rose-600 text-white font-bold text-[10px] rounded">ERRATA</span>');
+
+                let userAnsText = isSkipped ? "Nessuna risposta fornita" : q.options[userAns];
+
+                item.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <span class="font-bold text-sm text-slate-900">${idx + 1}. ${q.question}</span>
+                        ${statusBadge}
+                    </div>
+                    <div class="text-xs space-y-1">
+                        <p class="text-slate-700"><strong>Tua risposta:</strong> ${userAnsText}</p>
+                        <p class="text-emerald-800 font-semibold"><strong>Risposta esatta:</strong> ${q.options[q.correctIndex]}</p>
+                        <p class="text-slate-600 italic pt-1 border-t border-slate-200/60 mt-1">${q.explanation}</p>
+                    </div>
+                `;
+
+                listContainer.appendChild(item);
+            });
+        }
+
+        function toggleReviewMode() {
+            const rev = document.getElementById('reviewContainer');
+            rev.classList.toggle('hidden');
+            renderMathInDOM();
+        }
+
+        function restartQuiz() {
+            document.getElementById('screenCompleted').classList.add('hidden');
+            document.getElementById('screenStart').classList.remove('hidden');
+        }
+
+        window.onload = function() {
+            renderMathInDOM();
+        };
+    </script>
+</body>
+</html>
