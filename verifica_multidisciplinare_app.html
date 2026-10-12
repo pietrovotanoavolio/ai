@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica Multidisciplinare con Grounding e Timer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- KaTeX CSS e JS per rendering di formule matematiche e fisiche -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Librerie per parsing PDF e PPTX (PDF.js e JSZip) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .katex { font-size: 1.05em; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        @keyframes pulse-red {
+            0%, 100% { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
+            50% { background-color: #fca5a5; border-color: #dc2626; color: #7f1d1d; }
+        }
+        .timer-warning {
+            animation: pulse-red 1s infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- HEADER APP -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow">
+                    <i id="headerIcon" class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 id="headerTitle" class="text-base sm:text-lg font-bold leading-tight">Verifica Multidisciplinare</h1>
+                    <p id="headerSubtitle" class="text-xs text-slate-400">Piattaforma per Test Didattici Interattivi</p>
+                </div>
+            </div>
+            <button onclick="openTeacherModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders text-indigo-400"></i>
+                <span>Pannello Docente</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-3xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- ==================== SCHERMATA 1: AVVIO (INTERFACCIA ESSENZIALE) ==================== -->
+        <section id="screenStart" class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6">
+            <div class="text-center space-y-1 border-b border-slate-100 pb-4">
+                <h2 id="startScreenTitle" class="text-2xl font-extrabold text-slate-900">Avvio Verifica</h2>
+                <p class="text-slate-500 text-xs">Inserisci il tuo nome e inizia il test.</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Input Nome Studente -->
+                <div>
+                    <label for="studentNameInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <i class="fa-solid fa-user-pen mr-1"></i> Nome e Cognome Studente:
+                    </label>
+                    <input type="text" id="studentNameInput" placeholder="Inserisci il tuo nome..." 
+                           class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm">
+                </div>
+
+                <!-- Checkbox Timer Disattivabile -->
+                <div class="pt-1">
+                    <label for="noTimerCheckbox" class="flex items-center gap-3 p-3.5 bg-indigo-50/60 border border-indigo-200 rounded-xl cursor-pointer hover:bg-indigo-50 transition shadow-sm">
+                        <input type="checkbox" id="noTimerCheckbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
+                        <div class="flex items-center gap-2 text-xs font-bold text-indigo-950">
+                            <i class="fa-solid fa-hourglass-slash text-indigo-600 text-sm"></i>
+                            <span>Disattiva il timer di risposta (Modalità con tempo illimitato)</span>
+                        </div>
+                    </label>
+                </div>
+
+                <p id="nameErrorMsg" class="hidden text-xs text-rose-600 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Inserisci il tuo nome prima di iniziare il test.</p>
+            </div>
+
+            <!-- Tasto Inizia Test Principale -->
+            <button onclick="startSelectedQuiz()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                <span id="startBtnText">Inizia Test</span>
+                <i class="fa-solid fa-play text-xs"></i>
+            </button>
+        </section>
+
+        <!-- ==================== SCHERMATA 2: TEST IN CORSO ==================== -->
+        <section id="screenQuiz" class="hidden space-y-6">
+            
+            <!-- Barra di Avanzamento, Monitor & Timer -->
+            <div class="bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-600 flex-wrap gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span id="calcTypeBadge" class="px-2 py-0.5 rounded text-[10px] uppercase font-extrabold bg-slate-100 text-slate-700 border border-slate-200">Teoria</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <!-- Pulsante Jolly -->
+                        <button id="jollyBtn" onclick="useJolly()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Sostituisci questo quesito con uno nuovo (Usabile 1 sola volta)">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Usa Jolly 🃏</span>
+                        </button>
+
+                        <!-- Display Timer Quesito -->
+                        <div id="questionTimerDisplay" class="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 font-mono font-extrabold rounded-xl text-sm flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-stopwatch text-amber-600"></i>
+                            <span id="timerCountdown">60s</span>
+                        </div>
+
+                        <span id="questionCounterText" class="bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+                            Domanda 1
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Barra progresso tempo residuo domanda -->
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                    <div id="timeProgressBarFill" class="bg-amber-500 h-2 rounded-full transition-all duration-1000" style="width: 100%"></div>
+                </div>
+
+                <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                    <div id="progressBarFill" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" style="width: 4%"></div>
+                </div>
+
+                <div id="warningBanner" class="hidden bg-amber-50 border border-amber-200 text-amber-800 px-3 py-2 rounded-xl text-xs flex items-center justify-between">
+                    <span class="flex items-center gap-1.5 font-medium">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                        Attenzione: Rilevate uscite dalla scheda.
+                    </span>
+                    <span id="exitStatsBadge" class="bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded text-[11px]">
+                        Uscite: 0
+                    </span>
+                </div>
+            </div>
+
+            <!-- Scheda Quesito Corrente -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6">
+                
+                <div id="questionContainer" class="text-slate-900 text-base sm:text-lg font-semibold leading-relaxed">
+                    <!-- Inserito dinamicamente -->
+                </div>
+
+                <div id="optionsContainer" class="space-y-3">
+                    <!-- Inserite dinamicamente -->
+                </div>
+
+                <!-- Avanzamento Domande Grid -->
+                <div class="pt-4 border-t border-slate-100 space-y-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Stato Avanzamento:</span>
+                    <div id="questionGridNav" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
+                        <!-- Indicatori -->
+                    </div>
+                </div>
+
+                <!-- Pulsanti Navigazione -->
+                <div class="flex justify-between items-center pt-2">
+                    <button id="prevBtn" onclick="navigateQuestion(-1)" class="invisible px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-xl text-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                        <span class="hidden sm:inline">Precedente</span>
+                    </button>
+                    <div class="flex gap-2">
+                        <button id="nextBtn" onclick="navigateQuestion(1)" disabled class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm transition flex items-center gap-2 shadow">
+                            <span>Successiva</span>
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                        <button id="submitBtn" onclick="openConfirmModal()" disabled class="hidden px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition flex items-center gap-2 shadow-lg">
+                            <i class="fa-solid fa-paper-plane text-xs"></i> Consegna
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SCHERMATA 3: ESITO FINALE ==================== -->
+        <section id="screenCompleted" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6 text-center">
+                
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Verifica Completata!</h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Risultati salvati per lo studente: <strong id="completedPseudonym" class="text-indigo-600">Anonimo</strong>
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Esatte</span>
+                        <span id="resCorrect" class="text-2xl font-black text-emerald-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Errate</span>
+                        <span id="resWrong" class="text-2xl font-black text-rose-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Omesse</span>
+                        <span id="resSkipped" class="text-2xl font-black text-amber-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Accuratezza</span>
+                        <span id="resAccuracy" class="text-2xl font-black text-indigo-600">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-left space-y-1.5">
+                    <div class="flex justify-between items-center text-xs text-indigo-900 font-bold flex-wrap gap-2">
+                        <span id="resTotalScoreText">0 esatte su 0 quesiti</span>
+                        <div class="flex items-center gap-3">
+                            <span id="resTimerModeDisplay" class="px-2.5 py-0.5 rounded-full bg-indigo-200 text-indigo-900 text-[11px] font-extrabold">Timer: Standard</span>
+                            <span id="completionTimeDisplay" class="text-indigo-600 font-mono">--:--</span>
+                        </div>
+                    </div>
+                    <p id="resCheatingSummary" class="text-xs text-slate-600">
+                        Nessuna anomalia registrata durante la prova.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-3 justify-center pt-2">
+                    <button onclick="toggleReviewMode()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition shadow flex items-center gap-2">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Revisiona Tutte le Risposte</span>
+                    </button>
+                    <button onclick="restartQuiz()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Nuova Prova</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="reviewContainer" class="hidden bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6">
+                <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass text-indigo-600"></i>
+                    Correzione Dettagliata della Prova
+                </h3>
+
+                <div id="reviewList" class="space-y-4">
+                    <!-- Inserito dinamicamente -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALE: CONFERMA CONSEGNA -->
+    <div id="confirmSubmissionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">Confermi la consegna?</h3>
+                <p id="confirmModalText" class="text-xs text-slate-600 mt-1">Stai per inviare e concludere la tua verifica.</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeConfirmModal()" class="w-1/2 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">
+                    Annulla
+                </button>
+                <button onclick="confirmSubmissionAction()" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow">
+                    Conferma
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE: PANNELLO DOCENTE LOGIN & DASHBOARD GROUNDING -->
+    <div id="teacherModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6 max-h-[90vh] overflow-y-auto">
+            
+            <!-- Login Form -->
+            <div id="teacherAuthSection" class="space-y-4 text-center">
+                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Accesso Riservato Docente / Gestione Grounding</h3>
+                <p class="text-xs text-slate-500">Inserisci il PIN docente (Predefinito: 1234) per caricare materiale e consultare il registro.</p>
+
+                <div class="max-w-xs mx-auto space-y-3">
+                    <input type="password" id="teacherPinInput" placeholder="Inserisci PIN" 
+                           class="w-full text-center px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-lg tracking-widest focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <p id="teacherAuthError" class="text-xs text-rose-600 font-semibold hidden">PIN Errato!</p>
+                    <div class="flex gap-2">
+                        <button onclick="closeTeacherModal()" class="w-1/2 py-2.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">Annulla</button>
+                        <button onclick="verifyTeacherPin()" class="w-1/2 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow">Accedi</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Docente e Caricamento Grounding -->
+            <div id="teacherDashboardSection" class="hidden space-y-6">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Gestione Materia e File di Grounding
+                    </h3>
+                    <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Modulo Scelta Libera / Caricamento Grounding -->
+                <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-200 space-y-4">
+                    <div>
+                        <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-file-signature text-indigo-600"></i> Materia a Scelta Libera e Caricamento Grounding
+                        </h4>
+                        <p class="text-xs text-indigo-800 mt-1"> Inserisci qualunque materia o argomento desideri e carica il relativo file di grounding (.json o .txt/.md) con domande o note.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Seleziona Modulo Predefinito:</label>
+                            <select id="teacherSubjectSelect" onchange="handleTeacherPresetChange()" class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                                <option value="custom">✨ Materia Personalizzata (da File Grounding)</option>
+                                <option value="fluidostatica">🌊 Fisica: Fluidostatica</option>
+                                <option value="cinematica">🚀 Fisica: Cinematica e Dinamica</option>
+                                <option value="termodinamica">🌡️ Fisica: Termodinamica</option>
+                                <option value="matematica">📐 Matematica: Equazioni e Algebra</option>
+                                <option value="chimica">🧪 Chimica: Moli e Soluzioni</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Titolo Personalizzato Materia / Argomento:</label>
+                            <input type="text" id="customSubjectTitleInput" placeholder="Es. Storia: La Rivoluzione Francese" 
+                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-indigo-100">
+                        <label class="block text-[11px] font-bold text-indigo-900 uppercase">File di Grounding (PDF, PPTX, JSON, TXT, MD):</label>
+                        <input type="file" id="modalFileInput" accept=".pdf,.pptx,.json,.txt,.md" onchange="handleFileUpload(event)"
+                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 border border-indigo-200 rounded-lg bg-white p-1">
+                        
+                        <div class="pt-2">
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Oppure Incolla Testo / JSON di Grounding Diretto:</label>
+                            <textarea id="groundingRawTextarea" rows="3" placeholder="Incolla qui domande in JSON o appunti/slide in testo semplice..."
+                                      class="w-full p-2.5 text-xs font-mono bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+                        <button onclick="saveCustomGroundingFromTextarea()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Applica Grounding e Salva Materia
+                        </button>
+                        <button onclick="downloadSampleGroundingJSON()" class="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 text-xs font-bold rounded-lg transition border border-indigo-300">
+                            <i class="fa-solid fa-file-code mr-1"></i> Scarica Modello JSON
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Configurazione Google Sheets -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase"><i class="fa-brands fa-google mr-1"></i> Integrazione Google Sheets</label>
+                        <p class="text-[11px] text-slate-500 mt-0.5">I risultati verranno inviati automaticamente a questo URL al termine di ogni prova.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="sheetUrlSetting" placeholder="https://script.google.com/macros/s/.../exec" 
+                               class="flex-grow px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono focus:outline-none focus:border-indigo-500 transition">
+                        <button id="sheetSaveBtn" onclick="saveSheetUrlSetting()" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-700 transition">Salva</button>
+                    </div>
+                </div>
+
+                <!-- Tabella Consegne -->
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-slate-100 text-slate-900 uppercase font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Data/Ora</th>
+                                <th class="p-3">Studente</th>
+                                <th class="p-3">Esatte</th>
+                                <th class="p-3">Accuratezza</th>
+                                <th class="p-3">Modalità Timer</th>
+                                <th class="p-3">Uscite</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherTableBody" class="divide-y divide-slate-100 bg-white">
+                            <!-- Righe inserite dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="promptClearHistory()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-200">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Svuota Registro
+                    </button>
+                    <button onclick="closeTeacherModal()" class="px-5 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl">
+                        Chiudi
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+        <p>Verifica Didattica Multidisciplinare con Grounding • Supporto per PDF, PPTX, JSON, TXT e MD</p>
+    </footer>
+
+    <!-- ==================== LOGICA JAVASCRIPT ==================== -->
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        // Configuration & Global Settings
+        const QUIZ_SETTINGS = {
+            storageKey: 'QUIZ_RESULTS_HISTORY',
+            teacherPin: '1234',
+            googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || '',
+            timeStandardSec: 60,   // 60 secondi per domande standard
+            timeCalculationSec: 150 // 150 secondi per calcoli avanzati
+        };
+
+        // Stato Globale dell'Applicazione
+        let activeQuestions = [];
+        let studentAnswers = [];
+        let currentQuestionIndex = 0;
+        let exitCount = 0;
+        let studentName = '';
+        let quizStartTime = null;
+        let isUnlimitedTime = false;
+        let isJollyUsed = false;
+
+        // Gestione Timer
+        let timerInterval = null;
+        let currentQuestionTimeLeft = 0;
+        let currentQuestionMaxTime = 60;
+        
+        let selectedSubject = localStorage.getItem('PHYSICS_ACTIVE_SUBJECT') || 'fluidostatica';
+        let customSubjectTitle = localStorage.getItem('PHYSICS_CUSTOM_SUBJECT_TITLE') || 'Materia Personalizzata';
+        let customGroundingQuestions = [];
+
+        try {
+            const storedGrounding = localStorage.getItem('PHYSICS_CUSTOM_GROUNDING_QUESTIONS');
+            if (storedGrounding) customGroundingQuestions = JSON.parse(storedGrounding);
+        } catch(e) { customGroundingQuestions = []; }
+
+        const PRESET_SUBJECTS = {
+            fluidostatica: {
+                title: "Fisica: Fluidostatica",
+                icon: "fa-water",
+                badge: "Modulo: Fluidostatica"
+            },
+            cinematica: {
+                title: "Fisica: Cinematica e Dinamica",
+                icon: "fa-rocket",
+                badge: "Modulo: Cinematica e Dinamica"
+            },
+            termodinamica: {
+                title: "Fisica: Termodinamica",
+                icon: "fa-temperature-high",
+                badge: "Modulo: Termodinamica"
+            },
+            matematica: {
+                title: "Matematica: Equazioni e Algebra",
+                icon: "fa-calculator",
+                badge: "Modulo: Matematica"
+            },
+            chimica: {
+                title: "Chimica: Moli e Soluzioni",
+                icon: "fa-flask",
+                badge: "Modulo: Chimica"
+            }
+        };
+
+        // Determina se una domanda richiede calcoli avanzati (150s) oppure no (60s)
+        function isAdvancedCalculationQuestion(q) {
+            if (q.isCalculation !== undefined) return Boolean(q.isCalculation);
+            
+            // Rilevamento automatico basato sulla presenza di formule con numeri, unita di misura o operatori di calcolo
+            const fullText = (q.question + ' ' + (q.options ? q.options.join(' ') : '')).toLowerCase();
+            const calcKeywords = ['calcola', 'determina', 'quanti', 'quanto vale', '\\rho', 'g =', 'v =', 'm/s', 'kg/m', 'pa', 'm^3', '=', '\\cdot', '\\frac'];
+            
+            let matches = 0;
+            calcKeywords.forEach(kw => {
+                if (fullText.includes(kw)) matches++;
+            });
+
+            // Se contiene sia simboli matematici/numeri che parole chiave di calcolo
+            return matches >= 2 || /\d+\s*(m|s|kg|pa|j|w|n|v|a|m\/s)/i.test(fullText);
+        }
+
+        function getQuestionTimeLimit(q) {
+            if (q.timeLimit && typeof q.timeLimit === 'number') return q.timeLimit;
+            return isAdvancedCalculationQuestion(q) ? QUIZ_SETTINGS.timeCalculationSec : QUIZ_SETTINGS.timeStandardSec;
+        }
+
+        // --- AGGIORNAMENTO UI E MATERIA ---
+        function updateSubjectUI() {
+            const displayTitle = document.getElementById('activeSubjectDisplayTitle');
+            const subjectBadge = document.getElementById('subjectBadge');
+            const activeIcon = document.getElementById('activeSubjectIcon');
+            const sourceBadge = document.getElementById('groundingSourceBadge');
+            const mainSelect = document.getElementById('mainSubjectSelect');
+            const teacherSelect = document.getElementById('teacherSubjectSelect');
+
+            if (mainSelect) mainSelect.value = selectedSubject;
+            if (teacherSelect) teacherSelect.value = selectedSubject;
+
+            if (selectedSubject === 'custom') {
+                if (displayTitle) displayTitle.textContent = customSubjectTitle;
+                if (subjectBadge) subjectBadge.textContent = "Grounding Personalizzato";
+                if (activeIcon) activeIcon.className = "fa-solid fa-file-lines";
+                if (sourceBadge) sourceBadge.innerHTML = `<i class="fa-solid fa-file-code text-[11px]"></i> File Docente`;
+            } else if (PRESET_SUBJECTS[selectedSubject]) {
+                const preset = PRESET_SUBJECTS[selectedSubject];
+                if (displayTitle) displayTitle.textContent = preset.title;
+                if (subjectBadge) subjectBadge.textContent = preset.badge;
+                if (activeIcon) activeIcon.className = `fa-solid ${preset.icon}`;
+                if (sourceBadge) sourceBadge.innerHTML = `<i class="fa-solid fa-check-circle text-[11px]"></i> Standard`;
+            }
+        }
+
+        function handleMainSubjectChange() {
+            const selectVal = document.getElementById('mainSubjectSelect').value;
+            selectedSubject = selectVal;
+            localStorage.setItem('PHYSICS_ACTIVE_SUBJECT', selectVal);
+            updateSubjectUI();
+        }
+
+        function handleTeacherPresetChange() {
+            const selectVal = document.getElementById('teacherSubjectSelect').value;
+            if (selectVal !== 'custom') {
+                selectedSubject = selectVal;
+                localStorage.setItem('PHYSICS_ACTIVE_SUBJECT', selectVal);
+                updateSubjectUI();
+            }
+        }
+
+        function saveCustomGroundingFromTextarea() {
+            const rawText = document.getElementById('groundingRawTextarea').value.trim();
+            const customTitle = document.getElementById('customSubjectTitleInput').value.trim();
+            if (!rawText) {
+                alert("Inserisci un testo o JSON nell'area di testo prima di salvare.");
+                return;
+            }
+            processGroundingContent(rawText, customTitle || "Materia Personalizzata");
+        }
+
+        // --- CARICAMENTO E PARSING FILE DI GROUNDING (PDF, PPTX, JSON, TXT, MD) ---
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const filename = file.name;
+            const ext = filename.split('.').pop().toLowerCase();
+            const cleanTitle = filename.replace(/\.[^/.]+$/, "");
+
+            const statusMsg = document.getElementById('groundingStatusMessage');
+            if (statusMsg) statusMsg.innerHTML = `<span class="text-indigo-600 font-bold"><i class="fa-solid fa-spinner fa-spin"></i> Lettura file "${filename}" in corso...</span>`;
+
+            try {
+                if (ext === 'pdf') {
+                    file.arrayBuffer().then(function(arrayBuffer) {
+                        return extractTextFromPDF(arrayBuffer);
+                    }).then(function(pdfText) {
+                        processGroundingContent(pdfText, cleanTitle);
+                    }).catch(function(err) {
+                        console.error("Errore lettura file grounding PDF:", err);
+                        alert("Si è verificato un errore durante la lettura del file PDF.");
+                        updateSubjectUI();
+                    });
+                } else if (ext === 'pptx') {
+                    file.arrayBuffer().then(function(arrayBuffer) {
+                        return extractTextFromPPTX(arrayBuffer);
+                    }).then(function(pptxText) {
+                        processGroundingContent(pptxText, cleanTitle);
+                    }).catch(function(err) {
+                        console.error("Errore lettura file grounding PPTX:", err);
+                        alert("Si è verificato un errore durante la lettura del file PPTX.");
+                        updateSubjectUI();
+                    });
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        processGroundingContent(e.target.result, cleanTitle);
+                    };
+                    reader.readAsText(file);
+                }
+            } catch (err) {
+                console.error("Errore lettura file grounding:", err);
+                alert("Si è verificato un errore durante la lettura del file.");
+                updateSubjectUI();
+            }
+        }
+
+        // Estrazione testo da PDF
+        function extractTextFromPDF(arrayBuffer) {
+            return pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(function(pdf) {
+                const pagePromises = [];
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    (function(pageNum) {
+                        pagePromises.push(
+                            pdf.getPage(pageNum).then(function(page) {
+                                return page.getTextContent().then(function(textContent) {
+                                    const pageStrings = textContent.items.map(function(item) { return item.str; });
+                                    return `\n--- Pagina ${pageNum} ---\n` + pageStrings.join(" ");
+                                });
+                            })
+                        );
+                    })(i);
+                }
+                return Promise.all(pagePromises).then(function(pagesText) {
+                    return pagesText.join("");
+                });
+            });
+        }
+
+        // Estrazione testo da PPTX (file ZIP XML)
+        function extractTextFromPPTX(arrayBuffer) {
+            if (typeof JSZip === 'undefined') {
+                return Promise.reject(new Error("JSZip non caricato."));
+            }
+            return JSZip.loadAsync(arrayBuffer).then(function(zip) {
+                const slideFiles = Object.keys(zip.files).filter(function(f) {
+                    return f.startsWith("ppt/slides/slide") && f.endsWith(".xml");
+                });
+                
+                slideFiles.sort(function(a, b) {
+                    const matchA = a.match(/\d+/);
+                    const matchB = b.match(/\d+/);
+                    const numA = matchA ? parseInt(matchA[0], 10) : 0;
+                    const numB = matchB ? parseInt(matchB[0], 10) : 0;
+                    return numA - numB;
+                });
+
+                const slidePromises = slideFiles.map(function(slideFile, i) {
+                    return zip.files[slideFile].async("string").then(function(xmlContent) {
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(xmlContent, "text/xml");
+                        const textNodes = xmlDoc.getElementsByTagName("a:t");
+                        
+                        let slideText = [];
+                        for (let j = 0; j < textNodes.length; j++) {
+                            const txt = textNodes[j].textContent.trim();
+                            if (txt) slideText.push(txt);
+                        }
+                        if (slideText.length > 0) {
+                            return `\n--- Diapositiva ${i + 1} ---\n` + slideText.join(" ") + "\n";
+                        }
+                        return "";
+                    });
+                });
+
+                return Promise.all(slidePromises).then(function(slidesText) {
+                    return slidesText.join("");
+                });
+            });
+        }
+
+        function processGroundingContent(rawContent, filenameTitle = "") {
+            let questions = [];
+            let detectedTitle = filenameTitle || "Materia Personalizzata";
+
+            try {
+                const parsed = JSON.parse(rawContent);
+                if (Array.isArray(parsed)) {
+                    questions = parsed;
+                } else if (parsed.questions && Array.isArray(parsed.questions)) {
+                    questions = parsed.questions;
+                    if (parsed.subject) detectedTitle = parsed.subject;
+                }
+            } catch (err) {
+                questions = parseTextGrounding(rawContent);
+            }
+
+            if (questions.length > 0) {
+                customGroundingQuestions = questions;
+                selectedSubject = 'custom';
+                customSubjectTitle = detectedTitle;
+
+                localStorage.setItem('PHYSICS_ACTIVE_SUBJECT', 'custom');
+                localStorage.setItem('PHYSICS_CUSTOM_SUBJECT_TITLE', customSubjectTitle);
+                localStorage.setItem('PHYSICS_CUSTOM_GROUNDING_QUESTIONS', JSON.stringify(customGroundingQuestions));
+
+                updateSubjectUI();
+                alert(`Grounding caricato con successo!\nRiconosciuti ed elaborati ${questions.length} quesiti per "${customSubjectTitle}".`);
+            } else {
+                alert("Impossibile estrarre o generare domande dal file caricato. Assicurati che il file contenga testo leggibile.");
+            }
+        }
+
+        function parseTextGrounding(text) {
+            const questions = [];
+            const blocks = text.split(/(?:Domanda|Q:|\n\d+\.)/i).filter(b => b.trim().length > 0);
+
+            if (blocks.length > 1) {
+                blocks.forEach(block => {
+                    const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    if (lines.length < 2) return;
+
+                    let questionText = lines[0].replace(/^[\d\.\-\:\?]+/, '').trim();
+                    let options = [];
+                    let correctIndex = 0;
+                    let explanation = "Risposta basata sui principi teorici dell'argomento.";
+
+                    lines.slice(1).forEach(line => {
+                        const optMatch = line.match(/^(?:[A-D]\)|[A-D]\.|\*|-)\s*(.+)/i);
+                        if (optMatch) {
+                            options.push(optMatch[1].trim());
+                            if (line.includes('[X]') || line.toLowerCase().includes('(corretta)')) {
+                                correctIndex = options.length - 1;
+                            }
+                        } else if (line.toLowerCase().startsWith('risposta:') || line.toLowerCase().startsWith('ans:')) {
+                            const ansChar = line.split(':')[1].trim().toUpperCase();
+                            if (ansChar === 'B') correctIndex = 1;
+                            else if (ansChar === 'C') correctIndex = 2;
+                            else if (ansChar === 'D') correctIndex = 3;
+                            else correctIndex = 0;
+                        } else if (line.toLowerCase().startsWith('spiegazione:')) {
+                            explanation = line.replace(/spiegazione:/i, '').trim();
+                        }
+                    });
+
+                    if (options.length >= 2 && questionText.length > 5) {
+                        questions.push({
+                            question: questionText,
+                            options: options,
+                            correctIndex: correctIndex,
+                            explanation: explanation
+                        });
+                    }
+                });
+            }
+
+            // Generazione quesiti concettuali diretti SENZA menzionare "slide" o "documenti"
+            if (questions.length === 0) {
+                const sections = text.split(/\n(?=---|\n)/).map(s => s.trim()).filter(s => s.length > 30);
+
+                sections.forEach((section) => {
+                    const cleanSec = section.replace(/^---.*?---/g, '').trim();
+                    const sentences = cleanSec.split(/[.!?]+\s+/).filter(s => s.length > 20);
+
+                    if (sentences.length > 0) {
+                        const keySentence = sentences[0];
+                        
+                        questions.push({
+                            question: `Quale tra le seguenti affermazioni descrive in modo corretto il concetto: "${keySentence.substring(0, 110)}..."?`,
+                            options: [
+                                `Rappresenta una definizione teorica corretta dell'argomento trattato.`,
+                                `È un'affermazione errata che contraddice le leggi fisiche/scientifiche fondamentali.`,
+                                `Si riferisce a un fenomeno di natura opposta rispetto al contesto considerato.`,
+                                `Nessuna delle altre opzioni descrive accuratamente il fenomeno in esame.`
+                            ],
+                            correctIndex: 0,
+                            explanation: `In base alle definizioni teoriche di riferimento: "${keySentence}"`
+                        });
+                    }
+                });
+            }
+
+            return questions;
+        }
+
+        function downloadSampleGroundingJSON() {
+            const sampleData = {
+                subject: "Fisica e Chimica Applicata",
+                questions: [
+                    {
+                        question: "Cos'è la pressione in un fluido?",
+                        options: [
+                            "Il rapporto tra la forza perpendicolare e la superficie su cui agisce.",
+                            "La quantità totale di massa contenuta nel fluido.",
+                            "La velocità con cui il fluido si sposta nel condotto.",
+                            "La differenza di temperatura tra la superficie e il fondo."
+                        ],
+                        correctIndex: 0,
+                        isCalculation: false,
+                        explanation: "Per definizione $p = F / S$, la pressione misura la forza per unità di superficie."
+                    },
+                    {
+                        question: "Calcola la pressione idrostatica esercitata dall'acqua ($\rho = 1000\\text{ kg/m}^3$) alla profondità $h = 25\\text{ m}$. ($g = 9{,}81\\text{ m/s}^2$)",
+                        options: ["$245250\\text{ Pa}$", "$25000\\text{ Pa}$", "$100000\\text{ Pa}$", "$9810\\text{ Pa}$"],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: "Legge di Stevin: $p = \\rho \\cdot g \\cdot h = 1000 \\cdot 9{,}81 \\cdot 25 = 245250\\text{ Pa}$."
+                    }
+                ]
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(sampleData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "modello_grounding_esempio.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        // Utility Functions
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function roundVal(num, decimals = 1) { return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals); }
+        function shuffleArray(array) {
+            let cloned = [...array];
+            for (let i = cloned.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cloned[i], cloned[j]] = [cloned[j], cloned[i]];
+            }
+            return cloned;
+        }
+
+        function renderMathInDOM() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError : false
+                });
+            }
+        }
+
+        // --- PRESET GENERATORS (GENERA SEMPRE DATI E QUESITI DIVERSI) ---
+        function generateFluidostaticaQuestions(count = 20) {
+            const list = [];
+            const liquids = [
+                { name: "acqua dolce", density: 1000 }, 
+                { name: "olio d'oliva", density: 920 }, 
+                { name: "acqua di mare", density: 1030 },
+                { name: "glicerina", density: 1260 },
+                { name: "alcol etilico", density: 789 }
+            ];
+
+            for (let i = 0; i < count; i++) {
+                const liq = getRandomElement(liquids);
+                const depth = getRandomInt(2, 60);
+                const pHydro = Math.round(liq.density * 9.81 * depth);
+                const pAtm = 101325;
+                const pTot = pHydro + pAtm;
+
+                const qType = i % 5;
+
+                if (qType === 0) {
+                    list.push({
+                        question: `Calcola la pressione idrostatica esercitata in un recipiente contenente ${liq.name} ($\\rho = ${liq.density}\\text{ kg/m}^3$) alla profondità $h = ${depth}\\text{ m}$. (Assumi $g = 9{,}81\\text{ m/s}^2$)`,
+                        options: [`$${pHydro}\\text{ Pa}$`, `$${Math.round(pHydro / 10)}\\text{ Pa}$`, `$${Math.round(pHydro * 1.3)}\\text{ Pa}$`, `$${Math.round(liq.density * depth)}\\text{ Pa}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `Legge di Stevin: $p = \\rho \\cdot g \\cdot h = ${liq.density} \\cdot 9{,}81 \\cdot ${depth} = ${pHydro}\\text{ Pa}$.`
+                    });
+                } else if (qType === 1) {
+                    list.push({
+                        question: `Calcola la pressione ASSOLUTA (totale) alla profondità di $h = ${depth}\\text{ m}$ in ${liq.name} ($\\rho = ${liq.density}\\text{ kg/m}^3$), sapendo che la pressione atmosferica è $p_{\\text{atm}} = 101325\\text{ Pa}$.`,
+                        options: [`$${pTot}\\text{ Pa}$`, `$${pHydro}\\text{ Pa}$`, `$${pTot + 50000}\\text{ Pa}$`, `$${Math.round(pTot / 2)}\\text{ Pa}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `Pressione Assoluta: $p_{\\text{tot}} = p_{\\text{atm}} + \\rho g h = 101325 + ${pHydro} = ${pTot}\\text{ Pa}$.`
+                    });
+                } else if (qType === 2) {
+                    const area = getRandomInt(2, 15);
+                    const force = Math.round(pHydro * (area / 100));
+                    list.push({
+                        question: `Una superficie di $S = ${area}\\text{ cm}^2$ si trova immersa a profondità $h = ${depth}\\text{ m}$ in ${liq.name} ($\\rho = ${liq.density}\\text{ kg/m}^3$). Calcola la forza $F$ esercitata dal fluido su di essa.`,
+                        options: [`$${force}\\text{ N}$`, `$${Math.round(force * 10)}\\text{ N}$`, `$${Math.round(force / 5)}\\text{ N}$`, `$${force + 120}\\text{ N}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `Pressione $p = ${pHydro}\\text{ Pa}$, Area $S = ${area / 10000}\\text{ m}^2 \\implies F = p \\cdot S = ${force}\\text{ N}$.`
+                    });
+                } else if (qType === 3) {
+                    list.push({
+                        question: "Cosa stabilisce la legge di Stevin per un fluido incompressibile a riposo?",
+                        options: [
+                            "La pressione aumenta linearmente con l'aumentare della profondità.",
+                            "La pressione dipende dalla forma del recipiente che contiene il fluido.",
+                            "La pressione idrostatica è uguale in tutte le direzioni solo in assenza di gravità.",
+                            "La pressione decresce in modo esponenziale verso il fondo del contenitore."
+                        ],
+                        correctIndex: 0,
+                        isCalculation: false,
+                        explanation: "La legge di Stevin $p = p_0 + \\rho g h$ indica che la pressione aumenta linearmente con la profondità $h$."
+                    });
+                } else {
+                    list.push({
+                        question: "Quale principio stabilisce che la pressione esercitata su un fluido racchiuso si trasmette inalterata in ogni punto?",
+                        options: [
+                            "Il principio di Pascal",
+                            "Il principio di Archimede",
+                            "La legge di Stevin",
+                            "L'equazione di continuità di Bernoulli"
+                        ],
+                        correctIndex: 0,
+                        isCalculation: false,
+                        explanation: "Il principio di Pascal descrive la trasmissione uniforme della pressione nei fluidi confinati."
+                    });
+                }
+            }
+            return shuffleArray(list);
+        }
+
+        function generateCinematicaQuestions(count = 20) {
+            const list = [];
+            for (let i = 0; i < count; i++) {
+                const vel = getRandomInt(10, 35);
+                const time = getRandomInt(5, 50);
+                const dist = vel * time;
+                const accel = getRandomInt(2, 8);
+                const velFinal = accel * time;
+
+                if (i % 3 === 0) {
+                    list.push({
+                        question: `Un veicolo si muove di Moto Rettilineo Uniforme (MRU) alla velocità costante di $v = ${vel}\\text{ m/s}$. Quale distanza $s$ percorre in un intervallo di tempo $t = ${time}\\text{ s}$?`,
+                        options: [`$${dist}\\text{ m}$`, `$${roundVal(vel / time)}\\text{ m}$`, `$${dist * 2}\\text{ m}$`, `$${dist + 40}\\text{ m}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `Legge oraria del MRU: $s = v \\cdot t = ${vel} \\cdot ${time} = ${dist}\\text{ m}$.`
+                    });
+                } else if (i % 3 === 1) {
+                    list.push({
+                        question: `Un corpo parte da fermo ($v_0 = 0$) con accelerazione costante $a = ${accel}\\text{ m/s}^2$. Quale velocità $v$ raggiunge dopo $t = ${time}\\text{ s}$?`,
+                        options: [`$${velFinal}\\text{ m/s}$`, `$${roundVal(accel / time)}\\text{ m/s}$`, `$${velFinal * 2}\\text{ m/s}$`, `$${velFinal + 15}\\text{ m/s}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `Moto Rettilineo Uniformemente Accelerato: $v = a \\cdot t = ${accel} \\cdot ${time} = ${velFinal}\\text{ m/s}$.`
+                    });
+                } else {
+                    list.push({
+                        question: "Che cos'è l'accelerazione vettoriale media?",
+                        options: [
+                            "La variazione del vettore velocità nell'unità di tempo.",
+                            "Lo spazio totale percorso diviso per il tempo totale impiegato.",
+                            "La velocità massima istantanea raggiunta durante il tragitto.",
+                            "Il rapporto tra la forza applicata e lo spostamento compiuto."
+                        ],
+                        correctIndex: 0,
+                        isCalculation: false,
+                        explanation: "L'accelerazione misura il tasso di variazione vettoriale della velocità nel tempo."
+                    });
+                }
+            }
+            return shuffleArray(list);
+        }
+
+        function generateTermodinamicaQuestions(count = 20) {
+            const list = [];
+            for (let i = 0; i < count; i++) {
+                const tempC = getRandomInt(15, 100);
+                const tempK = tempC + 273;
+                const p1 = getRandomInt(1, 5);
+                const v1 = getRandomInt(2, 10);
+                const v2 = v1 * 2;
+                const p2 = p1 / 2;
+
+                if (i % 3 === 0) {
+                    list.push({
+                        question: `Converti la temperatura $T = ${tempC}^\\circ\\text{C}$ nella scala Kelvin.`,
+                        options: [`$${tempK}\\text{ K}$`, `$${tempC + 100}\\text{ K}$`, `$${tempC * 2}\\text{ K}$`, `$${tempK + 50}\\text{ K}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `$T(\\text{K}) = T(^\\circ\\text{C}) + 273{,}15 = ${tempC} + 273 = ${tempK}\\text{ K}$.`
+                    });
+                } else if (i % 3 === 1) {
+                    list.push({
+                        question: `Una massa di gas perfetto a temperatura costante si espande raddoppiando il volume da $V_1 = ${v1}\\text{ L}$ a $V_2 = ${v2}\\text{ L}$. Se la pressione iniziale era $p_1 = ${p1}\\text{ atm}$, quale sarà la pressione finale $p_2$?`,
+                        options: [`$${p2}\\text{ atm}$`, `$${p1 * 2}\\text{ atm}$`, `$${p1 + 2}\\text{ atm}$`, `$${roundVal(p1 / 4)}\\text{ atm}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `Legge di Boyle ($p_1 V_1 = p_2 V_2$): $p_2 = p_1 \\cdot (V_1 / V_2) = ${p1} \\cdot (1/2) = ${p2}\\text{ atm}$.`
+                    });
+                } else {
+                    list.push({
+                        question: "Cosa afferma il Primo Principio della Termodinamica?",
+                        options: [
+                            "La variazione di energia interna di un sistema è pari al calore scambiato meno il lavoro compiuto ($Q - L$).",
+                            "Il calore fluisce spontaneamente da un corpo freddo a uno più caldo.",
+                            "L'entropia totale dell'universo diminuisce sempre nei processi irreversibili.",
+                            "È possibile costruire una macchina termica con rendimento pari al 100%."
+                        ],
+                        correctIndex: 0,
+                        isCalculation: false,
+                        explanation: "Il Primo Principio è il principio di conservazione dell'energia: $\\Delta U = Q - L$."
+                    });
+                }
+            }
+            return shuffleArray(list);
+        }
+
+        function generateMatematicaQuestions(count = 20) {
+            const list = [];
+            for (let i = 0; i < count; i++) {
+                const a = getRandomInt(2, 9);
+                const b = getRandomInt(3, 15);
+                const c = getRandomInt(10, 50);
+                const sol = roundVal((c - b) / a, 2);
+
+                if (i % 2 === 0) {
+                    list.push({
+                        question: `Risolvi l'equazione di primo grado: $${a}x + ${b} = ${c}$.`,
+                        options: [`$x = ${sol}$`, `$x = ${roundVal(sol + 2)}$`, `$x = ${roundVal((c + b) / a)}$`, `$x = ${roundVal(sol * 2)}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `$${a}x = ${c} - ${b} \\implies ${a}x = ${c - b} \\implies x = ${sol}$.`
+                    });
+                } else {
+                    const base = getRandomInt(2, 5);
+                    const exp = getRandomInt(2, 4);
+                    const res = Math.pow(base, exp);
+                    list.push({
+                        question: `Calcola il valore del potenziale esponenziale: $${base}^{${exp}}$.`,
+                        options: [`$${res}$`, `$${base * exp}$`, `$${res + base}$`, `$${res * 2}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `$${base}^{${exp}} = ${res}$.`
+                    });
+                }
+            }
+            return shuffleArray(list);
+        }
+
+        function generateChimicaQuestions(count = 20) {
+            const list = [];
+            for (let i = 0; i < count; i++) {
+                const moles = getRandomInt(2, 10);
+                const mmWater = 18;
+                const mass = moles * mmWater;
+
+                if (i % 2 === 0) {
+                    list.push({
+                        question: `Calcola la massa in grammi di $n = ${moles}\\text{ mol}$ di acqua ($H_2O$), sapendo che la massa molare è $M = 18\\text{ g/mol}$.`,
+                        options: [`$${mass}\\text{ g}$`, `$${Math.round(mass / 2)}\\text{ g}$`, `$${moles + mmWater}\\text{ g}$`, `$${mass + 36}\\text{ g}$`],
+                        correctIndex: 0,
+                        isCalculation: true,
+                        explanation: `$m = n \\cdot M = ${moles} \\cdot 18 = ${mass}\\text{ g}$.`
+                    });
+                } else {
+                    list.push({
+                        question: "Cos'è la Molarità ($M$) di una soluzione chimica?",
+                        options: [
+                            "Il numero di moli di soluto per litro di soluzione.",
+                            "La massa di soluto espressa in grammi per chilogrammo di solvente.",
+                            "Il rapporto percentuale in peso tra soluto e solvente.",
+                            "Il volume totale della soluzione diviso per la temperatura."
+                        ],
+                        correctIndex: 0,
+                        isCalculation: false,
+                        explanation: "La molarità misura la concentrazione molare: $M = \\text{moli soluto} / \\text{litri soluzione}$."
+                    });
+                }
+            }
+            return shuffleArray(list);
+        }
+
+        function getSubjectQuestionPool(subject) {
+            if (subject === 'custom' && customGroundingQuestions.length > 0) {
+                return customGroundingQuestions;
+            }
+
+            if (subject === 'cinematica') return generateCinematicaQuestions(25);
+            if (subject === 'termodinamica') return generateTermodinamicaQuestions(25);
+            if (subject === 'matematica') return generateMatematicaQuestions(25);
+            if (subject === 'chimica') return generateChimicaQuestions(25);
+
+            return generateFluidostaticaQuestions(25);
+        }
+
+        function startSelectedQuiz() {
+            studentName = document.getElementById('studentNameInput').value.trim();
+            const errDiv = document.getElementById('nameErrorMsg');
+            
+            if (!studentName) {
+                errDiv.classList.remove('hidden');
+                return;
+            }
+            errDiv.classList.add('hidden');
+
+            // Lettura opzione tempo illimitato
+            const noTimerCb = document.getElementById('noTimerCheckbox');
+            isUnlimitedTime = noTimerCb ? noTimerCb.checked : false;
+
+            let fullPool = getSubjectQuestionPool(selectedSubject);
+
+            if (fullPool.length === 0) {
+                alert("Nessun quesito disponibile per questa materia. Carica un file di grounding prima di iniziare.");
+                return;
+            }
+
+            // Shuffle completo della lista quesiti (utilizza tutti i quesiti disponibili)
+            fullPool = shuffleArray(fullPool);
+            activeQuestions = fullPool;
+
+            // Per ciascuna domanda, rimescola sempre l'ordine delle opzioni di risposta
+            activeQuestions = activeQuestions.map(q => {
+                const correctAnswerStr = q.options[q.correctIndex];
+                let mixedOptions = shuffleArray([...q.options]);
+                return {
+                    question: q.question,
+                    options: mixedOptions,
+                    correctIndex: mixedOptions.indexOf(correctAnswerStr),
+                    isCalculation: q.isCalculation !== undefined ? q.isCalculation : isAdvancedCalculationQuestion(q),
+                    timeLimit: q.timeLimit || null,
+                    explanation: q.explanation || "Risposta derivata dal file di grounding."
+                };
+            });
+
+            studentAnswers = new Array(activeQuestions.length).fill(null);
+            currentQuestionIndex = 0;
+            exitCount = 0;
+            isJollyUsed = false;
+            quizStartTime = new Date();
+            
+            const quizSubjectLabel = document.getElementById('quizSubjectLabel');
+            if (quizSubjectLabel) {
+                quizSubjectLabel.textContent = selectedSubject === 'custom' ? customSubjectTitle : (PRESET_SUBJECTS[selectedSubject]?.title || customSubjectTitle);
+            }
+
+            document.getElementById('screenStart').classList.add('hidden');
+            document.getElementById('screenQuiz').classList.remove('hidden');
+            
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            renderQuestion();
+        }
+
+        function handleVisibilityChange() {
+            if (document.hidden && !document.getElementById('screenQuiz').classList.contains('hidden')) {
+                exitCount++;
+                document.getElementById('exitStatsBadge').textContent = `Uscite: ${exitCount}`;
+                document.getElementById('warningBanner').classList.remove('hidden');
+            }
+        }
+
+        // --- GESTIONE TIMER QUESITO ---
+        function stopQuestionTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function startQuestionTimer() {
+            stopQuestionTimer();
+
+            if (isUnlimitedTime) {
+                updateTimerDisplay();
+                return;
+            }
+
+            const q = activeQuestions[currentQuestionIndex];
+            currentQuestionMaxTime = getQuestionTimeLimit(q);
+            currentQuestionTimeLeft = currentQuestionMaxTime;
+
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                currentQuestionTimeLeft--;
+                updateTimerDisplay();
+
+                if (currentQuestionTimeLeft <= 0) {
+                    stopQuestionTimer();
+                    handleQuestionTimeout();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerText = document.getElementById('timerCountdown');
+            const timerBadge = document.getElementById('questionTimerDisplay');
+            const timeBarFill = document.getElementById('timeProgressBarFill');
+
+            if (isUnlimitedTime) {
+                if (timerText) timerText.textContent = "Tempo illimitato";
+                if (timerBadge) {
+                    timerBadge.className = "px-3 py-1 bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm";
+                }
+                if (timeBarFill) {
+                    timeBarFill.style.width = "100%";
+                    timeBarFill.className = "bg-emerald-500 h-2 rounded-full transition-all duration-300";
+                }
+                return;
+            }
+
+            if (timerText) timerText.textContent = `${currentQuestionTimeLeft}s`;
+
+            // Percentuale barra tempo
+            const pct = Math.max(0, (currentQuestionTimeLeft / currentQuestionMaxTime) * 100);
+            if (timeBarFill) timeBarFill.style.width = `${pct}%`;
+
+            // Allerta visiva sotto 15 secondi
+            if (currentQuestionTimeLeft <= 15) {
+                if (timerBadge) {
+                    timerBadge.className = "px-3 py-1 bg-rose-100 text-rose-900 border border-rose-400 font-mono font-extrabold rounded-xl text-sm flex items-center gap-1.5 shadow-sm timer-warning";
+                }
+                if (timeBarFill) timeBarFill.className = "bg-rose-600 h-2 rounded-full transition-all duration-1000";
+            } else {
+                if (timerBadge) {
+                    timerBadge.className = "px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 font-mono font-extrabold rounded-xl text-sm flex items-center gap-1.5 shadow-sm";
+                }
+                if (timeBarFill) timeBarFill.className = "bg-amber-500 h-2 rounded-full transition-all duration-1000";
+            }
+        }
+
+        function handleQuestionTimeout() {
+            // Tempo scaduto per la domanda corrente
+            if (currentQuestionIndex < activeQuestions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function renderQuestion() {
+            const q = activeQuestions[currentQuestionIndex];
+            
+            document.getElementById('questionCounterText').textContent = `Quesito ${currentQuestionIndex + 1} di ${activeQuestions.length}`;
+            const progressPct = ((currentQuestionIndex) / activeQuestions.length) * 100;
+            document.getElementById('progressBarFill').style.width = `${progressPct}%`;
+
+            // Aggiornamento dello stato del pulsante Jolly
+            const jollyBtn = document.getElementById('jollyBtn');
+            if (jollyBtn) {
+                if (isJollyUsed) {
+                    jollyBtn.disabled = true;
+                    jollyBtn.className = "px-3 py-1 bg-slate-200 text-slate-400 border border-slate-300 font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-not-allowed";
+                    jollyBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jolly Usato</span>`;
+                } else {
+                    jollyBtn.disabled = false;
+                    jollyBtn.className = "px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer";
+                    jollyBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Usa Jolly 🃏</span>`;
+                }
+            }
+
+            // Badge Calcolo / Teoria
+            const isCalc = isAdvancedCalculationQuestion(q);
+            const calcBadge = document.getElementById('calcTypeBadge');
+            if (calcBadge) {
+                if (isCalc) {
+                    calcBadge.textContent = "🧮 Calcolo Avanzato (150s)";
+                    calcBadge.className = "px-2 py-0.5 rounded text-[10px] uppercase font-extrabold bg-indigo-100 text-indigo-800 border border-indigo-200";
+                } else {
+                    calcBadge.textContent = "📖 Teoria (60s)";
+                    calcBadge.className = "px-2 py-0.5 rounded text-[10px] uppercase font-extrabold bg-slate-100 text-slate-700 border border-slate-200";
+                }
+            }
+
+            document.getElementById('questionContainer').innerHTML = q.question;
+
+            const optsContainer = document.getElementById('optionsContainer');
+            optsContainer.innerHTML = '';
+            
+            q.options.forEach((optText, index) => {
+                const isSelected = studentAnswers[currentQuestionIndex] === index;
+                const btn = document.createElement('button');
+                
+                btn.className = `w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-3 relative overflow-hidden group ${
+                    isSelected 
+                    ? 'border-indigo-600 bg-indigo-50/50 shadow-sm' 
+                    : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50 bg-white'
+                }`;
+                
+                btn.onclick = () => selectOption(index);
+
+                const markerChar = String.fromCharCode(65 + index);
+                const markerClass = isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-indigo-100 group-hover:text-indigo-600';
+                
+                btn.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 transition-colors ${markerClass}">
+                        ${markerChar}
+                    </div>
+                    <div class="flex-grow text-slate-700 text-sm sm:text-base font-medium">
+                        ${optText}
+                    </div>
+                    ${isSelected ? `<i class="fa-solid fa-circle-check text-indigo-600 absolute right-4 text-xl"></i>` : ''}
+                `;
+                
+                optsContainer.appendChild(btn);
+            });
+
+            renderMathInDOM();
+            updateGridNav();
+            updateNavigationButtons();
+            
+            // Avvia timer per questo quesito
+            startQuestionTimer();
+        }
+
+        // --- FUNZIONE UTILIZZO JOLLY ---
+        function useJolly() {
+            if (isJollyUsed) {
+                alert("Hai già utilizzato il tuo Jolly per questa verifica!");
+                return;
+            }
+
+            if (!confirm("Vuoi davvero usare il Jolly per sostituire questo quesito con uno nuovo? Ricorda che puoi usarlo una sola volta!")) {
+                return;
+            }
+
+            // Pescaggio del pool di domande per la materia selezionata
+            const fullPool = getSubjectQuestionPool(selectedSubject);
+            const currentQuestionsText = activeQuestions.map(q => q.question);
+            const unusedPool = fullPool.filter(q => !currentQuestionsText.includes(q.question));
+
+            let candidateQuestion;
+            if (unusedPool.length > 0) {
+                candidateQuestion = getRandomElement(unusedPool);
+            } else {
+                const otherQuestions = fullPool.filter(q => q.question !== activeQuestions[currentQuestionIndex].question);
+                if (otherQuestions.length > 0) {
+                    candidateQuestion = getRandomElement(otherQuestions);
+                } else {
+                    candidateQuestion = fullPool[0];
+                }
+            }
+
+            // Preparazione del nuovo quesito con opzioni mescolate
+            const correctAnswerStr = candidateQuestion.options[candidateQuestion.correctIndex];
+            const mixedOptions = shuffleArray([...candidateQuestion.options]);
+            const newQuestionObj = {
+                question: candidateQuestion.question,
+                options: mixedOptions,
+                correctIndex: mixedOptions.indexOf(correctAnswerStr),
+                isCalculation: candidateQuestion.isCalculation !== undefined ? candidateQuestion.isCalculation : isAdvancedCalculationQuestion(candidateQuestion),
+                timeLimit: candidateQuestion.timeLimit || null,
+                explanation: candidateQuestion.explanation || "Risposta derivata dal file di grounding."
+            };
+
+            // Sostituzione quesito e reset stato risposta
+            activeQuestions[currentQuestionIndex] = newQuestionObj;
+            studentAnswers[currentQuestionIndex] = null;
+            isJollyUsed = true;
+
+            renderQuestion();
+        }
+
+        function selectOption(index) {
+            studentAnswers[currentQuestionIndex] = index;
+            renderQuestion();
+        }
+
+        function updateGridNav() {
+            const grid = document.getElementById('questionGridNav');
+            grid.innerHTML = '';
+            
+            activeQuestions.forEach((_, i) => {
+                const isAnswered = studentAnswers[i] !== null;
+                const isCurrent = i === currentQuestionIndex;
+                const dot = document.createElement('button');
+                dot.onclick = () => { currentQuestionIndex = i; renderQuestion(); };
+                
+                let baseStyle = "w-8 h-8 rounded-md text-xs font-bold transition flex items-center justify-center border";
+                if (isCurrent) baseStyle += " border-indigo-600 bg-indigo-600 text-white shadow-md ring-2 ring-indigo-200";
+                else if (isAnswered) baseStyle += " border-indigo-300 bg-indigo-50 text-indigo-700 hover:bg-indigo-100";
+                else baseStyle += " border-slate-200 bg-slate-100 text-slate-400 hover:bg-slate-200";
+                
+                dot.className = baseStyle;
+                dot.textContent = i + 1;
+                grid.appendChild(dot);
+            });
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (currentQuestionIndex > 0) prevBtn.classList.remove('invisible');
+            else prevBtn.classList.add('invisible');
+
+            const currentAnswered = studentAnswers[currentQuestionIndex] !== null;
+
+            if (currentQuestionIndex === activeQuestions.length - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+                submitBtn.disabled = !currentAnswered;
+            } else {
+                submitBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                nextBtn.disabled = !currentAnswered;
+            }
+        }
+
+        function navigateQuestion(direction) {
+            if (direction === 1 && studentAnswers[currentQuestionIndex] === null) return; 
+            currentQuestionIndex += direction;
+            if (currentQuestionIndex < 0) currentQuestionIndex = 0;
+            if (currentQuestionIndex >= activeQuestions.length) currentQuestionIndex = activeQuestions.length - 1;
+            renderQuestion();
+        }
+
+        function openConfirmModal() {
+            const unanswered = studentAnswers.filter(a => a === null).length;
+            const modalText = document.getElementById('confirmModalText');
+            if (unanswered > 0) {
+                modalText.innerHTML = `Hai <strong>${unanswered} domande</strong> non risposte. Confermi la consegna?`;
+            } else {
+                modalText.innerHTML = "Hai risposto a tutti i quesiti. Confermi la consegna?";
+            }
+            document.getElementById('confirmSubmissionModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() { document.getElementById('confirmSubmissionModal').classList.add('hidden'); }
+        function confirmSubmissionAction() { closeConfirmModal(); finishQuiz(); }
+
+        function finishQuiz() {
+            stopQuestionTimer();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            const endTime = new Date();
+            const timeDiff = Math.floor((endTime - quizStartTime) / 1000); 
+            const minutes = Math.floor(timeDiff / 60).toString().padStart(2, '0');
+            const seconds = (timeDiff % 60).toString().padStart(2, '0');
+
+            let correct = 0, wrong = 0, skipped = 0;
+            activeQuestions.forEach((q, idx) => {
+                const ans = studentAnswers[idx];
+                if (ans === null) skipped++;
+                else if (ans === q.correctIndex) correct++;
+                else wrong++;
+            });
+
+            const accuracy = Math.round((correct / activeQuestions.length) * 100);
+
+            // Indicatore dello stato Timer
+            const timerModeLabel = isUnlimitedTime ? "Timer: Disattivato (Tempo Illimitato)" : "Timer: Attivo (60s / 150s)";
+            const resTimerModeDisplay = document.getElementById('resTimerModeDisplay');
+            if (resTimerModeDisplay) {
+                resTimerModeDisplay.textContent = timerModeLabel;
+                resTimerModeDisplay.className = isUnlimitedTime 
+                    ? "px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[11px] font-extrabold border border-amber-300"
+                    : "px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-900 text-[11px] font-extrabold border border-indigo-200";
+            }
+
+            document.getElementById('completedPseudonym').textContent = studentName;
+            document.getElementById('resCorrect').textContent = correct;
+            document.getElementById('resWrong').textContent = wrong;
+            document.getElementById('resSkipped').textContent = skipped;
+            document.getElementById('resAccuracy').textContent = `${accuracy}%`;
+            document.getElementById('resTotalScoreText').textContent = `${correct} esatte su ${activeQuestions.length} quesiti`;
+            document.getElementById('completionTimeDisplay').textContent = `Tempo Impiegato: ${minutes}:${seconds}`;
+
+            saveResultLocally(correct, accuracy, exitCount, isUnlimitedTime);
+            buildReviewList();
+
+            document.getElementById('screenQuiz').classList.add('hidden');
+            document.getElementById('progressBarFill').style.width = '100%';
+            document.getElementById('screenCompleted').classList.remove('hidden');
+        }
+
+        function saveResultLocally(correct, accuracy, exits, timerDisabled) {
+            let history = JSON.parse(localStorage.getItem(QUIZ_SETTINGS.storageKey) || "[]");
+            const timerModeText = timerDisabled ? "Disattivato" : "Attivo";
+            
+            const record = {
+                date: new Date().toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                student: studentName,
+                score: `${correct}/${activeQuestions.length}`,
+                accuracy: `${accuracy}%`,
+                timerMode: timerModeText,
+                exits: exits
+            };
+            
+            history.unshift(record);
+            localStorage.setItem(QUIZ_SETTINGS.storageKey, JSON.stringify(history));
+
+            if (QUIZ_SETTINGS.googleSheetUrl) {
+                fetch(QUIZ_SETTINGS.googleSheetUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(record)
+                }).catch(err => console.error("Sheet send error:", err));
+            }
+        }
+
+        function buildReviewList() {
+            const listContainer = document.getElementById('reviewList');
+            listContainer.innerHTML = '';
+
+            activeQuestions.forEach((q, idx) => {
+                const ans = studentAnswers[idx];
+                const isCorrect = ans === q.correctIndex;
+                const isSkipped = ans === null;
+                const isCalc = isAdvancedCalculationQuestion(q);
+                
+                let statusBadge, bgClass, borderClass;
+                if (isCorrect) {
+                    statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Esatta</span>`;
+                    bgClass = "bg-white";
+                    borderClass = "border-emerald-200 border-l-4 border-l-emerald-500";
+                } else if (isSkipped) {
+                    statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Omessa / Scaduta</span>`;
+                    bgClass = "bg-slate-50";
+                    borderClass = "border-slate-200 border-l-4 border-l-amber-500";
+                } else {
+                    statusBadge = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Errata</span>`;
+                    bgClass = "bg-rose-50/30";
+                    borderClass = "border-rose-200 border-l-4 border-l-rose-500";
+                }
+
+                const typeLabel = isCalc ? "🧮 Quesito con Calcolo" : "📖 Quesito Teorico";
+
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-xl border ${bgClass} ${borderClass} space-y-3`;
+
+                let html = `
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">${typeLabel}</span>
+                            <h4 class="text-sm font-bold text-slate-800">${idx + 1}. ${q.question}</h4>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="space-y-1.5 mt-2">
+                `;
+
+                q.options.forEach((opt, optIdx) => {
+                    let optClass = "text-xs px-3 py-1.5 rounded-lg border ";
+                    let icon = "";
+                    if (optIdx === q.correctIndex) {
+                        optClass += "bg-emerald-50 border-emerald-300 text-emerald-900 font-semibold";
+                        icon = `<i class="fa-solid fa-check text-emerald-600 mr-1"></i>`;
+                    } else if (optIdx === ans) {
+                        optClass += "bg-rose-50 border-rose-300 text-rose-900 font-semibold line-through";
+                        icon = `<i class="fa-solid fa-xmark text-rose-600 mr-1"></i>`;
+                    } else {
+                        optClass += "bg-white border-slate-100 text-slate-500";
+                        icon = `<span class="inline-block w-4"></span>`;
+                    }
+                    html += `<div class="${optClass}">${icon} ${opt}</div>`;
+                });
+
+                html += `
+                    </div>
+                    <div class="mt-3 bg-indigo-50/50 p-3 rounded-lg border border-indigo-100 text-xs text-indigo-900">
+                        <strong class="block mb-1 text-indigo-700"><i class="fa-solid fa-lightbulb"></i> Spiegazione Teorica:</strong>
+                        ${q.explanation}
+                    </div>
+                `;
+
+                item.innerHTML = html;
+                listContainer.appendChild(item);
+            });
+
+            renderMathInDOM();
+        }
+
+        function toggleReviewMode() {
+            const rev = document.getElementById('reviewContainer');
+            if (rev.classList.contains('hidden')) {
+                rev.classList.remove('hidden');
+                rev.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                rev.classList.add('hidden');
+            }
+        }
+
+        function restartQuiz() {
+            stopQuestionTimer();
+            document.getElementById('screenCompleted').classList.add('hidden');
+            document.getElementById('reviewContainer').classList.add('hidden');
+            document.getElementById('screenStart').classList.remove('hidden');
+            document.getElementById('warningBanner').classList.add('hidden');
+            document.getElementById('progressBarFill').style.width = '0%';
+            document.getElementById('nameErrorMsg').classList.add('hidden');
+        }
+
+        function openTeacherModal() {
+            document.getElementById('teacherModal').classList.remove('hidden');
+            document.getElementById('teacherAuthSection').classList.remove('hidden');
+            document.getElementById('teacherDashboardSection').classList.add('hidden');
+            document.getElementById('teacherPinInput').value = '';
+            document.getElementById('teacherAuthError').classList.add('hidden');
+            document.getElementById('sheetUrlSetting').value = QUIZ_SETTINGS.googleSheetUrl;
+        }
+
+        function closeTeacherModal() { document.getElementById('teacherModal').classList.add('hidden'); }
+
+        function saveSheetUrlSetting() {
+            const urlInput = document.getElementById('sheetUrlSetting').value.trim();
+            localStorage.setItem('PHYSICS_SHEET_URL', urlInput);
+            QUIZ_SETTINGS.googleSheetUrl = urlInput;
+            alert("URL Google Sheets salvato!");
+        }
+
+        function verifyTeacherPin() {
+            const pin = document.getElementById('teacherPinInput').value;
+            if (pin === QUIZ_SETTINGS.teacherPin) {
+                document.getElementById('teacherAuthSection').classList.add('hidden');
+                document.getElementById('teacherDashboardSection').classList.remove('hidden');
+                loadTeacherTable();
+            } else {
+                document.getElementById('teacherAuthError').classList.remove('hidden');
+            }
+        }
+
+        function loadTeacherTable() {
+            const tbody = document.getElementById('teacherTableBody');
+            tbody.innerHTML = '';
+            let history = JSON.parse(localStorage.getItem(QUIZ_SETTINGS.storageKey) || "[]");
+            
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">Nessun risultato salvato.</td></tr>`;
+                return;
+            }
+
+            history.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                const exitBadge = row.exits > 0 
+                    ? `<span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[10px] font-bold">${row.exits} avvisi</span>` 
+                    : `<span class="text-slate-400">-</span>`;
+
+                const timerBadge = row.timerMode === "Disattivato"
+                    ? `<span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold">Disattivato</span>`
+                    : `<span class="bg-indigo-100 text-indigo-900 px-2 py-0.5 rounded text-[10px] font-bold">Attivo</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-3 border-r border-slate-100 whitespace-nowrap">${row.date}</td>
+                    <td class="p-3 border-r border-slate-100 font-semibold text-slate-800">${row.student}</td>
+                    <td class="p-3 border-r border-slate-100 font-bold">${row.score}</td>
+                    <td class="p-3 border-r border-slate-100 text-indigo-600 font-bold">${row.accuracy}</td>
+                    <td class="p-3 border-r border-slate-100">${timerBadge}</td>
+                    <td class="p-3">${exitBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function promptClearHistory() {
+            if (confirm("Sei sicuro di voler svuotare il registro locale?")) {
+                localStorage.removeItem(QUIZ_SETTINGS.storageKey);
+                loadTeacherTable();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            updateSubjectUI();
+            renderMathInDOM();
+        });
+    </script>
+</body>
+</html>
