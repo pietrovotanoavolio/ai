@@ -902,9 +902,8 @@
             updateUIConfigDisplays();
         }
 
-        function getFallbackQuestions(count, referenceText, directives) {
-            // Fallback robusto offline per garantire il funzionamento su GitHub Pages senza blocchi 403
-            const fallbackPool = [
+        function getLocalFallbackQuestions(count, referenceText, directives) {
+            const pool = [
                 {
                     question: "Un punto materiale si muove di moto rettilineo uniforme con velocità $v = 5\\,\\text{m/s}$. Qual è lo spazio percorso in un intervallo di tempo $\\Delta t = 4\\,\\text{s}$?",
                     options: ["$20\\,\\text{m}$", "$10\\,\\text{m}$", "$25\\,\\text{m}$", "$5\\,\\text{m}$"],
@@ -967,12 +966,11 @@
                 }
             ];
 
-            // Se sono stati forniti file o direttive, personalizziamo leggermente i quesiti per riflettere il contesto inserito
-            let pool = [...fallbackPool];
-            while (pool.length < count) {
-                pool.push({...fallbackPool[pool.length % fallbackPool.length]});
+            let expanded = [...pool];
+            while (expanded.length < count) {
+                expanded.push({...pool[expanded.length % pool.length]});
             }
-            return pool.slice(0, count);
+            return expanded.slice(0, count);
         }
 
         async function fetchQuestionsFromAI(count, referenceText, directives) {
@@ -1022,24 +1020,25 @@
                 }
             };
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                const result = await response.json();
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (jsonText) {
-                    return JSON.parse(jsonText);
+            for (let attempt = 0; attempt < 2; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                    const result = await response.json();
+                    const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (jsonText) {
+                        return JSON.parse(jsonText);
+                    }
+                } catch(err) {
+                    if (attempt === 1) throw err;
+                    await new Promise(r => setTimeout(r, 500));
                 }
-                throw new Error("Risposta vuota");
-            } catch(err) {
-                // Fallback automatico in caso di blocchi di rete su GitHub Pages
-                console.warn("Nota: attivazione fallback locale per garantire continuità.", err);
-                return getFallbackQuestions(count, referenceText, directives);
             }
+            throw new Error("Impossibile connettersi al servizio di generazione.");
         }
 
         async function startSelectedQuiz() {
@@ -1067,10 +1066,16 @@
                 let combinedText = loadedReferenceFiles.map(f => `FILE: ${f.name}\n${f.text}`).join("\n\n");
                 let directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
 
-                let generatedQuestions = await fetchQuestionsFromAI(count + 2, combinedText, directives);
+                let generatedQuestions = [];
+                try {
+                    generatedQuestions = await fetchQuestionsFromAI(count + 2, combinedText, directives);
+                } catch(netErr) {
+                    console.warn("Utilizzo sistema di generazione locale di sicurezza:", netErr);
+                    generatedQuestions = getLocalFallbackQuestions(count + 2, combinedText, directives);
+                }
 
                 if (!Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
-                    generatedQuestions = getFallbackQuestions(count + 2, combinedText, directives);
+                    generatedQuestions = getLocalFallbackQuestions(count + 2, combinedText, directives);
                 }
 
                 let pool = generatedQuestions.slice(0, count);
@@ -1107,7 +1112,7 @@
                 renderCurrentQuestion();
             } catch (err) {
                 console.error("Errore Avvio:", err);
-                alert("Si è verificato un errore durante la preparazione della prova. Controlla la connessione e riprova.");
+                alert("Si è verificato un errore imprevisto durante l'avvio. Riprova.");
             } finally {
                 document.getElementById('loadingOverlay').classList.add('hidden');
             }
@@ -1429,7 +1434,7 @@
                 renderLoadedFilesList();
                 loadTeacherTable();
             } else {
-                document.getElementById('teacherAuthError').classList.remove('hidden');
+                document.getElementById('teacherAuthError').classList.add('hidden');
             }
         }
 
