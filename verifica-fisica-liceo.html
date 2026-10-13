@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Verifica di Fisica Liceo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: una schermata alla volta, colonna centrale stretta per lo studente, pannello largo a schede per il docente */
+:root{
+  --bg:#eef3f7; --surface:#ffffff; --surface-2:#f6f9fb; --ink:#10212f; --muted:#566878; --line:#d3dde6;
+  --accent:#0b5d8c; --accent-ink:#ffffff;
+  --celeste:#cdeefd; --celeste-line:#4fb8e8; --ciano:#00a9bd; --ciano-ink:#ffffff;
+  --danger:#c0352b; --danger-soft:#fbe7e5; --ok:#2c7a3f; --ok-soft:#e3f3e7; --warn:#a35f00; --warn-soft:#fdf0dc;
+  --shadow:0 1px 2px rgba(16,33,47,.06),0 6px 24px rgba(16,33,47,.07);
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c151d; --surface:#142230; --surface-2:#10202c; --ink:#e4edf4; --muted:#93a6b6; --line:#27394a;
+  --accent:#5fb4e6; --accent-ink:#06202f;
+  --celeste:#17435a; --celeste-line:#5fc3ef; --ciano:#00a3b6; --ciano-ink:#ffffff;
+  --danger:#ef6b5f; --danger-soft:#3a1d1b; --ok:#6cc483; --ok-soft:#173022; --warn:#f0a841; --warn-soft:#352610;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c151d; --surface:#142230; --surface-2:#10202c; --ink:#e4edf4; --muted:#93a6b6; --line:#27394a;
+  --accent:#5fb4e6; --accent-ink:#06202f;
+  --celeste:#17435a; --celeste-line:#5fc3ef; --ciano:#00a3b6; --ciano-ink:#ffffff;
+  --danger:#ef6b5f; --danger-soft:#3a1d1b; --ok:#6cc483; --ok-soft:#173022; --warn:#f0a841; --warn-soft:#352610;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;margin:0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--celeste-line);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+.wrap{min-height:100%;padding-inline:16px;padding-block:24px;display:flex;flex-direction:column}
+.screen{width:100%;max-width:560px;margin-inline:auto;display:flex;flex-direction:column;gap:20px;flex:1}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:24px}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);padding:12px 18px;font-weight:700;min-height:48px}
+.btn:hover{border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn-danger-outline{color:var(--danger);border-color:var(--danger);background:transparent}
+.btn-sm{min-height:38px;padding:7px 12px;font-size:.9rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:700;font-size:.92rem}
+.input{width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:12px 14px;min-height:48px}
+.input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--celeste)}
+
+/* --- HOME --- */
+.brand{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:8vh}
+.brand h1{font-size:clamp(2rem,7vw,2.75rem);letter-spacing:-.02em}
+.brand h1 span{display:block;font-size:.45em;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-family:var(--f-body);font-weight:700;margin-bottom:6px}
+.formula-strip{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:12px}
+.meta-line{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.82rem;background:var(--surface-2)}
+.chip.ok{border-color:transparent;background:var(--ok-soft);color:var(--ok)}
+.chip.warn{border-color:transparent;background:var(--warn-soft);color:var(--warn)}
+.chip.bad{border-color:transparent;background:var(--danger-soft);color:var(--danger)}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--line)}
+.switch{position:relative;width:52px;height:30px;flex:none}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .15s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.switch input:checked+span{background:var(--accent)}
+.switch input:checked+span::after{transform:translateX(22px)}
+.switch input:focus-visible+span{outline:3px solid var(--celeste-line);outline-offset:2px}
+.lock{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--muted);opacity:.7}
+.lock:hover{opacity:1}
+.msg{border-radius:10px;padding:12px 14px;font-size:.95rem}
+.msg.bad{background:var(--danger-soft);color:var(--danger)}
+.msg.warn{background:var(--warn-soft);color:var(--warn)}
+.msg.ok{background:var(--ok-soft);color:var(--ok)}
+
+/* --- TEST --- */
+.test{max-width:760px;gap:16px}
+.test-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.progress-txt{font-family:var(--f-mono);font-weight:700;font-size:.95rem}
+.progress{height:6px;background:var(--line);border-radius:999px;overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.timer{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-weight:700;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.timer .bar{width:110px;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.timer .bar i{display:block;height:100%;background:var(--ciano);width:100%}
+.timer.low{color:var(--danger)}
+.timer.low .bar i{background:var(--danger)}
+.qcard{padding:24px}
+.qtype{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.qtext{font-size:clamp(1.12rem,2.6vw,1.3rem);line-height:1.5;font-weight:700}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:14px;align-items:flex-start;text-align:left;width:100%;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:14px 16px;min-height:56px;font-size:1.02rem;line-height:1.4;transition:background .12s,border-color .12s}
+.opt b{font-family:var(--f-mono);flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);font-size:.85rem}
+.opt:hover{border-color:var(--celeste-line)}
+.opt.sel{background:var(--celeste);border-color:var(--celeste-line)}
+.opt.sel b{border-color:var(--celeste-line)}
+.opt.conf{background:var(--ciano);border-color:var(--ciano);color:var(--ciano-ink)}
+.opt.conf b{border-color:var(--ciano-ink)}
+.hint{font-size:.88rem;color:var(--muted);text-align:center;min-height:1.3em}
+.test-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+.no-select{user-select:none;-webkit-user-select:none}
+
+/* --- OVERLAY --- */
+.overlay{position:fixed;inset:0;background:rgba(6,16,24,.62);display:grid;place-items:center;padding:16px;z-index:50}
+.overlay .card{max-width:440px;width:100%;display:flex;flex-direction:column;gap:14px}
+.overlay .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+/* --- END --- */
+.end{justify-content:center;text-align:center;align-items:center}
+.check{width:72px;height:72px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center}
+.spinner{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spinner{animation-duration:3s}.progress>i{transition:none}}
+
+/* --- PANNELLO DOCENTE --- */
+.panel{max-width:1100px;gap:16px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{border:0;background:none;padding:10px 14px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.grid>*{min-width:0}
+.section{display:flex;flex-direction:column;gap:16px}
+.section h2{font-size:1.25rem}
+.range-row{display:flex;align-items:center;gap:12px}
+.range-row input[type=range]{flex:1;accent-color:var(--accent)}
+.range-row output{font-family:var(--f-mono);font-weight:700;min-width:4ch;text-align:right}
+.topics{display:flex;flex-wrap:wrap;gap:8px}
+.topic{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--surface-2);font-size:.9rem;cursor:pointer}
+.topic input{accent-color:var(--accent);margin:0}
+.statebox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface-2)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{background:var(--surface-2);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+.voto{font-family:var(--f-mono);font-weight:700}
+.dq{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.dq.C{border-left:5px solid var(--ok)}.dq.E{border-left:5px solid var(--danger)}.dq.N{border-left:5px solid var(--warn)}
+.dq ol{margin:0;padding-left:1.4em}
+.dq li.giusta{color:var(--ok);font-weight:700}
+.dq li.scelta-sbagliata{color:var(--danger);text-decoration:line-through}
+.detail-list{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto}
+.overlay .card.wide{max-width:760px}
+.code{font-family:var(--f-mono);font-size:.82rem;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;word-break:break-all}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:.92rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:700}
+</style>
+</head>
+<body>
+
+
+<div class="wrap" id="root">
+
+  <!-- HOME STUDENTE -->
+  <section class="screen" id="scr-home">
+    <div class="brand">
+      <h1><span>Liceo</span>Verifica di Fisica</h1>
+    </div>
+    <div class="meta-line" id="home-meta"></div>
+    <form class="card section" id="form-start" autocomplete="off" novalidate>
+      <div class="field">
+        <label for="inp-codice">Codice studente</label>
+        <input class="input" id="inp-codice" name="codice-verifica" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text">
+        <span class="small muted">Inserisci il codice che ti è stato assegnato.</span>
+      </div>
+      <div class="switch-row">
+        <label for="inp-notime" style="font-weight:700">Modalità senza tempo</label>
+        <span class="switch"><input type="checkbox" id="inp-notime" role="switch"><span></span></span>
+      </div>
+      <div id="home-msg" class="msg bad" hidden></div>
+      <button class="btn btn-primary" id="btn-start" type="submit">Inizia la verifica</button>
+      <div class="formula-strip" aria-hidden="true"><span>p = F/S</span><span>p = d·g·h</span><span>S = d·V·g</span></div>
+    </form>
+    <p class="small muted">Durante la verifica la pagina resta a schermo intero. Per ogni domanda: tocca una risposta per selezionarla, toccala di nuovo per confermarla.</p>
+    <button class="lock" id="btn-lock" type="button" aria-label="Area docente">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    </button>
+  </section>
+
+  <!-- PREPARAZIONE -->
+  <section class="screen end" id="scr-wait" hidden>
+    <div class="spinner" role="status" aria-label="Attendere"></div>
+    <p id="wait-txt">Il sistema sta preparando la verifica…</p>
+  </section>
+
+  <!-- VERIFICA -->
+  <section class="screen test no-select" id="scr-test" hidden>
+    <div class="test-head">
+      <span class="progress-txt" id="t-prog">Domanda 1 di 20</span>
+      <div class="timer" id="t-timer"><div class="bar"><i id="t-bar"></i></div><span id="t-sec">60</span></div>
+    </div>
+    <div class="progress"><i id="t-progbar"></i></div>
+    <article class="card qcard">
+      <div class="qtype"><span class="chip" id="t-tipo">Teoria</span><span class="small muted" id="t-arg"></span></div>
+      <p class="qtext" id="t-testo"></p>
+    </article>
+    <div class="opts" id="t-opts" role="group" aria-label="Risposte"></div>
+    <p class="hint" id="t-hint">Tocca una risposta per selezionarla, toccala di nuovo per confermare.</p>
+    <div class="test-foot">
+      <button class="btn" id="btn-jolly" type="button">Jolly <span class="chip" id="jolly-n">1</span></button>
+      <button class="btn btn-danger" id="btn-stop" type="button">Interrompi</button>
+    </div>
+  </section>
+
+  <!-- FINE -->
+  <section class="screen end" id="scr-end" hidden>
+    <div id="end-sending" class="section" style="align-items:center">
+      <div class="spinner" role="status" aria-label="Invio"></div>
+      <p>Consegna in corso… non chiudere la pagina.</p>
+    </div>
+    <div id="end-done" class="section" style="align-items:center" hidden>
+      <div class="check"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <h2>Verifica consegnata. Grazie.</h2>
+      <p class="muted" id="end-sub">Puoi chiudere la pagina.</p>
+      <div id="end-warn" class="msg warn" hidden>Consegna non confermata: non chiudere la pagina e avvisa il docente. <button class="btn btn-sm" id="btn-retry" type="button">Riprova l'invio</button></div>
+    </div>
+  </section>
+
+  <!-- PANNELLO DOCENTE -->
+  <section class="screen panel" id="scr-doc" hidden>
+    <div class="panel-head">
+      <div>
+        <p class="eyebrow">Area docente</p>
+        <h1 style="font-size:1.8rem">Verifica di Fisica Liceo</h1>
+      </div>
+      <div class="actions"><span class="chip" id="doc-conn">…</span><button class="btn btn-sm" id="btn-logout" type="button">Esci</button></div>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="sessione" aria-selected="true">Sessione</button>
+      <button class="tab" role="tab" data-tab="domande" aria-selected="false">Domande</button>
+      <button class="tab" role="tab" data-tab="report" aria-selected="false">Report</button>
+      <button class="tab" role="tab" data-tab="collegamento" aria-selected="false">Collegamento</button>
+    </div>
+
+    <!-- Sessione -->
+    <div class="section" data-pane="sessione">
+      <div class="statebox">
+        <div><strong id="sess-state">Sessione ferma</strong><div class="small muted" id="sess-info"></div></div>
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-avvia" type="button">Salva e avvia sessione</button>
+          <button class="btn btn-danger-outline" id="btn-ferma" type="button">Ferma sessione</button>
+        </div>
+      </div>
+      <div id="sess-msg" class="msg ok" hidden></div>
+      <div class="card section">
+        <h2>Classe e argomento</h2>
+        <div class="grid">
+          <div class="field"><label for="cfg-classe">Classe</label><input class="input" id="cfg-classe" placeholder="es. 2A"></div>
+          <div class="field"><label for="cfg-anno">Anno di corso</label>
+            <select class="input" id="cfg-anno"><option>Primo anno</option><option selected>Secondo anno</option><option>Terzo anno</option><option>Quarto anno</option><option>Quinto anno</option></select></div>
+          <div class="field" style="grid-column:1/-1"><label for="cfg-arg">Argomento del test (visibile agli studenti)</label><input class="input" id="cfg-arg"></div>
+        </div>
+      </div>
+      <div class="card section">
+        <h2>Domande e tempi</h2>
+        <div class="grid">
+          <div class="field"><label for="cfg-n">Numero di domande</label><input class="input" id="cfg-n" type="number" min="3" max="60" value="20"></div>
+          <div class="field"><label for="cfg-jolly">Jolly per studente</label><select class="input" id="cfg-jolly"><option value="0">Nessuno</option><option value="1" selected>1 domanda</option><option value="2">2 domande</option></select></div>
+          <div class="field"><label for="cfg-tt">Tempo domanda teorica (s)</label><input class="input" id="cfg-tt" type="number" min="15" max="600" value="60"></div>
+          <div class="field"><label for="cfg-tc">Tempo domanda di calcolo (s)</label><input class="input" id="cfg-tc" type="number" min="30" max="900" value="150"></div>
+        </div>
+        <div class="field"><label for="cfg-perc">Domande di calcolo sul totale</label>
+          <div class="range-row"><input type="range" id="cfg-perc" min="0" max="100" step="5" value="30"><output id="cfg-perc-out">30%</output></div>
+          <span class="small muted" id="cfg-summary"></span></div>
+        <div class="field"><label for="cfg-scad">Chiusura automatica (facoltativa)</label><input class="input" id="cfg-scad" type="datetime-local" style="max-width:320px"></div>
+      </div>
+      <div class="card section">
+        <h2>Argomenti inclusi</h2>
+        <p class="small muted" style="margin:0">Togli la spunta per escludere un argomento da questa verifica.</p>
+        <div class="topics" id="cfg-topics"></div>
+      </div>
+    </div>
+
+    <!-- Domande -->
+    <div class="section" data-pane="domande" hidden>
+      <div class="card section">
+        <h2 id="bank-title">Banca domande</h2>
+        <div class="tbl-wrap"><table><thead><tr><th>Argomento</th><th>Teoria</th><th>Calcolo</th></tr></thead><tbody id="bank-tbody"></tbody></table></div>
+        <p class="small muted" style="margin:0">Le domande di calcolo sono modelli: i numeri cambiano per ogni studente. Anche l'ordine delle domande e delle risposte è diverso per ciascuno.</p>
+        <div class="actions">
+          <label class="btn btn-primary" for="file-bank">Carica nuova banca (.json)</label>
+          <input type="file" id="file-bank" accept=".json,application/json" hidden>
+          <button class="btn" id="btn-bank-dl" type="button">Scarica banca attuale</button>
+          <button class="btn" id="btn-bank-reset" type="button">Ripristina banca predefinita</button>
+        </div>
+        <div id="bank-msg" class="msg ok" hidden></div>
+      </div>
+      <div class="card section">
+        <div class="panel-head"><h2>Anteprima di una verifica</h2><button class="btn btn-sm" id="btn-preview" type="button">Genera esempio</button></div>
+        <div class="detail-list" id="preview-list" style="max-height:none"></div>
+      </div>
+    </div>
+
+    <!-- Report -->
+    <div class="section" data-pane="report" hidden>
+      <div class="panel-head">
+        <label class="topic"><input type="checkbox" id="rep-current" checked> Solo sessione corrente</label>
+        <div class="actions"><button class="btn btn-sm" id="btn-rep-refresh" type="button">Aggiorna</button><button class="btn btn-sm" id="btn-rep-csv" type="button">Esporta CSV</button></div>
+      </div>
+      <div id="rep-msg" class="msg warn" hidden></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Ora</th><th>Classe</th><th>Codice</th><th>Voto</th><th>C / E / N</th><th>Jolly</th><th>Senza tempo</th><th>Uscite pagina</th><th>Sec. fuori</th><th>Uscite schermo</th><th>Stato</th></tr></thead>
+        <tbody id="rep-tbody"></tbody>
+      </table></div>
+      <p class="small muted" id="rep-foot"></p>
+    </div>
+
+    <!-- Collegamento -->
+    <div class="section" data-pane="collegamento" hidden>
+      <div class="card section">
+        <h2>Foglio Google dei risultati</h2>
+        <dl class="kv"><dt>Stato</dt><dd id="conn-state">—</dd><dt>Indirizzo script</dt><dd><div class="code" id="conn-url"></div></dd></dl>
+        <div class="actions"><button class="btn" id="btn-ping" type="button">Prova collegamento</button></div>
+        <div id="conn-msg" class="msg" hidden></div>
+        <p class="small muted" style="margin:0">L'indirizzo dello script si imposta una volta sola dentro il file della pagina (voce <span class="code" style="display:inline">INDIRIZZO_SCRIPT</span>). Senza collegamento la pagina funziona in modalità prova: i risultati restano solo su questo dispositivo.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- OVERLAY: uscita dalla pagina -->
+<div class="overlay" id="ov-away" hidden>
+  <div class="card" role="alertdialog" aria-labelledby="ov-away-t">
+    <h2 id="ov-away-t">Hai lasciato la pagina della verifica</h2>
+    <p style="margin:0">L'uscita è stata registrata. Il tempo della domanda ha continuato a scorrere.</p>
+    <div class="row"><button class="btn btn-primary" id="btn-away-ok" type="button">Torna alla verifica</button></div>
+  </div>
+</div>
+<!-- OVERLAY: uscita da schermo intero -->
+<div class="overlay" id="ov-fs" hidden>
+  <div class="card" role="alertdialog" aria-labelledby="ov-fs-t">
+    <h2 id="ov-fs-t">Sei uscito dallo schermo intero</h2>
+    <p style="margin:0">L'uscita è stata registrata. Rientra a schermo intero per continuare.</p>
+    <div class="row"><button class="btn btn-primary" id="btn-fs-ok" type="button">Rientra a schermo intero</button></div>
+  </div>
+</div>
+<!-- OVERLAY: conferma interruzione -->
+<div class="overlay" id="ov-stop" hidden>
+  <div class="card" role="alertdialog" aria-labelledby="ov-stop-t">
+    <h2 id="ov-stop-t">Interrompere la verifica?</h2>
+    <p style="margin:0">La verifica verrà consegnata subito. Le domande senza risposta saranno considerate non date.</p>
+    <div class="row"><button class="btn" id="btn-stop-no" type="button">Continua la verifica</button><button class="btn btn-danger" id="btn-stop-yes" type="button">Interrompi e consegna</button></div>
+  </div>
+</div>
+<!-- OVERLAY: accesso docente -->
+<div class="overlay" id="ov-login" hidden>
+  <form class="card" id="form-login" autocomplete="off" novalidate>
+    <h2>Area docente</h2>
+    <div class="field"><label for="inp-pw">Password</label>
+      <input class="input" id="inp-pw" name="vfl-k" type="password" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore></div>
+    <div id="login-msg" class="msg bad" hidden>Accesso negato</div>
+    <div class="row"><button class="btn" id="btn-login-no" type="button">Annulla</button><button class="btn btn-primary" type="submit">Entra</button></div>
+  </form>
+</div>
+<!-- OVERLAY: dettaglio studente -->
+<div class="overlay" id="ov-detail" hidden>
+  <div class="card wide">
+    <div class="panel-head"><h2 id="det-title">Dettaglio</h2><button class="btn btn-sm" id="btn-det-close" type="button">Chiudi</button></div>
+    <dl class="kv" id="det-kv"></dl>
+    <div class="detail-list" id="det-list"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURAZIONE — le uniche due righe da modificare nel file
+   ===================================================================== */
+const PASSWORD = '4835D';        // sostituisci con la tua password (la stessa va messa nello script del foglio)
+const INDIRIZZO_SCRIPT = 'https://script.google.com/macros/s/AKfycbzZmadTf0ZfSHuL8a0pFoEr3EdZxBHbmkZB78YftvK5jKcf1SDJDzpwjzh3qX8bEozS/exec'; // URL dell'app web di Google Apps Script (termina con /exec)
+/* ===================================================================== */
+
+const BANCA_PREDEFINITA = {"titolo":"I fluidi","unita":"Unità 6 – I fluidi","anno":"Secondo anno","versione":1,"note":"Domande teoriche: la prima opzione è quella corretta (l'ordine viene mescolato a ogni studente). Domande di calcolo: modelli con numeri estratti a caso; risposta e distrattori sono espressioni calcolate.","domande":[{"id":"t01","tipo":"teoria","argomento":"Stati della materia","testo":"Quale proprietà hanno i liquidi?","opzioni":["Hanno un volume proprio ma non una forma propria","Hanno forma e volume propri","Hanno una forma propria ma non un volume proprio","Non hanno né forma né volume propri"]},{"id":"t02","tipo":"teoria","argomento":"Stati della materia","testo":"Quale affermazione descrive correttamente gli aeriformi?","opzioni":["Non hanno né forma né volume propri e sono comprimibili","Hanno un volume proprio ma non una forma propria","Hanno una forma propria e sono incomprimibili","Hanno forma e volume propri"]},{"id":"t03","tipo":"teoria","argomento":"Stati della materia","testo":"Perché i liquidi si considerano incomprimibili?","opzioni":["Perché è molto difficile ridurne il volume aumentando la pressione","Perché non hanno una forma propria","Perché hanno tutti la stessa densità dell'acqua","Perché non trasmettono la pressione"]},{"id":"t04","tipo":"teoria","argomento":"Stati della materia","testo":"Quali stati della materia sono considerati fluidi?","opzioni":["I liquidi e gli aeriformi","Solo i liquidi","I solidi e i liquidi","Solo gli aeriformi"]},{"id":"t05","tipo":"teoria","argomento":"Stati della materia","testo":"Quale stato della materia si può comprimere facilmente?","opzioni":["Lo stato aeriforme","Lo stato liquido","Lo stato solido","Nessuno dei tre"]},{"id":"t06","tipo":"teoria","argomento":"Pressione","testo":"Come si definisce la pressione?","opzioni":["Il rapporto tra la forza perpendicolare a una superficie e l'area della superficie","Il prodotto tra la forza e l'area della superficie","Il rapporto tra l'area della superficie e la forza","Il rapporto tra la forza e il volume del corpo"]},{"id":"t07","tipo":"teoria","argomento":"Pressione","testo":"Qual è l'unità di misura della pressione nel Sistema Internazionale?","opzioni":["Il pascal (Pa)","Il newton (N)","Il joule (J)","Il kg/m³"]},{"id":"t08","tipo":"teoria","argomento":"Pressione","testo":"A che cosa equivale 1 Pa?","opzioni":["1 N/m²","1 N · m²","1 kg/m³","1 N/m"]},{"id":"t09","tipo":"teoria","argomento":"Pressione","testo":"La pressione è:","opzioni":["direttamente proporzionale alla forza e inversamente proporzionale alla superficie","direttamente proporzionale sia alla forza sia alla superficie","inversamente proporzionale sia alla forza sia alla superficie","direttamente proporzionale alla superficie e inversamente proporzionale alla forza"]},{"id":"t10","tipo":"teoria","argomento":"Pressione","testo":"A parità di forza, se la superficie su cui agisce raddoppia, la pressione:","opzioni":["si dimezza","raddoppia","resta uguale","quadruplica"]},{"id":"t11","tipo":"teoria","argomento":"Pressione","testo":"A parità di superficie, se la forza perpendicolare triplica, la pressione:","opzioni":["triplica","si riduce a un terzo","resta uguale","aumenta di nove volte"]},{"id":"t12","tipo":"teoria","argomento":"Pressione","testo":"Perché con gli sci si sprofonda meno nella neve che con gli scarponi?","opzioni":["Perché la superficie di appoggio è maggiore e quindi la pressione è minore","Perché gli sci riducono il peso della persona","Perché gli sci aumentano la pressione sulla neve","Perché gli sci riducono la superficie di appoggio"]},{"id":"t13","tipo":"teoria","argomento":"Pressione","testo":"Perché un coltello affilato taglia meglio di uno non affilato?","opzioni":["Perché la lama ha una superficie più piccola e, a parità di forza, la pressione è maggiore","Perché la lama affilata pesa di più","Perché la lama affilata ha una superficie più grande","Perché la forza applicata diventa automaticamente maggiore"]},{"id":"t14","tipo":"teoria","argomento":"Pressione","testo":"Nel calcolo della pressione quale forza si considera?","opzioni":["La componente della forza perpendicolare alla superficie","La componente della forza parallela alla superficie","La somma di tutte le forze, in qualsiasi direzione","Sempre e solo il peso dell'aria sovrastante"]},{"id":"t15","tipo":"teoria","argomento":"Pressione","testo":"Quanto vale 1 cm² espresso in m²?","opzioni":["10⁻⁴ m²","10⁻² m²","10² m²","10⁻⁶ m²"]},{"id":"t16","tipo":"teoria","argomento":"Principio di Pascal","testo":"Che cosa afferma il principio di Pascal?","opzioni":["La pressione esercitata in un punto di un fluido si trasmette con la stessa intensità in ogni punto del fluido, in tutte le direzioni","Un corpo immerso in un fluido riceve una spinta verso l'alto","La pressione in un liquido aumenta con la profondità","In vasi comunicanti un liquido raggiunge la stessa altezza"]},{"id":"t17","tipo":"teoria","argomento":"Principio di Pascal","testo":"Il principio di Pascal riguarda:","opzioni":["la trasmissione della pressione invariata in tutte le direzioni","la dipendenza della pressione dalla profondità del fluido","la spinta verso l'alto che riceve un corpo immerso","le condizioni di galleggiamento dei corpi"]},{"id":"t18","tipo":"teoria","argomento":"Principio di Pascal","testo":"Si preme il tappo di una bottiglia di plastica completamente piena d'acqua. L'aumento di pressione:","opzioni":["si trasmette uguale in ogni punto dell'acqua","agisce solo sul fondo della bottiglia","agisce solo vicino al tappo","si annulla subito"]},{"id":"t19","tipo":"teoria","argomento":"Torchio idraulico","testo":"Il torchio idraulico è un'applicazione:","opzioni":["del principio di Pascal","del principio di Archimede","della legge di Stevino","dell'esperimento di Torricelli"]},{"id":"t20","tipo":"teoria","argomento":"Torchio idraulico","testo":"Quale relazione vale per un torchio idraulico in equilibrio?","opzioni":["F₁/S₁ = F₂/S₂","F₁ · S₁ = F₂ · S₂","F₁/S₂ = F₂/S₁","F₁ + S₁ = F₂ + S₂"]},{"id":"t21","tipo":"teoria","argomento":"Torchio idraulico","testo":"In un torchio idraulico il pistone grande ha superficie S₂ = 4 · S₁. La forza ottenuta sul pistone grande è:","opzioni":["4 volte la forza applicata","un quarto della forza applicata","16 volte la forza applicata","uguale alla forza applicata"]},{"id":"t22","tipo":"teoria","argomento":"Torchio idraulico","testo":"In un torchio idraulico il diametro del pistone grande è il doppio di quello piccolo. La forza ottenuta è:","opzioni":["4 volte la forza applicata","il doppio della forza applicata","uguale alla forza applicata","la metà della forza applicata"]},{"id":"t23","tipo":"teoria","argomento":"Torchio idraulico","testo":"Perché il torchio idraulico permette di ottenere una forza maggiore di quella applicata?","opzioni":["Perché la stessa pressione agisce su una superficie più grande","Perché il fluido produce energia","Perché la pressione aumenta sotto il pistone grande","Perché il fluido diminuisce di volume"]},{"id":"t24","tipo":"teoria","argomento":"Torchio idraulico","testo":"Quale dei seguenti dispositivi sfrutta lo stesso principio del torchio idraulico?","opzioni":["Il sollevatore idraulico per le auto in officina","Il barometro","Il termometro","Il galleggiante della cassetta del WC"]},{"id":"t25","tipo":"teoria","argomento":"Legge di Stevino","testo":"Quale formula esprime la legge di Stevino?","opzioni":["p = d · g · h","p = F/S","S = d · V · g","d = m/V"]},{"id":"t26","tipo":"teoria","argomento":"Legge di Stevino","testo":"Secondo la legge di Stevino, da che cosa dipende la pressione dovuta a un liquido?","opzioni":["Dalla densità del liquido, dalla profondità e da g","Dal volume del recipiente","Dalla forma del recipiente","Dalla massa totale del liquido"]},{"id":"t27","tipo":"teoria","argomento":"Legge di Stevino","testo":"Quale affermazione sulla legge di Stevino è ERRATA?","opzioni":["La pressione è direttamente proporzionale al volume del fluido","La pressione è direttamente proporzionale alla densità del fluido","La pressione è direttamente proporzionale alla profondità","La pressione è direttamente proporzionale all'accelerazione di gravità"]},{"id":"t28","tipo":"teoria","argomento":"Legge di Stevino","testo":"Se la profondità raddoppia, la pressione dovuta al liquido:","opzioni":["raddoppia","quadruplica","si dimezza","non cambia"]},{"id":"t29","tipo":"teoria","argomento":"Legge di Stevino","testo":"Tre recipienti di forma diversa contengono acqua fino alla stessa altezza. La pressione sul fondo è:","opzioni":["uguale nei tre recipienti","maggiore nel recipiente più largo","maggiore nel recipiente che contiene più acqua","minore nel recipiente più stretto"]},{"id":"t30","tipo":"teoria","argomento":"Legge di Stevino","testo":"Alla stessa profondità, in quale liquido la pressione è maggiore?","opzioni":["In quello con densità maggiore","In quello con densità minore","È uguale in tutti i liquidi","Dipende dalla forma del recipiente"]},{"id":"t31","tipo":"teoria","argomento":"Legge di Stevino","testo":"Perché le dighe sono più spesse alla base che in cima?","opzioni":["Perché la pressione dell'acqua aumenta con la profondità","Perché in cima l'acqua è più densa","Perché la pressione atmosferica agisce solo alla base","Perché alla base l'acqua è più calda"]},{"id":"t32","tipo":"teoria","argomento":"Legge di Stevino","testo":"Nella formula p = d · g · h, che cosa rappresenta h?","opzioni":["La profondità misurata dalla superficie libera del liquido","L'altezza misurata dal fondo del recipiente","L'altezza totale del recipiente","Il volume del liquido"]},{"id":"t33","tipo":"teoria","argomento":"Legge di Stevino","testo":"Quale formula inversa della legge di Stevino permette di calcolare la profondità?","opzioni":["h = p/(d · g)","h = p · d · g","h = (d · g)/p","h = (p · g)/d"]},{"id":"t34","tipo":"teoria","argomento":"Vasi comunicanti","testo":"In un sistema di vasi comunicanti contenente un solo liquido:","opzioni":["il liquido raggiunge la stessa altezza in tutti i vasi","il liquido è più alto nel vaso più largo","il liquido è più alto nel vaso più stretto","l'altezza dipende dalla forma dei vasi"]},{"id":"t35","tipo":"teoria","argomento":"Vasi comunicanti","testo":"In un tubo a U ci sono due liquidi che non si mescolano, in equilibrio. Il liquido più denso:","opzioni":["raggiunge un'altezza minore","raggiunge un'altezza maggiore","raggiunge la stessa altezza dell'altro","sale sempre fino al bordo"]},{"id":"t36","tipo":"teoria","argomento":"Vasi comunicanti","testo":"In un tubo a U due liquidi sono in equilibrio e vale h₁ = 2 · h₂. Allora:","opzioni":["d₂ = 2 · d₁","d₂ = d₁","d₁ = 2 · d₂","d₂ = 1/d₁"]},{"id":"t37","tipo":"teoria","argomento":"Vasi comunicanti","testo":"Su quale principio si basa la livella ad acqua usata dai muratori (un tubo trasparente pieno d'acqua)?","opzioni":["Sui vasi comunicanti","Sul principio di Archimede","Sull'esperimento di Torricelli","Sul torchio idraulico"]},{"id":"t38","tipo":"teoria","argomento":"Principio di Archimede","testo":"Che cosa afferma il principio di Archimede?","opzioni":["Un corpo immerso in un fluido riceve una spinta verso l'alto uguale al peso del fluido spostato","Un corpo immerso riceve una spinta verso l'alto uguale al proprio peso","Un corpo immerso riceve una spinta verso il basso uguale al peso del fluido spostato","Un corpo immerso riceve una spinta uguale alla propria massa"]},{"id":"t39","tipo":"teoria","argomento":"Principio di Archimede","testo":"Con quale formula si calcola la spinta di Archimede?","opzioni":["S = d(fluido) · V(immerso) · g","S = d(corpo) · V · g","S = d · g · h","S = m/V"]},{"id":"t40","tipo":"teoria","argomento":"Principio di Archimede","testo":"Quale affermazione sul principio di Archimede è ERRATA?","opzioni":["La spinta è direttamente proporzionale alla profondità a cui si trova il corpo","La spinta è direttamente proporzionale al volume immerso","La spinta è direttamente proporzionale all'accelerazione di gravità","La spinta è uguale al peso del fluido spostato"]},{"id":"t41","tipo":"teoria","argomento":"Principio di Archimede","testo":"La spinta di Archimede dipende dalla densità:","opzioni":["del fluido","del corpo immerso","del contenitore","di nessuno dei due"]},{"id":"t42","tipo":"teoria","argomento":"Principio di Archimede","testo":"Un cubo di ferro e un cubo di legno hanno lo stesso volume e sono tenuti completamente sott'acqua. La spinta di Archimede:","opzioni":["è uguale sui due cubi","è maggiore sul cubo di ferro","è maggiore sul cubo di legno","è nulla sul cubo di ferro"]},{"id":"t43","tipo":"teoria","argomento":"Principio di Archimede","testo":"Che cos'è il peso apparente di un corpo immerso in un liquido?","opzioni":["Il peso del corpo meno la spinta di Archimede","Il peso del corpo più la spinta di Archimede","La sola spinta di Archimede","Il peso del liquido contenuto nel recipiente"]},{"id":"t44","tipo":"teoria","argomento":"Principio di Archimede","testo":"Anche l'aria esercita una spinta di Archimede?","opzioni":["Sì, su tutti i corpi immersi in essa: è ciò che fa salire una mongolfiera","No, solo i liquidi esercitano una spinta","Solo sui corpi in movimento","Solo se il corpo è di metallo"]},{"id":"t45","tipo":"teoria","argomento":"Galleggiamento","testo":"Un corpo completamente immerso in un liquido e lasciato libero sale e galleggia se:","opzioni":["la sua densità è minore di quella del liquido","la sua densità è maggiore di quella del liquido","la sua densità è uguale a quella del liquido","la sua massa è minore di 1 kg"]},{"id":"t46","tipo":"teoria","argomento":"Galleggiamento","testo":"Un corpo ha la stessa densità del liquido in cui è completamente immerso. Che cosa succede?","opzioni":["Resta in equilibrio nel punto in cui viene lasciato","Sale e galleggia in superficie","Affonda fino al fondo","Viene spinto verso il basso"]},{"id":"t47","tipo":"teoria","argomento":"Galleggiamento","testo":"Un oggetto viene immerso prima in acqua (1000 kg/m³) e poi in olio (920 kg/m³). Si può affermare che:","opzioni":["se non galleggia nell'acqua, sicuramente non galleggia nell'olio","se galleggia nell'acqua, sicuramente galleggia nell'olio","se galleggia nell'olio, sicuramente non galleggia nell'acqua","non si può dedurre nulla"]},{"id":"t48","tipo":"teoria","argomento":"Galleggiamento","testo":"Perché una nave d'acciaio galleggia, anche se l'acciaio è più denso dell'acqua?","opzioni":["Perché la sua forma cava le fa spostare un volume d'acqua il cui peso uguaglia il peso della nave","Perché l'acciaio in acqua diventa meno denso","Perché l'aria sopra la nave la spinge verso l'alto","Perché in mare la nave non ha peso"]},{"id":"t49","tipo":"teoria","argomento":"Galleggiamento","testo":"Un uovo affonda nell'acqua del rubinetto ma galleggia in acqua molto salata. Perché?","opzioni":["L'acqua salata è più densa, quindi la spinta di Archimede è maggiore","Il sale rende l'uovo più leggero","Il sale riduce l'accelerazione di gravità","Nell'acqua salata aumenta la pressione atmosferica"]},{"id":"t50","tipo":"teoria","argomento":"Pressione atmosferica","testo":"Quanto vale la pressione atmosferica normale al livello del mare?","opzioni":["Circa 1,013 · 10⁵ Pa","Circa 1,013 · 10³ Pa","Circa 760 Pa","Circa 9,8 Pa"]},{"id":"t51","tipo":"teoria","argomento":"Pressione atmosferica","testo":"Nell'esperimento di Torricelli, a livello del mare, quanto è alta la colonna di mercurio nel tubo?","opzioni":["Circa 76 cm","Circa 10 m","Circa 1 m","Circa 7,6 cm"]},{"id":"t52","tipo":"teoria","argomento":"Pressione atmosferica","testo":"A quanti mmHg corrisponde 1 atm?","opzioni":["760 mmHg","76 mmHg","1000 mmHg","100 mmHg"]},{"id":"t53","tipo":"teoria","argomento":"Pressione atmosferica","testo":"A quanti pascal corrisponde 1 bar?","opzioni":["10⁵ Pa","10³ Pa","1 Pa","10⁶ Pa"]},{"id":"t54","tipo":"teoria","argomento":"Pressione atmosferica","testo":"Chi misurò per primo la pressione atmosferica con un tubo pieno di mercurio?","opzioni":["Evangelista Torricelli","Blaise Pascal","Archimede","Simon Stevino"]},{"id":"t55","tipo":"teoria","argomento":"Pressione atmosferica","testo":"Salendo in montagna, la pressione atmosferica:","opzioni":["diminuisce","aumenta","resta uguale","si annulla subito"]},{"id":"t56","tipo":"teoria","argomento":"Pressione atmosferica","testo":"Chi scrisse: «Viviamo sommersi sul fondo di un oceano costituito di aria»?","opzioni":["Evangelista Torricelli","Galileo Galilei","Blaise Pascal","Isaac Newton"]},{"id":"t57","tipo":"teoria","argomento":"Pressione atmosferica","testo":"Perché nel barometro di Torricelli si usa il mercurio e non l'acqua?","opzioni":["Perché è molto più denso e la colonna è alta circa 76 cm invece di circa 10 m","Perché il mercurio non ha peso","Perché l'acqua non trasmette la pressione","Perché il mercurio è meno denso dell'acqua"]},{"id":"t58","tipo":"teoria","argomento":"Strumenti di misura","testo":"Che cosa misura un manometro?","opzioni":["La pressione di un fluido, ad esempio negli pneumatici o nella caldaia","La densità di un liquido","La temperatura di un gas","Il volume di un liquido"]},{"id":"t59","tipo":"teoria","argomento":"Strumenti di misura","testo":"Come si chiama lo strumento che misura la pressione atmosferica?","opzioni":["Barometro","Manometro","Dinamometro","Densimetro"]},{"id":"c01","tipo":"calcolo","argomento":"Pressione","testo":"Una forza di {F} N agisce perpendicolarmente su una superficie di {S} cm². Quanto vale la pressione? (1 cm² = 10⁻⁴ m²)","var":{"F":[30,40,50,60,80,120,150,200],"S":[20,25,40,50,80,100]},"risposta":"F/(S*1e-4)","distrattori":["F/S","F/(S*1e-2)","F*S*1e-4"],"unita":"Pa","cifre":3},{"id":"c02","tipo":"calcolo","argomento":"Pressione","testo":"Su una superficie di {S} m² agisce una pressione di {p} Pa. Quanto vale la forza perpendicolare alla superficie?","var":{"p":[200,400,500,800,1200,1500,2000],"S":[0.2,0.5,1.5,2,2.5]},"risposta":"p*S","distrattori":["p/S","S/p","p*S*10"],"unita":"N","cifre":3},{"id":"c03","tipo":"calcolo","argomento":"Pressione","testo":"Una cassa di massa {m} kg poggia su una base di area {S} m². Quale pressione esercita sul pavimento? (g = 9,8 m/s²)","var":{"m":[20,40,50,60,80],"S":[0.04,0.05,0.1,0.2,0.4]},"risposta":"m*9.8/S","distrattori":["m/S","m*9.8*S","m/(9.8*S)"],"unita":"Pa","cifre":3},{"id":"c04","tipo":"calcolo","argomento":"Pressione","testo":"Una forza di {F} N, perpendicolare a una superficie, produce una pressione di {p} Pa. Quanto vale l'area della superficie?","var":{"F":[100,200,300,600],"p":[500,1000,2000,4000]},"risposta":"F/p","distrattori":["p/F","F*p","F/p*100"],"unita":"m²","cifre":3},{"id":"c05","tipo":"calcolo","argomento":"Torchio idraulico","testo":"In un torchio idraulico si applica una forza di {F1} N sul pistone piccolo, di area {S1} cm². Il pistone grande ha area {S2} cm². Quale forza si ottiene sul pistone grande?","var":{"F1":[20,30,40,50,60],"S1":[5,10,20],"k":[4,5,8,10,20]},"calc":{"S2":"S1*k"},"risposta":"F1*S2/S1","distrattori":["F1*S1/S2","F1*k*k","F1*S2/S1*2"],"unita":"N","cifre":3},{"id":"c06","tipo":"calcolo","argomento":"Torchio idraulico","testo":"In un torchio idraulico il pistone piccolo ha diametro {d1} cm e quello grande ha diametro {d2} cm. Sul pistone piccolo si applica una forza di {F1} N. Quale forza si ottiene sul pistone grande?","var":{"F1":[10,20,25,40,50],"d1":[2,3,4,5],"k":[2,3,4,5]},"calc":{"d2":"d1*k"},"risposta":"F1*k*k","distrattori":["F1*k","F1/(k*k)","F1*k*k*k"],"unita":"N","cifre":3},{"id":"c07","tipo":"calcolo","argomento":"Torchio idraulico","testo":"Con un sollevatore idraulico si vuole sollevare un carico che richiede una forza di {F2} N sul pistone grande, di area {S2} cm². Il pistone piccolo ha area {S1} cm². Quale forza bisogna applicare sul pistone piccolo?","var":{"F2":[2000,3000,5000,8000,12000],"S1":[10,20,25],"S2":[500,1000,2000]},"risposta":"F2*S1/S2","distrattori":["F2*S2/S1","F2*S1/S2*10","F2/S2"],"unita":"N","cifre":3},{"id":"c08","tipo":"calcolo","argomento":"Torchio idraulico","testo":"Sul pistone di un torchio idraulico, di area {S1} cm², agisce una forza di {F1} N. Quale deve essere l'area del secondo pistone per equilibrare una forza di {F2} N?","var":{"F1":[50,80,100],"S1":[10,20,40],"r":[3,4,5,10]},"calc":{"F2":"F1*r"},"risposta":"S1*r","distrattori":["S1/r","S1*r*r","F2/S1"],"unita":"cm²","cifre":3},{"id":"c09","tipo":"calcolo","argomento":"Legge di Stevino","testo":"Quanto vale la pressione dovuta a un liquido di densità {d} kg/m³ alla profondità di {h} m? (g = 9,8 m/s²)","var":{"d":[800,1000,1030,1200],"h":[2,3,4,5,8,10,15,20]},"risposta":"d*9.8*h","distrattori":["d*h","d*9.8*h/10","d*9.8*h+101300"],"unita":"Pa","cifre":3},{"id":"c10","tipo":"calcolo","argomento":"Legge di Stevino","testo":"Calcola la pressione dovuta a un liquido di densità {d} kg/m³ alla profondità di {h} cm. (g = 9,8 m/s²)","var":{"d":[800,1000,1200],"h":[40,60,80,120,150,250]},"risposta":"d*9.8*h/100","distrattori":["d*9.8*h","d*h/100","d*9.8*h/10"],"unita":"Pa","cifre":3},{"id":"c11","tipo":"calcolo","argomento":"Legge di Stevino","testo":"In acqua (d = 1000 kg/m³) la pressione dovuta al liquido vale {p} Pa. A quale profondità ci si trova? (g = 9,8 m/s²)","var":{"hr":[5,10,12,20,25,30]},"calc":{"p":"1000*9.8*hr"},"risposta":"hr","distrattori":["hr*9.8","hr/10","hr*100"],"unita":"m","cifre":3},{"id":"c12","tipo":"calcolo","argomento":"Legge di Stevino","testo":"Alla profondità di {h} m in un liquido la pressione dovuta al liquido vale {p} Pa. Quanto vale la densità del liquido? (g = 9,8 m/s²)","var":{"dr":[800,900,1200,1300],"h":[2,4,5]},"calc":{"p":"dr*9.8*h"},"risposta":"dr","distrattori":["dr*9.8","dr/10","dr*h"],"unita":"kg/m³","cifre":3},{"id":"c13","tipo":"calcolo","argomento":"Legge di Stevino","testo":"Un sub si trova a {h} m di profondità in un lago (d = 1000 kg/m³). Quanto vale la pressione TOTALE, comprendendo la pressione atmosferica di 1,01 · 10⁵ Pa? (g = 9,8 m/s²)","var":{"h":[5,10,20,30]},"risposta":"101000+1000*9.8*h","distrattori":["1000*9.8*h","101000*h","101000-1000*9.8*h"],"unita":"Pa","cifre":3},{"id":"c14","tipo":"calcolo","argomento":"Legge di Stevino","testo":"In un liquido di densità {d} kg/m³ si confrontano due punti, alle profondità di {h1} m e {h2} m. Quanto vale la differenza di pressione tra i due punti? (g = 9,8 m/s²)","var":{"d":[800,1000],"h1":[2,3],"dh":[2,4,5]},"calc":{"h2":"h1+dh"},"risposta":"d*9.8*dh","distrattori":["d*9.8*h2","d*9.8*(h1+h2)","d*dh"],"unita":"Pa","cifre":3},{"id":"c15","tipo":"calcolo","argomento":"Legge di Stevino","testo":"Un sommozzatore in un lago (d = 1000 kg/m³) è soggetto a una pressione dovuta all'acqua di {atm} atm (senza contare la pressione atmosferica). A quale profondità si trova circa? (1 atm = 1,0 · 10⁵ Pa; g = 9,8 m/s²)","var":{"atm":[1,2,3,5,10]},"risposta":"atm*1e5/9800","distrattori":["atm*1e5/1000","atm*1e5/98","atm*1e5/9800/10"],"unita":"m","cifre":3},{"id":"c16","tipo":"calcolo","argomento":"Principio di Archimede","testo":"Un corpo di volume {V} dm³ è completamente immerso in {liq} (densità {d} kg/m³). Quanto vale la spinta di Archimede? (1 dm³ = 10⁻³ m³; g = 9,8 m/s²)","var":{"V":[2,3,4,5,8,10,12]},"gruppi":[{"liq":"acqua","d":1000},{"liq":"alcol","d":800},{"liq":"glicerina","d":1260}],"risposta":"d*V*1e-3*9.8","distrattori":["d*V*9.8","d*V*1e-3","V*1e-3*9.8"],"unita":"N","cifre":3},{"id":"c17","tipo":"calcolo","argomento":"Principio di Archimede","testo":"Un oggetto di volume {V} cm³ è completamente immerso in acqua (d = 1000 kg/m³). Quanto vale la spinta di Archimede? (1 cm³ = 10⁻⁶ m³; g = 9,8 m/s²)","var":{"V":[200,500,800,1500,2500]},"risposta":"1000*V*1e-6*9.8","distrattori":["1000*V*1e-3*9.8","V*9.8","1000*V*1e-6"],"unita":"N","cifre":3},{"id":"c18","tipo":"calcolo","argomento":"Principio di Archimede","testo":"Un cubetto di spigolo {a} cm è completamente immerso in {liq} (densità {d} kg/m³). Quanto vale la spinta di Archimede? (g = 9,8 m/s²)","var":{"a":[2,3,4,5,10]},"gruppi":[{"liq":"acqua","d":1000},{"liq":"mercurio","d":13600},{"liq":"olio","d":920}],"risposta":"d*Math.pow(a/100,3)*9.8","distrattori":["d*Math.pow(a/100,2)*9.8","d*Math.pow(a/100,3)","d*(a/100)*9.8"],"unita":"N","cifre":3},{"id":"c19","tipo":"calcolo","argomento":"Principio di Archimede","testo":"Un corpo completamente immerso in acqua (d = 1000 kg/m³) riceve una spinta di Archimede di {S} N. Quanto vale il suo volume, in dm³? (g = 9,8 m/s²)","var":{"Vr":[2,5,10,20]},"calc":{"S":"1000*Vr*1e-3*9.8"},"risposta":"Vr","distrattori":["Vr*9.8","Vr*1000","Vr/10"],"unita":"dm³","cifre":3},{"id":"c20","tipo":"calcolo","argomento":"Principio di Archimede","testo":"Un corpo di massa {m} kg e volume {V} dm³ è completamente immerso in acqua (d = 1000 kg/m³). Quanto vale il suo peso apparente? (g = 9,8 m/s²)","var":{"m":[2,3,5,8],"V":[0.5,1,1.5]},"risposta":"m*9.8-1000*V*1e-3*9.8","distrattori":["m*9.8","m*9.8+1000*V*1e-3*9.8","1000*V*1e-3*9.8"],"unita":"N","cifre":3},{"id":"c21","tipo":"calcolo","argomento":"Galleggiamento","testo":"Un corpo di massa {m} kg e volume {V} dm³ viene tenuto completamente immerso in {liq} (densità {d} kg/m³) e poi lasciato libero. Che cosa succede?","var":{"m":[2,3,4,6,8],"V":[4,5,10]},"gruppi":[{"liq":"acqua","d":1000},{"liq":"olio","d":920},{"liq":"acqua di mare","d":1030}],"scelte":["Sale e galleggia","Affonda","Resta in equilibrio dove viene lasciato","Non si può stabilire con questi dati"],"corretta":"(m/(V/1000))<d?0:((m/(V/1000))>d?1:2)"},{"id":"c22","tipo":"calcolo","argomento":"Galleggiamento","testo":"Un oggetto ha massa {m} kg e volume {V} dm³. Quanto vale la sua densità? (1 dm³ = 10⁻³ m³)","var":{"m":[1.5,2,3,5,7.8],"V":[0.5,1,2]},"risposta":"m/(V*1e-3)","distrattori":["m/V","m*V","m*V*1000"],"unita":"kg/m³","cifre":3},{"id":"c23","tipo":"calcolo","argomento":"Vasi comunicanti","testo":"In un tubo a U si trovano acqua (d = 1000 kg/m³) e {liq} (densità {d} kg/m³), che non si mescolano. Rispetto alla superficie di separazione, l'acqua è alta {h1} cm. Quanto è alta la colonna di {liq}?","var":{"h1":[8,10,12,16]},"gruppi":[{"liq":"olio","d":920},{"liq":"alcol","d":800},{"liq":"benzina","d":700}],"risposta":"1000*h1/d","distrattori":["h1*d/1000","h1","h1*2"],"unita":"cm","cifre":3},{"id":"c24","tipo":"calcolo","argomento":"Pressione atmosferica","testo":"Quanto vale in pascal una pressione di {x} atm? (1 atm = 1,013 · 10⁵ Pa)","var":{"x":[0.5,1.5,2,3,5]},"risposta":"x*1.013e5","distrattori":["x*1.013e3","x*760","x*1e3"],"unita":"Pa","cifre":3},{"id":"c25","tipo":"calcolo","argomento":"Pressione atmosferica","testo":"La pressione di uno pneumatico è {x} bar. Quanto vale in pascal? (1 bar = 10⁵ Pa)","var":{"x":[0.8,1.2,2,2.5,3]},"risposta":"x*1e5","distrattori":["x*1e3","x*1e4","x*1e6"],"unita":"Pa","cifre":2},{"id":"c26","tipo":"calcolo","argomento":"Pressione atmosferica","testo":"Una pressione di {x} mmHg a quante atmosfere corrisponde? (1 atm = 760 mmHg)","var":{"x":[190,380,570,1140,1520]},"risposta":"x/760","distrattori":["x/76","x/1000","x*760/1e5"],"unita":"atm","cifre":2},{"id":"c27","tipo":"calcolo","argomento":"Pressione atmosferica","testo":"Esprimi in bar una pressione di {p} Pa. (1 bar = 10⁵ Pa)","var":{"p":[25000,50000,250000,320000]},"risposta":"p/1e5","distrattori":["p/1e3","p/1e4","p/1e6"],"unita":"bar","cifre":2},{"id":"c28","tipo":"calcolo","argomento":"Pressione atmosferica","testo":"La pressione atmosferica (1,01 · 10⁵ Pa) agisce su una superficie di {S} m². Quanto vale la forza che esercita su di essa?","var":{"S":[0.01,0.02,0.5,1,2]},"risposta":"1.01e5*S","distrattori":["1.01e5/S","1.01e3*S","S/1.01e5"],"unita":"N","cifre":3},{"id":"c29","tipo":"calcolo","argomento":"Pressione atmosferica","testo":"Se Torricelli avesse usato {liq} (densità {d} kg/m³) invece del mercurio, quanto sarebbe stata alta la colonna di liquido? (pressione atmosferica 1,01 · 10⁵ Pa; g = 9,8 m/s²)","var":{},"gruppi":[{"liq":"acqua","d":1000},{"liq":"olio","d":920},{"liq":"alcol","d":800}],"risposta":"101000/(d*9.8)","distrattori":["0.76","101000/d","101000/(d*9.8)/10"],"unita":"m","cifre":3}]};
+
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const REMOTO = /^https:\/\/script\.google(usercontent)?\.com\//.test(INDIRIZZO_SCRIPT);
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem('vfl_'+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('vfl_'+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem('vfl_'+k); }catch(e){} }
+};
+const CFG_DEFAULT = { classe:'', anno:'Secondo anno', argomento:'', n:20, perc:30, tt:60, tc:150, jolly:1, scadenza:'', esclusi:[] };
+
+/* ---------------- Utilità numeriche ---------------- */
+const SUP = {'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function fmt(x, sig){
+  sig = sig || 2;
+  if (!isFinite(x)) return '—';
+  if (x === 0) return '0';
+  const neg = x < 0; x = Math.abs(x);
+  const r = Number(x.toPrecision(sig));
+  const e = Math.floor(Math.log10(r) + 1e-12);
+  let out;
+  if (e >= -2 && e <= 3) out = r.toFixed(Math.max(0, sig - 1 - e));
+  else out = (r / Math.pow(10, e)).toFixed(sig - 1) + ' · 10' + String(e).split('').map(c => SUP[c]).join('');
+  return (neg ? '−' : '') + out.replace('.', ',');
+}
+function fmtVar(v){
+  if (typeof v === 'number'){
+    if (Number.isInteger(v)) return String(v);
+    return String(v).replace('.', ',');
+  }
+  return String(v);
+}
+function shuffle(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
+function evalExpr(expr, scope){
+  const names = Object.keys(scope);
+  // eslint-disable-next-line no-new-func
+  return Function(...names, '"use strict";return (' + expr + ');')(...names.map(n => scope[n]));
+}
+
+/* ---------------- Banca e generazione ---------------- */
+function bancaAttiva(){ return LS.get('banca', null) || BANCA_PREDEFINITA; }
+function validaBanca(b){
+  if (!b || !Array.isArray(b.domande) || !b.domande.length) throw new Error('Il file non contiene un elenco "domande".');
+  b.domande.forEach((q, i) => {
+    if (!q.tipo || !q.testo) throw new Error('Domanda ' + (i+1) + ': mancano "tipo" o "testo".');
+    if (q.tipo === 'teoria' && (!Array.isArray(q.opzioni) || q.opzioni.length < 2)) throw new Error('Domanda ' + (i+1) + ': servono almeno 2 opzioni.');
+    if (q.tipo === 'calcolo' && !q.risposta && !q.scelte) throw new Error('Domanda ' + (i+1) + ': manca "risposta".');
+    if (!q.id) q.id = 'q' + (i+1);
+    if (!q.argomento) q.argomento = 'Generale';
+  });
+  // prova di generazione
+  b.domande.forEach(q => { if (q.tipo === 'calcolo') istanzia(q); });
+  return b;
+}
+function istanzia(q){
+  // Restituisce {id,tipo,argomento,testo,opzioni[],corretta}
+  if (q.tipo !== 'calcolo'){
+    const corr = q.corretta || 0;
+    const ord = shuffle(q.opzioni.map((t, i) => ({t, i})));
+    return { id:q.id, tipo:'teoria', argomento:q.argomento, testo:q.testo, opzioni:ord.map(o => o.t), corretta:ord.findIndex(o => o.i === corr) };
+  }
+  for (let tent = 0; tent < 40; tent++){
+    const sc = {Math};
+    Object.entries(q.var || {}).forEach(([k, arr]) => { sc[k] = pick(arr); });
+    if (q.gruppi && q.gruppi.length) Object.assign(sc, pick(q.gruppi));
+    Object.entries(q.calc || {}).forEach(([k, ex]) => { sc[k] = evalExpr(ex, sc); });
+    const testo = q.testo.replace(/\{(\w+)\}/g, (m, k) => {
+      if (!(k in sc)) return m;
+      const v = sc[k];
+      if (q.calc && k in q.calc) return (typeof v === 'number' && !Number.isInteger(v)) || Math.abs(v) >= 10000 ? fmt(v, 3) : fmtVar(v);
+      return fmtVar(v);
+    });
+    if (q.scelte){
+      const corr = evalExpr(q.corretta, sc);
+      const ord = shuffle(q.scelte.map((t, i) => ({t, i})));
+      return { id:q.id, tipo:'calcolo', argomento:q.argomento, testo, opzioni:ord.map(o => o.t), corretta:ord.findIndex(o => o.i === corr) };
+    }
+    const cifre = q.cifre || 2, u = q.unita ? ' ' + q.unita : '';
+    const ris = evalExpr(q.risposta, sc);
+    if (!isFinite(ris) || ris === 0) continue;
+    const sRis = fmt(ris, cifre);
+    const viste = new Set([sRis]);
+    const dis = [];
+    const candidati = (q.distrattori || []).map(ex => { try { return evalExpr(ex, sc); } catch(e){ return NaN; } })
+      .concat([ris*10, ris/10, ris*2, ris/2, ris*100, ris/100, ris*3]);
+    for (const c of candidati){
+      if (dis.length >= 3) break;
+      if (!isFinite(c) || c <= 0 && ris > 0) continue;
+      const s = fmt(c, cifre);
+      if (viste.has(s)) continue;
+      viste.add(s); dis.push(s);
+    }
+    if (dis.length < 3) continue;
+    const ord = shuffle([sRis + u].concat(dis.map(d => d + u)).map((t, i) => ({t, i})));
+    return { id:q.id, tipo:'calcolo', argomento:q.argomento, testo, opzioni:ord.map(o => o.t), corretta:ord.findIndex(o => o.i === 0) };
+  }
+  throw new Error('Impossibile generare la domanda ' + q.id);
+}
+function pool(banca, cfg){
+  const escl = new Set(cfg.esclusi || []);
+  const ok = banca.domande.filter(q => !escl.has(q.argomento));
+  return { teoria: ok.filter(q => q.tipo !== 'calcolo'), calcolo: ok.filter(q => q.tipo === 'calcolo') };
+}
+function costruisciVerifica(banca, cfg){
+  const P = pool(banca, cfg);
+  const n = Math.max(1, cfg.n|0);
+  let nc = Math.round(n * (cfg.perc|0) / 100);
+  if (!P.calcolo.length) nc = 0;
+  let nt = n - nc;
+  if (!P.teoria.length){ nt = 0; nc = n; }
+  const scelte = [];
+  const t = shuffle(P.teoria);
+  for (let i = 0; i < nt; i++){ if (i < t.length) scelte.push(t[i]); else { nc++; } }
+  // calcolo: prima tutti i modelli diversi, poi eventuali ripetizioni con numeri diversi
+  let c = shuffle(P.calcolo);
+  for (let i = 0; i < nc; i++){ if (c.length) scelte.push(c[i % c.length]); }
+  return shuffle(scelte).map(istanzia);
+}
+
+/* ---------------- Collegamento al foglio ---------------- */
+const api = {
+  async get(params){
+    const qs = new URLSearchParams(params).toString();
+    const r = await fetch(INDIRIZZO_SCRIPT + '?' + qs, {cache:'no-store'});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  },
+  async post(obj){
+    await fetch(INDIRIZZO_SCRIPT, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(obj)});
+  }
+};
+async function leggiStato(){
+  if (REMOTO){
+    const s = await api.get({azione:'stato'});
+    return { attiva: !!s.attiva, sessione: s.sessione || '', scadenza: s.scadenza || '', cfg: Object.assign({}, CFG_DEFAULT, s.cfg || {}), banca: s.banca || BANCA_PREDEFINITA, avviata: s.avviata || '' };
+  }
+  const st = LS.get('stato', null) || { attiva:true, sessione:'PROVA', avviata:'' };
+  return { attiva: st.attiva, sessione: st.sessione, scadenza: (LS.get('cfg', CFG_DEFAULT).scadenza || ''), cfg: Object.assign({}, CFG_DEFAULT, LS.get('cfg', {})), banca: bancaAttiva(), avviata: st.avviata };
+}
+function scaduta(s){ return s.scadenza && new Date(s.scadenza).getTime() < Date.now(); }
+
+/* ---------------- Navigazione schermate ---------------- */
+function show(id){ $$('#root > .screen').forEach(s => s.hidden = (s.id !== id)); window.scrollTo(0,0); }
+function fsOn(){ const d = document.documentElement; const f = d.requestFullscreen || d.webkitRequestFullscreen; if (f && !isFS()) { try { const p = f.call(d); if (p && p.catch) p.catch(()=>{}); } catch(e){} } }
+function fsOff(){ const f = document.exitFullscreen || document.webkitExitFullscreen; if (f && isFS()) { try { const p = f.call(document); if (p && p.catch) p.catch(()=>{}); } catch(e){} } }
+function isFS(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function fsSupportato(){ const d = document.documentElement; return !!(d.requestFullscreen || d.webkitRequestFullscreen); }
+
+/* ---------------- HOME ---------------- */
+let STATO = null;
+async function initHome(){
+  show('scr-home');
+  try { STATO = await leggiStato(); } catch(e){ STATO = null; }
+  const meta = $('#home-meta'); meta.innerHTML = '';
+  if (STATO){
+    const arg = STATO.cfg.argomento || (STATO.banca && STATO.banca.titolo) || '';
+    if (arg) meta.insertAdjacentHTML('beforeend', '<span class="chip">' + esc(arg) + '</span>');
+    if (STATO.cfg.classe) meta.insertAdjacentHTML('beforeend', '<span class="chip">Classe ' + esc(STATO.cfg.classe) + '</span>');
+    if (!STATO.attiva || scaduta(STATO)) meta.insertAdjacentHTML('beforeend', '<span class="chip warn">Verifica non disponibile</span>');
+    if (!REMOTO) meta.insertAdjacentHTML('beforeend', '<span class="chip warn">Modalità prova</span>');
+  }
+  // verifica lasciata a metà su questo dispositivo
+  const inCorso = LS.get('incorso', null);
+  if (inCorso && inCorso.record){
+    const rec = inCorso.record; rec.stato = 'interrotta (pagina chiusa o ricaricata)';
+    chiudiConteggi(rec, inCorso.domande || []);
+    LS.del('incorso');
+    consegna(rec).catch(()=>{});
+    homeMsg('La verifica aperta prima su questo dispositivo è stata chiusa e consegnata così com\'era. Avvisa il docente.', 'warn');
+  }
+}
+function homeMsg(t, cls){ const m = $('#home-msg'); m.textContent = t; m.className = 'msg ' + (cls||'bad'); m.hidden = !t; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+$('#form-start').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const codice = $('#inp-codice').value.trim().toUpperCase().replace(/\s+/g, '');
+  if (codice.length < 2){ homeMsg('Inserisci il tuo codice studente.'); $('#inp-codice').focus(); return; }
+  homeMsg('');
+  fsOn(); // richiede il gesto dell'utente: va chiamato subito
+  show('scr-wait');
+  try {
+    STATO = await leggiStato();
+  } catch(e){
+    show('scr-home'); fsOff(); homeMsg('Impossibile collegarsi. Controlla la connessione e riprova.'); return;
+  }
+  if (!STATO.attiva){ show('scr-home'); fsOff(); homeMsg('La verifica non è ancora disponibile.'); return; }
+  if (scaduta(STATO)){ show('scr-home'); fsOff(); homeMsg('Il tempo per svolgere la verifica è terminato.'); return; }
+  try {
+    if (REMOTO){
+      const c = await api.get({azione:'controlla', codice, sessione:STATO.sessione});
+      if (c.usato){ show('scr-home'); fsOff(); homeMsg('Questo codice ha già svolto la verifica.'); return; }
+    } else {
+      const usati = LS.get('usati_' + STATO.sessione, []);
+      if (usati.includes(codice)){ show('scr-home'); fsOff(); homeMsg('Questo codice ha già svolto la verifica su questo dispositivo.'); return; }
+    }
+  } catch(e){ show('scr-home'); fsOff(); homeMsg('Impossibile collegarsi. Controlla la connessione e riprova.'); return; }
+  let domande;
+  try { domande = costruisciVerifica(STATO.banca, STATO.cfg); }
+  catch(e){ show('scr-home'); fsOff(); homeMsg('La verifica non è disponibile in questo momento. Avvisa il docente.'); return; }
+  setTimeout(() => avviaTest(codice, $('#inp-notime').checked, domande), 600);
+});
+
+/* ---------------- VERIFICA ---------------- */
+let T = null; // stato della verifica in corso
+function nuovoRecord(codice, senzaTempo, n){
+  return {
+    data: new Date().toISOString(), sessione: STATO.sessione, classe: STATO.cfg.classe || '', anno: STATO.cfg.anno || '',
+    argomento: STATO.cfg.argomento || (STATO.banca.titolo || ''), codice, nDomande: n, corrette:0, errate:0, nonRisposte:0, voto:0,
+    jolly:0, senzaTempo: senzaTempo ? 'sì' : 'no', uscite:0, secondiFuori:0, usciteSchermo:0, stato:'in corso', durataMin:0, dettaglio:[]
+  };
+}
+function avviaTest(codice, senzaTempo, domande){
+  T = {
+    codice, senzaTempo, domande, i:0, sel:-1, bloccata:false,
+    jolly: Math.max(0, Math.min(2, STATO.cfg.jolly|0)),
+    record: nuovoRecord(codice, senzaTempo, domande.length),
+    inizio: Date.now(), tq:0, lim:0, tick:null, fuoriDa:0, attiva:true,
+    usati: new Set(domande.map(d => d.id))
+  };
+  salvaInCorso();
+  try { history.pushState({vfl:1}, ''); } catch(e){}
+  show('scr-test');
+  mostraDomanda();
+}
+function salvaInCorso(){ if (T) LS.set('incorso', {record:T.record, domande:T.domande.slice(T.i).map(d => ({id:d.id, tipo:d.tipo, argomento:d.argomento, testo:d.testo, opzioni:d.opzioni, corretta:d.corretta})), sessione:STATO.sessione}); }
+function limite(q){ return q.tipo === 'calcolo' ? (STATO.cfg.tc|0 || 150) : (STATO.cfg.tt|0 || 60); }
+function mostraDomanda(){
+  const q = T.domande[T.i];
+  T.sel = -1; T.bloccata = false; T.tq = Date.now(); T.lim = limite(q);
+  $('#t-prog').textContent = 'Domanda ' + (T.i + 1) + ' di ' + T.domande.length;
+  $('#t-progbar').style.width = (T.i / T.domande.length * 100) + '%';
+  $('#t-tipo').textContent = q.tipo === 'calcolo' ? 'Esercizio' : 'Teoria';
+  $('#t-arg').textContent = q.argomento || '';
+  $('#t-testo').textContent = q.testo;
+  const box = $('#t-opts'); box.innerHTML = '';
+  q.opzioni.forEach((t, k) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'opt'; b.dataset.k = k;
+    b.innerHTML = '<b>' + 'ABCDEFG'[k] + '</b><span></span>';
+    b.querySelector('span').textContent = t;
+    b.addEventListener('click', () => clickOpzione(k));
+    box.appendChild(b);
+  });
+  $('#t-hint').textContent = 'Tocca una risposta per selezionarla, toccala di nuovo per confermare.';
+  $('#jolly-n').textContent = T.jolly;
+  $('#btn-jolly').disabled = T.jolly <= 0;
+  $('#btn-jolly').hidden = (STATO.cfg.jolly|0) <= 0;
+  $('#t-timer').hidden = T.senzaTempo;
+  clearInterval(T.tick);
+  if (!T.senzaTempo){ aggiornaTimer(); T.tick = setInterval(aggiornaTimer, 250); }
+}
+function aggiornaTimer(){
+  if (!T || T.bloccata) return;
+  const rest = Math.max(0, T.lim - (Date.now() - T.tq) / 1000);
+  $('#t-sec').textContent = Math.ceil(rest);
+  $('#t-bar').style.width = (rest / T.lim * 100) + '%';
+  $('#t-timer').classList.toggle('low', rest <= 10);
+  if (rest <= 0) registraRisposta(-1, 'tempo scaduto');
+}
+function clickOpzione(k){
+  if (!T || T.bloccata) return;
+  const btns = $$('#t-opts .opt');
+  if (T.sel !== k){
+    T.sel = k;
+    btns.forEach((b, j) => b.classList.toggle('sel', j === k));
+    $('#t-hint').textContent = 'Tocca di nuovo la stessa risposta per confermarla.';
+    return;
+  }
+  btns[k].classList.remove('sel'); btns[k].classList.add('conf');
+  registraRisposta(k, '');
+}
+function registraRisposta(k, nota){
+  T.bloccata = true; clearInterval(T.tick);
+  const q = T.domande[T.i];
+  const esito = k < 0 ? 'N' : (k === q.corretta ? 'C' : 'E');
+  T.record.dettaglio.push({ n:T.i + 1, tipo:q.tipo, argomento:q.argomento, testo:q.testo, opzioni:q.opzioni, corretta:q.corretta, scelta:k, esito, secondi:Math.round((Date.now() - T.tq) / 1000), nota });
+  T.i++;
+  salvaInCorso();
+  setTimeout(() => { if (T.i >= T.domande.length) termina('completata'); else mostraDomanda(); }, k < 0 ? 150 : 380);
+}
+$('#btn-jolly').addEventListener('click', () => {
+  if (!T || T.bloccata || T.jolly <= 0) return;
+  const q = T.domande[T.i];
+  const P = pool(STATO.banca, STATO.cfg);
+  const stessi = (q.tipo === 'calcolo' ? P.calcolo : P.teoria).filter(x => !T.usati.has(x.id));
+  const altri = P.teoria.concat(P.calcolo).filter(x => !T.usati.has(x.id));
+  let nuova = stessi.length ? pick(stessi) : (altri.length ? pick(altri) : null);
+  if (!nuova && q.tipo === 'calcolo') nuova = STATO.banca.domande.find(x => x.id === q.id); // stesso modello, numeri nuovi
+  if (!nuova) { $('#t-hint').textContent = 'Non ci sono altre domande disponibili.'; return; }
+  T.usati.add(nuova.id);
+  T.jolly--; T.record.jolly++;
+  T.record.dettaglio.push({ n:T.i + 1, tipo:q.tipo, argomento:q.argomento, testo:q.testo, opzioni:q.opzioni, corretta:q.corretta, scelta:-1, esito:'J', secondi:Math.round((Date.now() - T.tq) / 1000), nota:'saltata con jolly' });
+  T.domande[T.i] = istanzia(nuova);
+  salvaInCorso();
+  mostraDomanda();
+});
+$('#btn-stop').addEventListener('click', () => { if (T && !T.bloccata) $('#ov-stop').hidden = false; });
+$('#btn-stop-no').addEventListener('click', () => { $('#ov-stop').hidden = true; });
+$('#btn-stop-yes').addEventListener('click', () => { $('#ov-stop').hidden = true; termina('interrotta dallo studente'); });
+
+function chiudiConteggi(rec, rimaste){
+  (rimaste || []).forEach((q, j) => rec.dettaglio.push({ n: rec.dettaglio.filter(d => d.esito !== 'J').length + 1, tipo:q.tipo, argomento:q.argomento, testo:q.testo, opzioni:q.opzioni, corretta:q.corretta, scelta:-1, esito:'N', secondi:0, nota:'non svolta' }));
+  const vere = rec.dettaglio.filter(d => d.esito !== 'J');
+  rec.corrette = vere.filter(d => d.esito === 'C').length;
+  rec.errate = vere.filter(d => d.esito === 'E').length;
+  rec.nonRisposte = vere.filter(d => d.esito === 'N').length;
+  rec.nDomande = vere.length;
+  rec.voto = rec.nDomande ? Math.round(rec.corrette / rec.nDomande * 100) / 10 : 0;
+  rec.durataMin = Math.round((Date.now() - new Date(rec.data).getTime()) / 6000) / 10;
+}
+function termina(stato){
+  if (!T || !T.attiva) return;
+  T.attiva = false; T.bloccata = true; clearInterval(T.tick);
+  if (T.fuoriDa){ T.record.secondiFuori += Math.round((Date.now() - T.fuoriDa) / 1000); T.fuoriDa = 0; }
+  const rimaste = T.domande.slice(T.i);
+  const rec = T.record; rec.stato = stato;
+  chiudiConteggi(rec, rimaste);
+  LS.del('incorso');
+  $$('.overlay').forEach(o => o.hidden = true);
+  show('scr-end'); $('#end-sending').hidden = false; $('#end-done').hidden = true;
+  fsOff();
+  consegna(rec).then(ok => fineConsegna(ok, rec));
+}
+function fineConsegna(ok, rec){
+  $('#end-sending').hidden = true; $('#end-done').hidden = false;
+  $('#end-warn').hidden = ok;
+  $('#end-sub').hidden = !ok;
+  $('#btn-retry').onclick = () => { $('#end-done').hidden = true; $('#end-sending').hidden = false; consegna(rec).then(o => fineConsegna(o, rec)); };
+  T = null;
+}
+async function consegna(rec){
+  if (!REMOTO){
+    const arr = LS.get('report', []); arr.push(rec); LS.set('report', arr);
+    const u = LS.get('usati_' + rec.sessione, []); u.push(rec.codice); LS.set('usati_' + rec.sessione, u);
+    return true;
+  }
+  const pend = LS.get('pendenti', []); pend.push(rec); LS.set('pendenti', pend);
+  const chiave = {azione:'controlla', codice:rec.codice, sessione:rec.sessione};
+  const togli = () => LS.set('pendenti', LS.get('pendenti', []).filter(p => !(p.codice === rec.codice && p.sessione === rec.sessione)));
+  for (let tent = 0; tent < 4; tent++){
+    try {
+      if (tent > 0){ const c0 = await api.get(chiave); if (c0.usato){ togli(); return true; } }
+      await api.post({azione:'risultato', record:rec});
+      await new Promise(r => setTimeout(r, 1800 + tent * 1500));
+      const c = await api.get(chiave);
+      if (c.usato){ togli(); return true; }
+    } catch(e){ await new Promise(r => setTimeout(r, 2500)); }
+  }
+  return false;
+}
+
+/* ---------------- Controllo uscite dalla pagina ---------------- */
+function vaFuori(){
+  if (!T || !T.attiva || T.fuoriDa) return;
+  T.fuoriDa = Date.now(); T.record.uscite++; salvaInCorso();
+}
+function rientra(){
+  if (!T || !T.attiva || !T.fuoriDa) return;
+  if (document.hidden || !document.hasFocus()) return;
+  T.record.secondiFuori += Math.round((Date.now() - T.fuoriDa) / 1000);
+  T.fuoriDa = 0; salvaInCorso();
+  $('#ov-away').hidden = false;
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) vaFuori(); else rientra(); });
+window.addEventListener('blur', vaFuori);
+window.addEventListener('focus', () => setTimeout(rientra, 50));
+$('#btn-away-ok').addEventListener('click', () => { $('#ov-away').hidden = true; if (fsSupportato() && !isFS()) fsOn(); });
+function onFsChange(){
+  if (!T || !T.attiva) return;
+  if (!isFS() && fsSupportato()){ T.record.usciteSchermo++; salvaInCorso(); $('#ov-fs').hidden = false; }
+  else $('#ov-fs').hidden = true;
+}
+document.addEventListener('fullscreenchange', onFsChange);
+document.addEventListener('webkitfullscreenchange', onFsChange);
+$('#btn-fs-ok').addEventListener('click', () => { fsOn(); $('#ov-fs').hidden = true; });
+window.addEventListener('beforeunload', e => { if (T && T.attiva){ e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('popstate', () => { if (T && T.attiva){ try { history.pushState({vfl:1}, ''); } catch(e){} } });
+document.addEventListener('contextmenu', e => { if (T && T.attiva) e.preventDefault(); });
+['copy','cut'].forEach(ev => document.addEventListener(ev, e => { if (T && T.attiva) e.preventDefault(); }));
+
+/* ---------------- ACCESSO DOCENTE ---------------- */
+let CHIAVE = '';
+$('#btn-lock').addEventListener('click', () => { $('#inp-pw').value = ''; $('#login-msg').hidden = true; $('#ov-login').hidden = false; setTimeout(() => $('#inp-pw').focus(), 30); });
+$('#btn-login-no').addEventListener('click', () => { $('#ov-login').hidden = true; $('#inp-pw').value = ''; });
+$('#form-login').addEventListener('submit', ev => {
+  ev.preventDefault();
+  const v = $('#inp-pw').value;
+  $('#inp-pw').value = '';
+  if (v && v === PASSWORD){ CHIAVE = v; $('#ov-login').hidden = true; apriPannello(); }
+  else { $('#login-msg').hidden = false; }
+});
+$('#btn-logout').addEventListener('click', () => { CHIAVE = ''; initHome(); });
+
+/* ---------------- PANNELLO DOCENTE ---------------- */
+let DOC = { stato:null, banca:null };
+function leggiForm(){
+  return {
+    classe: $('#cfg-classe').value.trim(), anno: $('#cfg-anno').value, argomento: $('#cfg-arg').value.trim(),
+    n: Math.max(3, Math.min(60, parseInt($('#cfg-n').value, 10) || 20)), perc: parseInt($('#cfg-perc').value, 10) || 0,
+    tt: Math.max(15, parseInt($('#cfg-tt').value, 10) || 60), tc: Math.max(30, parseInt($('#cfg-tc').value, 10) || 150),
+    jolly: parseInt($('#cfg-jolly').value, 10) || 0, scadenza: $('#cfg-scad').value || '',
+    esclusi: $$('#cfg-topics input').filter(i => !i.checked).map(i => i.value)
+  };
+}
+function scriviForm(c){
+  $('#cfg-classe').value = c.classe || ''; $('#cfg-anno').value = c.anno || 'Secondo anno';
+  $('#cfg-arg').value = c.argomento || (DOC.banca && DOC.banca.titolo) || '';
+  $('#cfg-n').value = c.n; $('#cfg-perc').value = c.perc; $('#cfg-tt').value = c.tt; $('#cfg-tc').value = c.tc;
+  $('#cfg-jolly').value = String(c.jolly); $('#cfg-scad').value = c.scadenza || '';
+  disegnaArgomenti(c.esclusi || []); riepilogo();
+}
+function argomenti(b){ const s = []; b.domande.forEach(q => { if (!s.includes(q.argomento)) s.push(q.argomento); }); return s; }
+function disegnaArgomenti(esclusi){
+  const box = $('#cfg-topics'); box.innerHTML = '';
+  argomenti(DOC.banca).forEach((a, i) => {
+    const id = 'top-' + i;
+    box.insertAdjacentHTML('beforeend', '<label class="topic" for="' + id + '"><input type="checkbox" id="' + id + '" value="' + esc(a) + '"' + (esclusi.includes(a) ? '' : ' checked') + '> ' + esc(a) + '</label>');
+  });
+  $$('#cfg-topics input').forEach(i => i.addEventListener('change', riepilogo));
+}
+function riepilogo(){
+  const c = leggiForm();
+  $('#cfg-perc-out').textContent = c.perc + '%';
+  const nc = Math.round(c.n * c.perc / 100), nt = c.n - nc;
+  const P = pool(DOC.banca, c);
+  const min = Math.round((nt * c.tt + nc * c.tc) / 60);
+  let t = nt + ' teoriche (' + c.tt + ' s) + ' + nc + ' di calcolo (' + c.tc + ' s) · durata massima circa ' + min + ' min.';
+  if (nt > P.teoria.length) t += ' Attenzione: le domande teoriche disponibili sono solo ' + P.teoria.length + '.';
+  if (nc > 0 && !P.calcolo.length) t += ' Attenzione: nessuna domanda di calcolo negli argomenti scelti.';
+  $('#cfg-summary').textContent = t;
+}
+['#cfg-n','#cfg-perc','#cfg-tt','#cfg-tc','#cfg-jolly'].forEach(s => $(s).addEventListener('input', riepilogo));
+
+async function apriPannello(){
+  show('scr-doc');
+  $('#doc-conn').textContent = REMOTO ? 'Collegamento in verifica…' : 'Modalità prova (non collegata al foglio)';
+  $('#doc-conn').className = 'chip ' + (REMOTO ? '' : 'warn');
+  $('#conn-url').textContent = REMOTO ? INDIRIZZO_SCRIPT : 'non impostato';
+  $('#conn-state').textContent = REMOTO ? '—' : 'Modalità prova';
+  try { DOC.stato = await leggiStato(); $('#doc-conn').textContent = REMOTO ? 'Collegato al foglio' : $('#doc-conn').textContent; if (REMOTO) $('#doc-conn').className = 'chip ok'; }
+  catch(e){ DOC.stato = null; $('#doc-conn').textContent = 'Foglio non raggiungibile'; $('#doc-conn').className = 'chip bad'; }
+  DOC.banca = LS.get('banca', null) || (REMOTO && DOC.stato && DOC.stato.banca) || BANCA_PREDEFINITA;
+  const cfg = Object.assign({}, CFG_DEFAULT, LS.get('cfg', {}), DOC.stato && REMOTO ? DOC.stato.cfg : {});
+  scriviForm(cfg);
+  disegnaStato(); disegnaBanca();
+  selTab('sessione');
+}
+function disegnaStato(){
+  const s = DOC.stato;
+  const on = s && s.attiva && !scaduta(s);
+  $('#sess-state').textContent = on ? 'Sessione attiva' : (s && s.attiva && scaduta(s) ? 'Sessione scaduta' : 'Sessione ferma');
+  let info = '';
+  if (s && s.sessione) info += 'Codice sessione ' + s.sessione;
+  if (s && s.avviata) info += ' · avviata ' + new Date(s.avviata).toLocaleString('it-IT', {dateStyle:'short', timeStyle:'short'});
+  if (s && s.scadenza) info += ' · chiusura ' + new Date(s.scadenza).toLocaleString('it-IT', {dateStyle:'short', timeStyle:'short'});
+  $('#sess-info').textContent = info;
+  $('#btn-ferma').disabled = !(s && s.attiva);
+}
+function sessMsg(t, cls){ const m = $('#sess-msg'); m.textContent = t; m.className = 'msg ' + (cls || 'ok'); m.hidden = !t; }
+$('#btn-avvia').addEventListener('click', async () => {
+  const cfg = leggiForm();
+  const P = pool(DOC.banca, cfg);
+  if (!P.teoria.length && !P.calcolo.length){ sessMsg('Seleziona almeno un argomento.', 'bad'); return; }
+  LS.set('cfg', cfg);
+  const id = 'S' + new Date().toISOString().slice(2,16).replace(/[-:T]/g, '');
+  const avviata = new Date().toISOString();
+  if (!REMOTO){
+    LS.set('stato', {attiva:true, sessione:id, avviata});
+    DOC.stato = await leggiStato(); disegnaStato();
+    sessMsg('Sessione avviata in modalità prova. I risultati restano su questo dispositivo.', 'warn');
+    return;
+  }
+  $('#btn-avvia').disabled = true; sessMsg('Invio delle impostazioni al foglio…', 'warn');
+  try {
+    await api.post({azione:'avvia', chiave:CHIAVE, sessione:id, avviata, scadenza:cfg.scadenza ? new Date(cfg.scadenza).toISOString() : '', cfg, banca:DOC.banca});
+    await new Promise(r => setTimeout(r, 2000));
+    DOC.stato = await leggiStato(); disegnaStato();
+    if (DOC.stato.sessione === id && DOC.stato.attiva) sessMsg('Sessione avviata. Gli studenti possono iniziare.', 'ok');
+    else sessMsg('Il foglio non ha confermato l\'avvio. Controlla che la password nello script sia uguale a quella del pannello.', 'bad');
+  } catch(e){ sessMsg('Impossibile raggiungere il foglio. Controlla il collegamento.', 'bad'); }
+  $('#btn-avvia').disabled = false;
+});
+$('#btn-ferma').addEventListener('click', async () => {
+  if (!REMOTO){ const st = LS.get('stato', {}); st.attiva = false; LS.set('stato', st); DOC.stato = await leggiStato(); disegnaStato(); sessMsg('Sessione fermata.', 'ok'); return; }
+  try {
+    await api.post({azione:'ferma', chiave:CHIAVE});
+    await new Promise(r => setTimeout(r, 1500));
+    DOC.stato = await leggiStato(); disegnaStato();
+    sessMsg(DOC.stato.attiva ? 'Il foglio non ha confermato lo stop. Riprova.' : 'Sessione fermata. Nessuno studente può più iniziare.', DOC.stato.attiva ? 'bad' : 'ok');
+  } catch(e){ sessMsg('Impossibile raggiungere il foglio.', 'bad'); }
+});
+
+/* Tabs */
+function selTab(name){
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+  $$('[data-pane]').forEach(p => p.hidden = p.dataset.pane !== name);
+  if (name === 'report') caricaReport();
+}
+$$('.tab').forEach(t => t.addEventListener('click', () => selTab(t.dataset.tab)));
+
+/* Banca */
+function disegnaBanca(){
+  const b = DOC.banca;
+  $('#bank-title').textContent = 'Banca domande: ' + (b.titolo || 'senza titolo');
+  const tb = $('#bank-tbody'); tb.innerHTML = '';
+  let tt = 0, tc = 0;
+  argomenti(b).forEach(a => {
+    const t = b.domande.filter(q => q.argomento === a && q.tipo !== 'calcolo').length;
+    const c = b.domande.filter(q => q.argomento === a && q.tipo === 'calcolo').length;
+    tt += t; tc += c;
+    tb.insertAdjacentHTML('beforeend', '<tr><td>' + esc(a) + '</td><td>' + t + '</td><td>' + c + '</td></tr>');
+  });
+  tb.insertAdjacentHTML('beforeend', '<tr><td><strong>Totale</strong></td><td><strong>' + tt + '</strong></td><td><strong>' + tc + '</strong></td></tr>');
+}
+function bankMsg(t, cls){ const m = $('#bank-msg'); m.textContent = t; m.className = 'msg ' + (cls || 'ok'); m.hidden = !t; }
+$('#file-bank').addEventListener('change', ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const b = validaBanca(JSON.parse(rd.result));
+      LS.set('banca', b); DOC.banca = b;
+      $('#cfg-arg').value = b.titolo || '';
+      disegnaBanca(); disegnaArgomenti([]); riepilogo();
+      bankMsg('Banca "' + (b.titolo || f.name) + '" caricata: ' + b.domande.length + ' domande. Premi "Salva e avvia sessione" per usarla con gli studenti.', 'ok');
+    } catch(e){ bankMsg('File non valido: ' + e.message, 'bad'); }
+    ev.target.value = '';
+  };
+  rd.readAsText(f);
+});
+function scarica(nome, testo, tipo){
+  const blob = new Blob([testo], {type:tipo});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nome;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+$('#btn-bank-dl').addEventListener('click', () => scarica('banca-' + (DOC.banca.titolo || 'domande').toLowerCase().replace(/\W+/g, '-') + '.json', JSON.stringify(DOC.banca, null, 2), 'application/json'));
+$('#btn-bank-reset').addEventListener('click', () => { LS.del('banca'); DOC.banca = BANCA_PREDEFINITA; $('#cfg-arg').value = DOC.banca.titolo; disegnaBanca(); disegnaArgomenti([]); riepilogo(); bankMsg('Ripristinata la banca predefinita.', 'ok'); });
+$('#btn-preview').addEventListener('click', () => {
+  const cfg = leggiForm();
+  const list = $('#preview-list'); list.innerHTML = '';
+  let d;
+  try { d = costruisciVerifica(DOC.banca, cfg); } catch(e){ list.textContent = e.message; return; }
+  d.forEach((q, i) => list.appendChild(bloccoDomanda({n:i+1, tipo:q.tipo, argomento:q.argomento, testo:q.testo, opzioni:q.opzioni, corretta:q.corretta, scelta:null, esito:''})));
+});
+function bloccoDomanda(d){
+  const div = document.createElement('div');
+  div.className = 'dq ' + (d.esito || '');
+  const et = {C:'Corretta', E:'Errata', N:'Non risposta', J:'Saltata con jolly'}[d.esito] || '';
+  div.innerHTML = '<div class="small muted">' + d.n + '. ' + (d.tipo === 'calcolo' ? 'Esercizio' : 'Teoria') + ' · ' + esc(d.argomento) + (et ? ' · <strong>' + et + '</strong>' : '') + (d.secondi != null && d.esito ? ' · ' + d.secondi + ' s' : '') + '</div><div><strong>' + esc(d.testo) + '</strong></div>';
+  const ol = document.createElement('ol'); ol.type = 'A';
+  (d.opzioni || []).forEach((o, k) => {
+    const li = document.createElement('li'); li.textContent = o;
+    if (k === d.corretta) li.className = 'giusta';
+    if (d.scelta === k && k !== d.corretta) li.className = 'scelta-sbagliata';
+    if (d.scelta === k) li.textContent += '  ← scelta';
+    ol.appendChild(li);
+  });
+  div.appendChild(ol);
+  return div;
+}
+
+/* Report */
+let RIGHE = [];
+function repMsg(t){ const m = $('#rep-msg'); m.textContent = t; m.hidden = !t; }
+async function caricaReport(){
+  repMsg('');
+  const solo = $('#rep-current').checked;
+  const sess = DOC.stato ? DOC.stato.sessione : '';
+  if (!REMOTO){
+    RIGHE = LS.get('report', []);
+    repMsg('Modalità prova: qui vedi solo le verifiche svolte su questo dispositivo.');
+  } else {
+    try {
+      const r = await api.get({azione:'report', chiave:CHIAVE});
+      if (!r.ok) throw new Error(r.errore || 'errore');
+      RIGHE = r.righe || [];
+    } catch(e){ repMsg('Impossibile leggere il foglio. Controlla il collegamento e la password nello script.'); RIGHE = []; }
+  }
+  if (solo && sess) RIGHE = RIGHE.filter(r => r.sessione === sess);
+  RIGHE.sort((a, b) => String(b.data).localeCompare(String(a.data)));
+  const tb = $('#rep-tbody'); tb.innerHTML = '';
+  RIGHE.forEach((r, i) => {
+    const ora = r.data ? new Date(r.data).toLocaleString('it-IT', {dateStyle:'short', timeStyle:'short'}) : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + esc(ora) + '</td><td>' + esc(r.classe) + '</td><td><strong>' + esc(r.codice) + '</strong></td><td class="voto">' + esc(String(r.voto).replace('.', ',')) + '</td><td>' + r.corrette + ' / ' + r.errate + ' / ' + r.nonRisposte + '</td><td>' + esc(r.jolly) + '</td><td>' + esc(r.senzaTempo) + '</td><td>' + (r.uscite > 0 ? '<span class="chip bad">' + r.uscite + '</span>' : '0') + '</td><td>' + esc(r.secondiFuori) + '</td><td>' + (r.usciteSchermo > 0 ? '<span class="chip warn">' + r.usciteSchermo + '</span>' : '0') + '</td><td>' + (String(r.stato).startsWith('completata') ? '<span class="chip ok">completata</span>' : '<span class="chip warn">' + esc(r.stato) + '</span>') + '</td>';
+    tr.addEventListener('click', () => apriDettaglio(r));
+    tb.appendChild(tr);
+  });
+  if (!RIGHE.length) tb.innerHTML = '<tr><td colspan="11" class="muted" style="cursor:default">Nessuna verifica consegnata' + (solo ? ' in questa sessione' : '') + '.</td></tr>';
+  const media = RIGHE.length ? (RIGHE.reduce((s, r) => s + Number(r.voto || 0), 0) / RIGHE.length) : 0;
+  $('#rep-foot').textContent = RIGHE.length ? RIGHE.length + (RIGHE.length === 1 ? ' verifica' : ' verifiche') + ' · media ' + media.toFixed(1).replace('.', ',') + ' / 10 · tocca una riga per il dettaglio domanda per domanda.' : '';
+}
+$('#btn-rep-refresh').addEventListener('click', caricaReport);
+$('#rep-current').addEventListener('change', caricaReport);
+function apriDettaglio(r){
+  $('#det-title').textContent = 'Codice ' + r.codice + ' · voto ' + String(r.voto).replace('.', ',');
+  const kv = [['Classe', r.classe], ['Argomento', r.argomento], ['Corrette / errate / non date', r.corrette + ' / ' + r.errate + ' / ' + r.nonRisposte], ['Jolly usati', r.jolly], ['Modalità senza tempo', r.senzaTempo], ['Uscite dalla pagina', r.uscite + ' (' + r.secondiFuori + ' s fuori)'], ['Uscite da schermo intero', r.usciteSchermo], ['Durata', String(r.durataMin).replace('.', ',') + ' min'], ['Stato', r.stato]];
+  $('#det-kv').innerHTML = kv.map(([k, v]) => '<dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd>').join('');
+  const list = $('#det-list'); list.innerHTML = '';
+  let det = r.dettaglio; if (typeof det === 'string'){ try { det = JSON.parse(det); } catch(e){ det = []; } }
+  (det || []).forEach(d => list.appendChild(bloccoDomanda(d)));
+  $('#ov-detail').hidden = false;
+}
+$('#btn-det-close').addEventListener('click', () => { $('#ov-detail').hidden = true; });
+$('#btn-rep-csv').addEventListener('click', () => {
+  const col = ['data','sessione','classe','anno','argomento','codice','nDomande','corrette','errate','nonRisposte','voto','jolly','senzaTempo','uscite','secondiFuori','usciteSchermo','stato','durataMin'];
+  const head = ['Data e ora','Sessione','Classe','Anno','Argomento','Codice','N. domande','Corrette','Errate','Non risposte','Voto','Jolly','Senza tempo','Uscite pagina','Secondi fuori','Uscite schermo intero','Stato','Durata (min)'];
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const righe = [head.map(q).join(';')].concat(RIGHE.map(r => col.map(c => c === 'voto' || c === 'durataMin' ? q(String(r[c]).replace('.', ',')) : q(r[c])).join(';')));
+  scarica('report-verifica.csv', '﻿' + righe.join('\r\n'), 'text/csv');
+});
+
+/* Collegamento */
+$('#btn-ping').addEventListener('click', async () => {
+  const m = $('#conn-msg'); m.hidden = false;
+  if (!REMOTO){ m.className = 'msg warn'; m.textContent = 'Indirizzo dello script non impostato nel file: la pagina è in modalità prova.'; return; }
+  m.className = 'msg warn'; m.textContent = 'Prova in corso…';
+  try { const r = await api.get({azione:'ping', chiave:CHIAVE}); m.className = 'msg ' + (r.ok ? 'ok' : 'bad'); m.textContent = r.ok ? ('Collegamento riuscito. Foglio: ' + (r.foglio || '') + (r.chiaveOk === false ? ' — ATTENZIONE: la password nello script è diversa da quella del pannello.' : '')) : 'Risposta non valida dallo script.'; $('#conn-state').textContent = r.ok ? 'Collegato' : 'Errore'; }
+  catch(e){ m.className = 'msg bad'; m.textContent = 'Il foglio non risponde. Controlla che lo script sia pubblicato come app web con accesso "Chiunque".'; $('#conn-state').textContent = 'Non raggiungibile'; }
+});
+
+/* Avvio */
+initHome();
+})();
+</script>
+
+</body>
+</html>
