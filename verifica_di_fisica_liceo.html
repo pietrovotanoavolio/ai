@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Verifica di Fisica Liceo</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- KaTeX per rendering formule matematiche e fisiche in LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Librerie client-side per estrazione da PDF, PPTX, XLSX/XLS, CSV, DOCX e TXT -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .katex {
+            font-size: 1.08em;
+            text-rendering: optimizeLegibility;
+        }
+
+        .option-card-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+            padding: 1.1rem 1.25rem;
+            border-radius: 0.85rem;
+            border: 2px solid #e2e8f0;
+            background-color: #ffffff;
+            color: #1e293b;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            margin-bottom: 0.75rem;
+        }
+
+        .option-card-btn:hover:not(:disabled) {
+            border-color: #06b6d4;
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        .option-card-btn.selected-state {
+            border-color: #06b6d4 !important;
+            background-color: #ecfeff !important;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25) !important;
+        }
+
+        .option-card-btn.selected-state .option-badge {
+            background-color: #06b6d4 !important;
+            color: #ffffff !important;
+            border-color: #06b6d4 !important;
+        }
+
+        .option-badge {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            background-color: #f1f5f9;
+            color: #475569;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            border: 1px solid #cbd5e1;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .option-card-btn:hover .option-badge {
+            background-color: #06b6d4;
+            color: #ffffff;
+            border-color: #06b6d4;
+        }
+
+        @keyframes pulse-red-alert {
+            0%, 100% { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
+            50% { background-color: #fca5a5; border-color: #dc2626; color: #7f1d1d; }
+        }
+        .timer-alert {
+            animation: pulse-red-alert 1s infinite;
+        }
+
+        @keyframes banner-shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+        .alert-shake {
+            animation: banner-shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between antialiased selection:bg-indigo-600 selection:text-white">
+
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30 border-b border-slate-800">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow shrink-0">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
+                        <span id="headerSubjectTopic">Verifica di Fisica Liceo</span>
+                    </h1>
+                    <p id="headerSubtopics" class="text-xs text-slate-400">Impulso, Urti e Conservazione</p>
+                </div>
+            </div>
+            <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-sliders"></i>
+                <span class="hidden sm:inline">Pannello Docente</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- ==================== SCHERMATA 1: AVVIO E ACCESSO ==================== -->
+        <section id="screenStart" class="bg-white rounded-2xl p-6 sm:p-8 shadow-lg border border-slate-200/90 space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 gap-3">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Accesso alla Prova</h2>
+                    <p class="text-slate-500 text-xs mt-0.5">Inserisci le tue generalità prima di iniziare la sessione di verifica.</p>
+                </div>
+                <button onclick="openTeacherModal()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-200 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Configura Prova</span>
+                </button>
+            </div>
+
+            <!-- RIEPILOGO PARAMETRI FISSATI DAL DOCENTE -->
+            <div class="bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Parametri della Verifica
+                    </span>
+                    <span id="groundingSourceBadge" class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
+                        Generazione Dinamica
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Argomento</span>
+                        <strong id="startScreenTopic" class="text-xs font-bold text-slate-800 block truncate">Quantità di moto</strong>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">N. Quesiti</span>
+                        <strong id="activeQuestionCountDisplay" class="text-xs font-bold text-slate-800 block truncate">10 Quesiti</strong>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Difficoltà</span>
+                        <strong id="activeDifficultyDisplay" class="text-xs font-bold text-slate-800 block truncate">Alto (Max 40% Calcoli)</strong>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Timer</span>
+                        <strong id="activeTimerModeDisplay" class="text-xs font-bold text-indigo-600 block truncate">Attivo</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ISTRUZIONI ESAME CON AVVISO ANTI-USCITA -->
+            <div class="p-4 bg-amber-50/90 border border-amber-200/90 rounded-xl text-amber-900 text-xs flex items-start gap-3">
+                <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5 shrink-0"></i>
+                <div class="space-y-1">
+                    <strong class="block font-bold">Norme formali di svolgimento:</strong>
+                    <p class="text-amber-800 leading-relaxed">
+                        • <strong>Doppio clic per rispondere:</strong> clicca una volta sull'opzione per selezionarla (diventerà color ciano). Clicca una <strong>seconda volta</strong> sulla stessa opzione per confermare e passare in automatico alla domanda successiva.<br>
+                        • <strong>Monitoraggio vigilanza attivo:</strong> ogni uscita dalla scheda o cambio finestra verrà segnalato a schermo e registrato nel verbale d'esame.<br>
+                        • Al termine <strong>non verrà resa visibile la correzione o la revisione degli errori</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- BANNER SCADENZA PROVA SE CONFIGURATA -->
+            <div id="deadlineNoticeBanner" class="hidden p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-900 text-xs flex items-center gap-2.5">
+                <i class="fa-solid fa-clock-rotate-left text-rose-600 text-sm shrink-0"></i>
+                <span id="deadlineNoticeText" class="font-bold">Scadenza prova superata.</span>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label for="studentNameInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <i class="fa-solid fa-user-pen mr-1 text-indigo-600"></i> Cognome e Nome Studente:
+                    </label>
+                    <input type="text" id="studentNameInput" placeholder="Es. Rossi Mario" 
+                           class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm">
+                </div>
+
+                <!-- OPZIONE TIMER SOLO ALL'INIZIO (GESTITA DALLO STUDENTE O CONFIGURATA DAL DOCENTE) -->
+                <div id="studentTimerChoiceBox" class="flex items-center gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <input type="checkbox" id="studentDisableTimerCheck" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                    <label for="studentDisableTimerCheck" class="text-xs font-bold text-slate-700 cursor-pointer">
+                        Svolgi la prova senza limiti di tempo (Disattiva timer)
+                    </label>
+                </div>
+
+                <p id="nameErrorMsg" class="hidden text-xs text-rose-600 font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Inserisci cognome e nome prima di iniziare.
+                </p>
+            </div>
+
+            <button id="startQuizBtn" onclick="startSelectedQuiz()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                <span>Inizia la Prova</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </section>
+
+        <!-- ==================== SCHERMATA 2: TEST IN CORSO ==================== -->
+        <section id="screenQuiz" class="hidden space-y-4">
+            
+            <!-- BANNER ALERT RILEVAMENTO USCITA / CAMBIO SCHEDA -->
+            <div id="exitAlertBanner" class="hidden bg-rose-50 border-2 border-rose-500 text-rose-950 p-3.5 rounded-2xl text-xs flex items-center justify-between shadow-lg alert-shake">
+                <div class="flex items-center gap-2.5 font-bold">
+                    <div class="w-7 h-7 bg-rose-600 text-white rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                    </div>
+                    <div>
+                        <span class="block text-rose-900 font-extrabold">ATTENZIONE: Rilevato cambio di scheda o finestra!</span>
+                        <span class="text-[11px] text-rose-700 font-normal">L'anomalia è stata conteggiata e registrata nel verbale della verifica.</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span id="exitAlertCountBadge" class="bg-rose-600 text-white font-black px-2.5 py-1 rounded-lg text-xs shadow-sm">
+                        Uscite: 1
+                    </span>
+                    <button onclick="dismissExitAlert()" class="text-rose-600 hover:text-rose-900 px-2 py-1 text-xs font-bold cursor-pointer" title="Nascondi avviso">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barra Superiore Monitor e Timer (Senza tasto timer durante il quiz) -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/90 space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-600 flex-wrap gap-2">
+                    <div class="flex items-center gap-2">
+                        <span id="calcTypeBadge" class="px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
+                            Teoria (60s)
+                        </span>
+
+                        <!-- Badge Vigilanza Uscite in Tempo Reale -->
+                        <span id="liveExitsMonitorBadge" class="hidden px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-rose-100 text-rose-800 border border-rose-300">
+                            <i class="fa-solid fa-eye mr-1"></i> Uscite: <span id="liveExitsCountText">0</span>
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Pulsante Jolly -->
+                        <button id="jollyBtn" onclick="useJolly()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Sostituisci questo quesito con uno nuovo (Usabile 1 sola volta)">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Usa Jolly 🃏</span>
+                        </button>
+
+                        <!-- Tasto Termina Prova in anticipo -->
+                        <button onclick="confirmEarlyExit()" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Consegna la verifica in anticipo">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span class="hidden sm:inline">Termina Prova</span>
+                        </button>
+
+                        <!-- Display Timer Quesito -->
+                        <div id="questionTimerDisplay" class="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 font-mono font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-stopwatch text-amber-600"></i>
+                            <span id="timerCountdown">60s</span>
+                        </div>
+
+                        <span id="questionCounterText" class="bg-slate-100 px-3 py-1 rounded-full border border-slate-200 font-bold text-slate-800">
+                            Quesito 1 di 10
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Barra tempo residuo domanda -->
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden border border-slate-200">
+                    <div id="timeProgressBarFill" class="bg-amber-500 h-1.5 rounded-full transition-all duration-1000" style="width: 100%"></div>
+                </div>
+
+                <!-- Barra progresso globale verifica -->
+                <div class="w-full bg-slate-200 rounded-full h-1 overflow-hidden">
+                    <div id="progressBarFill" class="bg-indigo-600 h-1 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Scheda del Quesito -->
+            <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-lg border border-slate-200 space-y-5">
+                <div id="questionContainer" class="text-slate-900 text-base sm:text-lg font-semibold leading-relaxed">
+                    <!-- Quesito inserito dinamicamente -->
+                </div>
+
+                <!-- Lista Opzioni Risposta -->
+                <div id="optionsContainer">
+                    <!-- Opzioni inserite dinamicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== SCHERMATA 3: ESITO FINALE ==================== -->
+        <section id="screenCompleted" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200 space-y-6 text-center">
+                
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl shadow-inner">
+                    <i class="fa-solid fa-stamp"></i>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Verifica Conclusa</h2>
+                    <p class="text-slate-600 text-sm mt-1">
+                        Candidato: <strong id="completedPseudonym" class="text-indigo-600">Studente</strong>
+                    </p>
+                    <p class="text-xs text-slate-400 mt-0.5">La prova è stata registrata regolarmente nel verbale d'esame.</p>
+                </div>
+
+                <!-- Scheda Esito Vigilanza / Uscite dalla prova -->
+                <div id="vigilanceReportBox" class="p-3.5 rounded-xl border flex items-center justify-between text-xs text-left bg-emerald-50 border-emerald-200">
+                    <div class="flex items-center gap-2.5">
+                        <i id="vigilanceReportIcon" class="fa-solid fa-shield-halved text-emerald-600 text-lg"></i>
+                        <div>
+                            <strong id="vigilanceReportTitle" class="block font-bold text-emerald-900">Integrità Sessione: Regolare</strong>
+                            <span id="vigilanceReportSubtitle" class="text-emerald-700">Nessuna uscita dalla schermata della prova rilevata durante il test.</span>
+                        </div>
+                    </div>
+                    <span id="vigilanceReportBadge" class="px-2.5 py-1 rounded-lg text-xs font-black bg-emerald-200 text-emerald-900">0 uscite</span>
+                </div>
+
+                <!-- Riepilogo Punteggio -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Esatte</span>
+                        <span id="resCorrect" class="text-2xl font-black text-emerald-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Errate</span>
+                        <span id="resWrong" class="text-2xl font-black text-rose-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Omesse</span>
+                        <span id="resSkipped" class="text-2xl font-black text-amber-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-500 uppercase block">Punteggio</span>
+                        <span id="resAccuracy" class="text-2xl font-black text-indigo-600">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-left space-y-2">
+                    <div class="flex justify-between items-center text-xs text-slate-800 font-bold flex-wrap gap-2">
+                        <span id="resTotalScoreText" class="text-sm text-slate-900 font-extrabold">0 esatte su 0 quesiti</span>
+                        <div class="flex items-center gap-3">
+                            <span id="resTimerModeDisplay" class="px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-800 text-[11px] font-extrabold">Timer: Standard</span>
+                            <span id="completionTimeDisplay" class="text-slate-600 font-mono text-xs">--:--</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-slate-400"></i>
+                        <span>Trattandosi di una verifica, la correzione dettagliata e l'analisi degli errori sono riservate al docente.</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-center pt-2">
+                    <button onclick="restartQuiz()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition shadow flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-arrow-rotate-right"></i>
+                        <span>Torna alla Pagina Iniziale</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERLAY CARICAMENTO (SENZA NESSUNA MENZIONE ALL'IA) -->
+        <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center text-white px-4">
+            <i class="fa-solid fa-circle-notch fa-spin text-5xl text-indigo-400"></i>
+        </div>
+
+        <!-- MODALE CONFERMA TERMINA PROVA -->
+        <div id="earlyExitModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+            <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-rose-100 text-center space-y-4">
+                <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-900">Terminare la prova?</h3>
+                    <p class="text-sm text-slate-500 mt-2">Sei sicuro di voler consegnare in anticipo? Le domande a cui non hai ancora risposto verranno valutate con 0 punti.</p>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button onclick="closeEarlyExitModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition cursor-pointer">Annulla</button>
+                    <button onclick="executeEarlyExit()" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow transition cursor-pointer">Conferma</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== MODALE: PANNELLO DOCENTE ==================== -->
+    <div id="teacherModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 space-y-5 max-h-[90vh] overflow-y-auto">
+            
+            <!-- Login Docente -->
+            <div id="teacherAuthSection" class="space-y-4 text-center py-2">
+                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Accesso Riservato Docente</h3>
+                <p class="text-xs text-slate-500">Inserisci il PIN docente per gestire le impostazioni e il registro.</p>
+
+                <div class="max-w-xs mx-auto space-y-3">
+                    <input type="password" id="teacherPinInput" placeholder="Inserisci PIN" 
+                           class="w-full text-center px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-lg tracking-widest focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <p id="teacherAuthError" class="text-xs text-rose-600 font-semibold hidden">PIN Errato!</p>
+                    <div class="flex gap-2">
+                        <button onclick="closeTeacherModal()" class="w-1/2 py-2.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer">Annulla</button>
+                        <button onclick="verifyTeacherPin()" class="w-1/2 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow cursor-pointer">Accedi</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Docente -->
+            <div id="teacherDashboardSection" class="hidden space-y-5">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Configurazione Prova
+                    </h3>
+                    <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- SEZIONE: INFORMAZIONI PROVA -->
+                <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200 space-y-3">
+                    <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-2 border-b border-indigo-200/60 pb-2">
+                        <i class="fa-solid fa-book text-indigo-600"></i> Informazioni Generali Prova
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Materia:</label>
+                            <input type="text" id="teacherSubjectInput" placeholder="Es. Fisica, Matematica..." oninput="saveTeacherSettings()"
+                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Argomento Principale:</label>
+                            <input type="text" id="teacherTopicInput" placeholder="Es. Quantità di moto..." oninput="saveTeacherSettings()"
+                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Sottotitoli / Dettagli (Opzionale):</label>
+                            <input type="text" id="teacherSubtopicsInput" placeholder="Es. Elenco degli argomenti trattati..." oninput="saveTeacherSettings()"
+                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parametri di Somministrazione e Scadenza -->
+                <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200 space-y-3">
+                    <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-2 border-b border-indigo-200/60 pb-2">
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Parametri di Somministrazione
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
+                                <i class="fa-solid fa-list-ol mr-1"></i> Numero Quesiti:
+                            </label>
+                            <input type="number" id="teacherQuestionCountInput" min="0" max="100" placeholder="0 = Predefinito" oninput="saveTeacherSettings()"
+                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
+                                <i class="fa-solid fa-calculator mr-1"></i> Quantità Calcoli:
+                            </label>
+                            <select id="teacherCalcRatioSelect" onchange="saveTeacherSettings()" class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                                <option value="0.2">Basso (Max 20% Problemi)</option>
+                                <option value="0.3">Medio (Max 30% Problemi)</option>
+                                <option value="0.4" selected>Alto (Max 40% Problemi)</option>
+                                <option value="0.0">Solo Teoria (0% Problemi)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
+                                <i class="fa-solid fa-hourglass-half mr-1"></i> Gestione Timer:
+                            </label>
+                            <select id="teacherTimerModeSelect" onchange="saveTeacherSettings()" class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                                <option value="standard">⏱️ Attivo (60s/150s)</option>
+                                <option value="unlimited">♾️ Illimitato</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- SCADENZA PROVA CONFIGURABILE -->
+                    <div class="pt-2">
+                        <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
+                            <i class="fa-solid fa-calendar-xmark mr-1"></i> Data e Ora di Scadenza Prova (Opzionale):
+                        </label>
+                        <input type="datetime-local" id="teacherDeadlineInput" onchange="saveTeacherSettings()"
+                               class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                        <span class="text-[10px] text-indigo-700 mt-1 block">Se impostata, oltre questo orario la prova non potrà più essere avviata dagli studenti.</span>
+                    </div>
+                </div>
+
+                <!-- CARICAMENTO FILE E DIRETTIVE -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                    
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                                <i class="fa-solid fa-folder-open text-indigo-600"></i>
+                                Carica File di Riferimento (PDF, Word, PPTX, XLSX, TXT)
+                            </label>
+                            <span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">
+                                Copertura equa attiva
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">
+                            Carica i materiali didattici. Le domande verranno distribuite in modo uniforme ed equo tra tutte le idee e concetti presenti nei file, attenendosi rigorosamente ad essi.
+                        </p>
+                        
+                        <input type="file" id="referenceFileInput" multiple accept=".pdf,.docx,.doc,.pptx,.ppt,.xlsx,.xls,.csv,.txt,.json,.md" onchange="handleMultipleReferenceFiles(event)"
+                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 border border-slate-300 rounded-lg bg-white p-1 cursor-pointer">
+                        
+                        <div id="fileUploadStatusMsg" class="text-[11px] font-semibold text-emerald-700 hidden"></div>
+
+                        <!-- Elenco dinamico dei file caricati -->
+                        <div id="loadedFilesContainer" class="pt-2 space-y-1.5 hidden">
+                            <div class="flex justify-between items-center text-[11px] font-bold text-slate-700 border-b border-slate-200 pb-1">
+                                <span><i class="fa-solid fa-layer-group text-indigo-600 mr-1"></i> File di riferimento caricati (<span id="loadedFilesCountBadge">0</span>):</span>
+                                <button onclick="clearAllReferenceFiles()" class="text-rose-600 hover:text-rose-800 text-[10px] font-bold cursor-pointer">
+                                    <i class="fa-solid fa-trash-can mr-1"></i> Rimuovi tutti
+                                </button>
+                            </div>
+                            <div id="loadedFilesList" class="max-h-36 overflow-y-auto space-y-1 pr-1">
+                                <!-- Elementi file iniettati dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 pt-2 border-t border-slate-200">
+                        <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-comment-dots text-indigo-600"></i>
+                            Indicazioni del Docente (Prompt per generazione)
+                        </label>
+                        <p class="text-[11px] text-slate-500">
+                            Specifica linee guida (es. "Focalizzati sugli argomenti del capitolo 2").
+                        </p>
+                        <textarea id="teacherPromptDirectives" rows="3" oninput="saveTeacherDirectives()"
+                                  placeholder="Scrivi qui i tuoi criteri e commenti su come formulare i quesiti..."
+                                  class="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+
+                    <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
+                        <button onclick="applyFileAndDirectives()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Applica Impostazioni alla Prova</span>
+                        </button>
+                        <span id="referenceSourceBadgeStatus" class="text-[11px] text-slate-600 font-semibold"></span>
+                    </div>
+                </div>
+
+                <!-- Configurazione Google Sheets (Agganciato al tuo foglio di default) -->
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase"><i class="fa-brands fa-google mr-1 text-emerald-600"></i> Google Sheets (Per vedere i risultati da un altro PC)</label>
+                        <p class="text-[11px] text-slate-500">URL della Web App di Google Apps Script per sincronizzare i risultati in cloud.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="sheetUrlSetting" placeholder="https://script.google.com/macros/s/.../exec" 
+                               class="flex-grow px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono focus:outline-none focus:border-indigo-500 transition">
+                        <button id="sheetSaveBtn" onclick="saveSheetUrlSetting()" class="px-3.5 py-1.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-700 transition cursor-pointer">Salva</button>
+                    </div>
+                </div>
+
+                <!-- Tabella Consegne con Colonna Uscite -->
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-slate-100 text-slate-900 uppercase font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="p-2.5">Data/Ora</th>
+                                <th class="p-2.5">Studente</th>
+                                <th class="p-2.5">Esito</th>
+                                <th class="p-2.5">Percentuale</th>
+                                <th class="p-2.5">Timer</th>
+                                <th class="p-2.5">Uscite</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherTableBody" class="divide-y divide-slate-100 bg-white">
+                            <!-- Inserite dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="promptClearHistory()" class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-200 cursor-pointer">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Svuota Registro
+                    </button>
+                    <button onclick="closeTeacherModal()" class="px-5 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl cursor-pointer">
+                        Chiudi
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500 mt-auto">
+        <p id="footerText">Verifica di Fisica Liceo</p>
+    </footer>
+
+    <script>
+        const QUIZ_SETTINGS = {
+            storageKey: 'LICEO_FISICA_ESITI_GENERAL',
+            teacherPin: '3548', // PIN SEGRETO CONFIGURATO
+            googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw6H3XF7Cg_a5cKqX7h8K9z7mX6Cg_a5cKqX7h8K9z7mX6Cg/exec',
+            timeStandardSec: 60,
+            timeCalculationSec: 150
+        };
+
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        let activeQuestions = [];
+        let studentAnswers = [];
+        let currentQuestionIndex = 0;
+        let currentSelectedOption = null;
+        let studentName = '';
+        let quizStartTime = null;
+        let isUnlimitedTime = false;
+        let isJollyUsed = false;
+        let isProcessingAdvance = false;
+        let spareQuestions = [];
+
+        let timerInterval = null;
+        let currentQuestionTimeLeft = 60;
+        let currentQuestionMaxTime = 60;
+
+        let isQuizActive = false;
+        let exitCount = 0;
+        let lastExitTimestamp = 0;
+
+        let loadedReferenceFiles = [];
+        try {
+            const rawStoredFiles = localStorage.getItem('PHYSICS_LOADED_FILES_LIST');
+            if (rawStoredFiles) loadedReferenceFiles = JSON.parse(rawStoredFiles);
+        } catch(e) { loadedReferenceFiles = []; }
+
+        async function fetchWithRetry(url, options, retries = 3, backoff = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                    await new Promise(r => setTimeout(r, backoff * Math.pow(2, i)));
+                }
+            }
+        }
+
+        async function generateQuestionsWithLLM(textContext, subject, topic, subtopics, directives, count, calcRatio) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const prompt = `Sei un docente rigoroso. Genera una verifica a risposta multipla inedita e originale di ${subject} sull'argomento: ${topic} (${subtopics}).
+            
+            REGOLE FONDAMENTALI PER I CONTENUTI E LA COPERTURA:
+            ${textContext && textContext.trim().length > 0 ? `Devi attenerti STRETTAMENTE E SOLTANTO alle informazioni presenti nel seguente testo di riferimento allegato dal docente. DISTRIBUISCI le domande in modo UNIFORME ED EQUO tra i vari concetti, capitoli, definizioni e idee presenti nel testo, garantendo una copertura approfondita ed esaustiva di tutto il materiale fornito (a meno che non ci siano indicazioni contrarie nelle 'Indicazioni del Docente'). NON utilizzare terminologia, argomenti, concetti o definizioni che non siano esplicitamente menzionati in questo testo:\n\n---\nINIZIO MATERIALE DOCENTE\n${textContext.substring(0, 45000)}\nFINE MATERIALE DOCENTE\n---\n` : 'Nessun materiale specifico fornito. Basati esclusivamente sulle nozioni standard richieste per questo specifico argomento e livello scolastico.'}
+            
+            ${directives ? `\nINDICAZIONI AGGIUNTIVE DEL DOCENTE:\n${directives}\n` : ''}
+            
+            REGOLE FORMATO E GENERAZIONE:
+            1. Genera ESATTAMENTE ${count} domande.
+            2. Le domande devono essere sempre diverse e inedite ad ogni esecuzione. Non usare i classici esempi banali, crea scenari o formulazioni originali. Non ripetere la stessa domanda due volte.
+            3. Massimo il ${Math.floor(count * calcRatio)} delle domande può richiedere calcoli matematici o risoluzione di problemi numerici (imposta isCalculation: true). Le restanti devono essere teoriche o concettuali (isCalculation: false).
+            4. Se decidi di inserire domande di calcolo per la materia indicata, assicurati che i calcoli siano eseguibili in circa 2 minuti da uno studente (es. usando numeri interi, semplificazioni dirette, etc.), senza l'uso obbligatorio della calcolatrice.
+            5. Ogni domanda deve avere esattamente 4 opzioni di risposta, di cui 1 sola corretta. REGOLE PER LE OPZIONI: Tutte e 4 le opzioni devono avere APPROSSIMATIVAMENTE LA STESSA LUNGHEZZA e struttura sintattica. La risposta corretta NON deve mai essere visibilmente più lunga, articolata o dettagliata delle risposte errate.
+            6. Formatta eventuali formule matematiche usando la sintassi LaTeX standard inclusa tra $ o $$ (es. $F = m \\cdot v$).`;
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "question": { type: "STRING" },
+                                "options": {
+                                    type: "ARRAY",
+                                    items: { type: "STRING" },
+                                    description: "Esattamente 4 opzioni."
+                                },
+                                "correctIndex": { type: "INTEGER", description: "Indice dell'opzione corretta (0, 1, 2, o 3)" },
+                                "isCalculation": { type: "BOOLEAN" }
+                            },
+                            required: ["question", "options", "correctIndex", "isCalculation"]
+                        }
+                    }
+                }
+            };
+
+            const result = await fetchWithRetry(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts.length > 0) {
+                return JSON.parse(result.candidates[0].content.parts[0].text);
+            }
+            throw new Error("Risposta IA non valida");
+        }
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function renderMathInTarget(elem) {
+            if (typeof renderMathInElement === 'function' && elem) {
+                try {
+                    renderMathInElement(elem, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        throwOnError: false
+                    });
+                } catch(e) { 
+                    console.debug("KaTeX rendering note:", e); 
+                }
+            }
+        }
+
+        function recordStudentExit(reason) {
+            if (!isQuizActive) return;
+
+            const now = Date.now();
+            if (now - lastExitTimestamp < 1200) return; 
+            lastExitTimestamp = now;
+
+            exitCount++;
+
+            const banner = document.getElementById('exitAlertBanner');
+            const badge = document.getElementById('exitAlertCountBadge');
+            if (banner && badge) {
+                badge.textContent = `Uscite: ${exitCount}`;
+                banner.classList.remove('hidden');
+                banner.classList.remove('alert-shake');
+                void banner.offsetWidth; 
+                banner.classList.add('alert-shake');
+            }
+
+            const liveMonitor = document.getElementById('liveExitsMonitorBadge');
+            const liveText = document.getElementById('liveExitsCountText');
+            if (liveMonitor && liveText) {
+                liveText.textContent = exitCount;
+                liveMonitor.classList.remove('hidden');
+            }
+        }
+
+        function dismissExitAlert() {
+            const banner = document.getElementById('exitAlertBanner');
+            if (banner) banner.classList.add('hidden');
+        }
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                recordStudentExit('visibility_hidden');
+            }
+        });
+        window.addEventListener('blur', function() {
+            recordStudentExit('window_blur');
+        });
+
+        async function handleMultipleReferenceFiles(event) {
+            const files = Array.from(event.target.files);
+            if (!files || files.length === 0) return;
+
+            const statusDiv = document.getElementById('fileUploadStatusMsg');
+            if (statusDiv) {
+                statusDiv.classList.remove('hidden');
+                statusDiv.className = "text-[11px] font-semibold text-indigo-700";
+                statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Acquisizione di ${files.length} file in corso...`;
+            }
+
+            for (const file of files) {
+                try {
+                    const result = await processSingleFile(file);
+                    loadedReferenceFiles = loadedReferenceFiles.filter(f => f.name !== file.name);
+                    loadedReferenceFiles.push({
+                        name: file.name,
+                        ext: file.name.split('.').pop().toLowerCase(),
+                        contentLength: result.content.length,
+                        content: result.content 
+                    });
+                } catch (err) {
+                    console.error("Errore elaborazione file:", file.name, err);
+                }
+            }
+
+            localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+            event.target.value = '';
+
+            if (statusDiv) {
+                statusDiv.className = "text-[11px] font-semibold text-emerald-700";
+                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> ${files.length} file acquisiti! Copertura equa garantita.`;
+            }
+
+            renderLoadedFilesList();
+            updateUIConfigDisplays();
+        }
+
+        function processSingleFile(file) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            return new Promise((resolve, reject) => {
+                if (ext === 'pdf') {
+                    file.arrayBuffer().then(buf => extractTextFromPDF(buf))
+                        .then(text => resolve({ content: text })).catch(reject);
+                } else if (ext === 'docx' || ext === 'doc') {
+                    file.arrayBuffer().then(buf => extractTextFromWord(buf))
+                        .then(text => resolve({ content: text })).catch(reject);
+                } else if (ext === 'pptx' || ext === 'ppt') {
+                    file.arrayBuffer().then(buf => extractTextFromPPTX(buf))
+                        .then(text => resolve({ content: text })).catch(reject);
+                } else if (ext === 'xlsx' || ext === 'xls') {
+                    file.arrayBuffer().then(buf => extractTextFromExcel(buf))
+                        .then(text => resolve({ content: text })).catch(reject);
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) { resolve({ content: e.target.result }); };
+                    reader.onerror = reject;
+                    reader.readAsText(file);
+                }
+            });
+        }
+
+        function extractTextFromWord(arrayBuffer) {
+            if (typeof mammoth === 'undefined') {
+                return Promise.reject(new Error("Libreria Word (mammoth) non disponibile."));
+            }
+            return mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+                .then(result => result.value)
+                .catch(err => {
+                    console.error("Errore lettura Word:", err);
+                    return ""; 
+                });
+        }
+
+        function extractTextFromPDF(arrayBuffer) {
+            if (typeof pdfjsLib === 'undefined') {
+                return Promise.reject(new Error("Libreria PDF non disponibile"));
+            }
+            return pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(pdf => {
+                const pagePromises = [];
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    pagePromises.push(
+                        pdf.getPage(i).then(page => 
+                            page.getTextContent().then(tc => tc.items.map(it => it.str).join(" "))
+                        )
+                    );
+                }
+                return Promise.all(pagePromises).then(pages => pages.join("\n\n"));
+            });
+        }
+
+        function extractTextFromPPTX(arrayBuffer) {
+            if (typeof JSZip === 'undefined') {
+                return Promise.reject(new Error("Libreria JSZip non disponibile"));
+            }
+            return JSZip.loadAsync(arrayBuffer).then(zip => {
+                const slideFiles = Object.keys(zip.files).filter(f => f.startsWith("ppt/slides/slide") && f.endsWith(".xml"));
+                slideFiles.sort((a, b) => {
+                    const nA = parseInt((a.match(/\d+/) || [0])[0], 10);
+                    const nB = parseInt((b.match(/\d+/) || [0])[0], 10);
+                    return nA - nB;
+                });
+                const promises = slideFiles.map(file => zip.files[file].async("string").then(xml => {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xml, "text/xml");
+                    const nodes = xmlDoc.getElementsByTagName("a:t");
+                    let txt = [];
+                    for (let j = 0; j < nodes.length; j++) {
+                        const val = nodes[j].textContent.trim();
+                        if (val) txt.push(val);
+                    }
+                    return txt.join(" ");
+                }));
+                return Promise.all(promises).then(slides => slides.join("\n\n"));
+            });
+        }
+
+        function extractTextFromExcel(arrayBuffer) {
+            if (typeof XLSX === 'undefined') {
+                return Promise.reject(new Error("Libreria Excel non disponibile"));
+            }
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            let combinedText = [];
+            workbook.SheetNames.forEach(sheetName => {
+                const sheet = workbook.Sheets[sheetName];
+                const csvData = XLSX.utils.sheet_to_csv(sheet);
+                combinedText.push(csvData);
+            });
+            return Promise.resolve(combinedText.join("\n\n"));
+        }
+
+        function renderLoadedFilesList() {
+            const container = document.getElementById('loadedFilesContainer');
+            const list = document.getElementById('loadedFilesList');
+            const badge = document.getElementById('loadedFilesCountBadge');
+
+            if (!container || !list) return;
+
+            if (loadedReferenceFiles.length === 0) {
+                container.classList.add('hidden');
+                list.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            if (badge) badge.textContent = loadedReferenceFiles.length;
+            list.innerHTML = '';
+
+            loadedReferenceFiles.forEach((fileItem, idx) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200 text-xs shadow-sm hover:border-indigo-300 transition";
+                
+                let iconClass = "fa-file-lines text-slate-500";
+                if (fileItem.ext === 'pdf') iconClass = "fa-file-pdf text-rose-500";
+                else if (fileItem.ext === 'docx' || fileItem.ext === 'doc') iconClass = "fa-file-word text-blue-600";
+                else if (fileItem.ext === 'pptx' || fileItem.ext === 'ppt') iconClass = "fa-file-powerpoint text-orange-500";
+                else if (fileItem.ext === 'xlsx' || fileItem.ext === 'xls' || fileItem.ext === 'csv') iconClass = "fa-file-excel text-emerald-600";
+                else if (fileItem.ext === 'json') iconClass = "fa-file-code text-indigo-500";
+
+                itemDiv.innerHTML = `
+                    <div class="flex items-center gap-2 truncate max-w-[80%]">
+                        <i class="fa-solid ${iconClass} text-sm shrink-0"></i>
+                        <span class="font-bold text-slate-800 truncate" title="${fileItem.name}">${fileItem.name}</span>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
+                            Testo elaborato
+                        </span>
+                    </div>
+                    <button onclick="removeReferenceFile(${idx})" class="text-rose-500 hover:text-rose-700 p-1 rounded hover:bg-rose-50 cursor-pointer" title="Rimuovi questo file">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                list.appendChild(itemDiv);
+            });
+        }
+
+        function removeReferenceFile(index) {
+            loadedReferenceFiles.splice(index, 1);
+            localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+            renderLoadedFilesList();
+            updateUIConfigDisplays();
+        }
+
+        function clearAllReferenceFiles() {
+            loadedReferenceFiles = [];
+            localStorage.removeItem('PHYSICS_LOADED_FILES_LIST');
+            renderLoadedFilesList();
+            updateUIConfigDisplays();
+        }
+
+        function checkDeadlineStatus() {
+            const deadlineVal = localStorage.getItem('PHYSICS_DEADLINE_TIME');
+            const banner = document.getElementById('deadlineNoticeBanner');
+            const noticeText = document.getElementById('deadlineNoticeText');
+            const startBtn = document.getElementById('startQuizBtn');
+            const timerChoiceBox = document.getElementById('studentTimerChoiceBox');
+
+            if (!deadlineVal) {
+                if (banner) banner.classList.add('hidden');
+                if (startBtn) { startBtn.disabled = false; startBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if (timerChoiceBox) timerChoiceBox.classList.remove('hidden');
+                return false;
+            }
+
+            const deadlineDate = new Date(deadlineVal);
+            const now = new Date();
+
+            if (now > deadlineDate) {
+                if (banner && noticeText) {
+                    noticeText.textContent = `La prova è scaduta il ${deadlineDate.toLocaleString('it-IT')}. Non è più possibile avviarla.`;
+                    banner.classList.remove('hidden');
+                }
+                if (startBtn) {
+                    startBtn.disabled = true;
+                    startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+                if (timerChoiceBox) timerChoiceBox.classList.add('hidden');
+                return true;
+            } else {
+                if (banner) banner.classList.add('hidden');
+                if (startBtn) { startBtn.disabled = false; startBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if (timerChoiceBox) timerChoiceBox.classList.remove('hidden');
+                return false;
+            }
+        }
+
+        function updateUIConfigDisplays() {
+            const countDisplay = document.getElementById('activeQuestionCountDisplay');
+            const timerDisplay = document.getElementById('activeTimerModeDisplay');
+            const countInput = document.getElementById('teacherQuestionCountInput');
+            const timerSelect = document.getElementById('teacherTimerModeSelect');
+            const groundingBadge = document.getElementById('groundingSourceBadge');
+            const deadlineInput = document.getElementById('teacherDeadlineInput');
+
+            const savedCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '0', 10);
+            const savedTimer = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
+            const savedDeadline = localStorage.getItem('PHYSICS_DEADLINE_TIME') || '';
+
+            if (countDisplay) {
+                countDisplay.textContent = savedCount > 0 ? `${savedCount} Quesiti configurati` : "10 Quesiti (Predefinito)";
+            }
+            if (countInput) {
+                countInput.value = savedCount > 0 ? savedCount : '';
+            }
+
+            if (timerDisplay) {
+                if (savedTimer === 'unlimited') {
+                    timerDisplay.textContent = "Tempo Illimitato";
+                    timerDisplay.className = "text-xs font-bold text-amber-600 block truncate";
+                } else {
+                    timerDisplay.textContent = "Attivo";
+                    timerDisplay.className = "text-xs font-bold text-indigo-600 block truncate";
+                }
+            }
+            if (timerSelect) {
+                timerSelect.value = savedTimer;
+            }
+
+            if (deadlineInput) {
+                deadlineInput.value = savedDeadline;
+            }
+
+            const directivesArea = document.getElementById('teacherPromptDirectives');
+            if (directivesArea) {
+                directivesArea.value = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
+            }
+
+            const statusBadge = document.getElementById('referenceSourceBadgeStatus');
+            if (statusBadge) {
+                if (loadedReferenceFiles.length > 0) {
+                    statusBadge.innerHTML = `<span class="text-indigo-700 font-bold"><i class="fa-solid fa-brain mr-1"></i> ${loadedReferenceFiles.length} file forniti. Copertura equa attiva.</span>`;
+                    if (groundingBadge) groundingBadge.textContent = `${loadedReferenceFiles.length} File caricati`;
+                } else {
+                    statusBadge.textContent = "Generazione dinamica (basata sull'argomento)";
+                    if (groundingBadge) groundingBadge.textContent = "Generazione Dinamica";
+                }
+            }
+
+            checkDeadlineStatus();
+        }
+
+        function saveTeacherDirectives() {
+            const val = document.getElementById('teacherPromptDirectives').value;
+            localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', val);
+        }
+
+        function applyFileAndDirectives() {
+            saveTeacherDirectives();
+            let msg = "Configurazione salvata con successo!";
+            if (loadedReferenceFiles.length > 0) {
+                msg += `\n• La verifica genererà domande distribuendole equamente tra i ${loadedReferenceFiles.length} file forniti.`;
+            } else {
+                msg += `\n• Nessun file caricato: la prova verrà generata usando conoscenze standard relative all'argomento impostato.`;
+            }
+            
+            const deadlineVal = document.getElementById('teacherDeadlineInput').value;
+            localStorage.setItem('PHYSICS_DEADLINE_TIME', deadlineVal);
+
+            alert(msg);
+            updateUIConfigDisplays();
+        }
+
+        function saveTeacherSettings() {
+            const countInput = document.getElementById('teacherQuestionCountInput');
+            const countVal = countInput ? (parseInt(countInput.value, 10) || 0) : 0;
+            const timerSelect = document.getElementById('teacherTimerModeSelect');
+            const timerVal = timerSelect ? timerSelect.value : 'standard';
+            const ratioSelect = document.getElementById('teacherCalcRatioSelect');
+            const ratioVal = ratioSelect ? ratioSelect.value : '0.4';
+
+            const subjInput = document.getElementById('teacherSubjectInput');
+            const topInput = document.getElementById('teacherTopicInput');
+            const subtInput = document.getElementById('teacherSubtopicsInput');
+            const deadlineInput = document.getElementById('teacherDeadlineInput');
+            
+            if (subjInput) localStorage.setItem('QUIZ_SUBJECT', subjInput.value.trim() || "Fisica");
+            if (topInput) localStorage.setItem('QUIZ_TOPIC', topInput.value.trim() || "Quantità di moto");
+            if (subtInput) localStorage.setItem('QUIZ_SUBTOPICS', subtInput.value.trim());
+            if (deadlineInput) localStorage.setItem('PHYSICS_DEADLINE_TIME', deadlineInput.value);
+
+            localStorage.setItem('PHYSICS_CALC_RATIO', ratioVal);
+            localStorage.setItem('PHYSICS_QUESTIONS_COUNT', countVal);
+            localStorage.setItem('PHYSICS_TIMER_MODE', timerVal);
+            
+            applyDynamicText();
+            updateUIConfigDisplays();
+        }
+
+        async function startSelectedQuiz() {
+            if (checkDeadlineStatus()) {
+                alert("Impossibile avviare la prova: la scadenza temporale è stata superata.");
+                return;
+            }
+
+            studentName = document.getElementById('studentNameInput').value.trim();
+            const errDiv = document.getElementById('nameErrorMsg');
+            
+            if (!studentName) {
+                errDiv.classList.remove('hidden');
+                return;
+            }
+            errDiv.classList.add('hidden');
+
+            const disableTimerChecked = document.getElementById('studentDisableTimerCheck').checked;
+            const teacherTimerSetting = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
+            isUnlimitedTime = disableTimerChecked || (teacherTimerSetting === 'unlimited');
+
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+
+            try {
+                const subject = localStorage.getItem('QUIZ_SUBJECT') || "Fisica";
+                const topic = localStorage.getItem('QUIZ_TOPIC') || "Quantità di moto";
+                const subtopics = localStorage.getItem('QUIZ_SUBTOPICS') || "Impulso, Urti e Conservazione";
+                const directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || "";
+                const calcRatio = parseFloat(localStorage.getItem('PHYSICS_CALC_RATIO') || '0.4');
+                
+                let textContext = loadedReferenceFiles.map(f => f.content).join("\n\n");
+                let targetCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '0', 10);
+                if (targetCount === 0 || targetCount > 20) targetCount = 10;
+
+                let generatedPool = await generateQuestionsWithLLM(textContext, subject, topic, subtopics, directives, targetCount + 2, calcRatio);
+                
+                let pool = generatedPool.slice(0, targetCount);
+                spareQuestions = generatedPool.slice(targetCount);
+
+                activeQuestions = pool.map(q => {
+                    const correctStr = q.options[q.correctIndex];
+                    const mixedOpts = shuffleArray([...q.options]);
+                    return {
+                        question: q.question,
+                        options: mixedOpts,
+                        correctIndex: mixedOpts.indexOf(correctStr),
+                        isCalculation: Boolean(q.isCalculation)
+                    };
+                });
+
+                studentAnswers = new Array(activeQuestions.length).fill(null);
+                currentQuestionIndex = 0;
+                isJollyUsed = false;
+                isProcessingAdvance = false;
+
+                exitCount = 0;
+                lastExitTimestamp = 0;
+                isQuizActive = true;
+                quizStartTime = new Date();
+
+                dismissExitAlert();
+                const liveMonitor = document.getElementById('liveExitsMonitorBadge');
+                if (liveMonitor) liveMonitor.classList.add('hidden');
+
+                document.getElementById('screenStart').classList.add('hidden');
+                document.getElementById('screenQuiz').classList.remove('hidden');
+
+                renderCurrentQuestion();
+            } catch (err) {
+                console.error("Errore Generazione:", err);
+                alert("Si è verificato un errore durante la generazione della prova. Verifica la connessione e riprova. Dettaglio: " + err.message);
+            } finally {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }
+        }
+
+        function renderCurrentQuestion() {
+            isProcessingAdvance = false;
+            currentSelectedOption = null;
+            const q = activeQuestions[currentQuestionIndex];
+
+            document.getElementById('questionCounterText').textContent = `Quesito ${currentQuestionIndex + 1} di ${activeQuestions.length}`;
+            const pct = (currentQuestionIndex / activeQuestions.length) * 100;
+            document.getElementById('progressBarFill').style.width = `${pct}%`;
+
+            const badge = document.getElementById('calcTypeBadge');
+            if (badge) {
+                if (q.isCalculation) {
+                    badge.textContent = "🧮 Calcolo / Problema (150s)";
+                    badge.className = "px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-indigo-100 text-indigo-900 border border-indigo-200";
+                } else {
+                    badge.textContent = "📖 Teoria e Principi (60s)";
+                    badge.className = "px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-slate-100 text-slate-700 border border-slate-200";
+                }
+            }
+
+            const jollyBtn = document.getElementById('jollyBtn');
+            if (jollyBtn) {
+                if (isJollyUsed) {
+                    jollyBtn.disabled = true;
+                    jollyBtn.className = "px-3 py-1 bg-slate-200 text-slate-400 border border-slate-300 font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-not-allowed";
+                    jollyBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jolly Usato</span>`;
+                } else {
+                    jollyBtn.disabled = false;
+                    jollyBtn.className = "px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer";
+                    jollyBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Usa Jolly 🃏</span>`;
+                }
+            }
+
+            const qContainer = document.getElementById('questionContainer');
+            qContainer.innerHTML = q.question;
+            renderMathInTarget(qContainer);
+
+            const optsContainer = document.getElementById('optionsContainer');
+            optsContainer.innerHTML = '';
+
+            q.options.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-card-btn";
+                btn.onclick = () => handleOptionClick(index, btn);
+
+                const marker = String.fromCharCode(65 + index);
+                btn.innerHTML = `
+                    <div class="option-badge">${marker}</div>
+                    <div class="flex-grow text-sm sm:text-base font-medium leading-relaxed">${optText}</div>
+                `;
+                optsContainer.appendChild(btn);
+            });
+
+            renderMathInTarget(optsContainer);
+            startQuestionTimer();
+        }
+
+        function handleOptionClick(optionIndex, btnElement) {
+            if (isProcessingAdvance) return;
+
+            if (currentSelectedOption === optionIndex) {
+                // Secondo Clic sulla stessa opzione: Conferma e Avanza
+                isProcessingAdvance = true;
+                stopQuestionTimer();
+
+                studentAnswers[currentQuestionIndex] = optionIndex;
+
+                const allBtns = document.querySelectorAll('#optionsContainer button');
+                allBtns.forEach(b => b.disabled = true);
+
+                setTimeout(() => {
+                    if (currentQuestionIndex < activeQuestions.length - 1) {
+                        currentQuestionIndex++;
+                        renderCurrentQuestion();
+                    } else {
+                        finishQuiz();
+                    }
+                }, 250);
+            } else {
+                // Primo Clic: Seleziona l'opzione colorandola di ciano
+                currentSelectedOption = optionIndex;
+                const allBtns = document.querySelectorAll('#optionsContainer button');
+                allBtns.forEach(b => b.classList.remove('selected-state'));
+                btnElement.classList.add('selected-state');
+            }
+        }
+
+        function confirmEarlyExit() {
+            document.getElementById('earlyExitModal').classList.remove('hidden');
+        }
+
+        function closeEarlyExitModal() {
+            document.getElementById('earlyExitModal').classList.add('hidden');
+        }
+
+        function executeEarlyExit() {
+            closeEarlyExitModal();
+            finishQuiz();
+        }
+
+        function stopQuestionTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function startQuestionTimer() {
+            stopQuestionTimer();
+
+            if (isUnlimitedTime) {
+                updateTimerDisplay();
+                return;
+            }
+
+            const q = activeQuestions[currentQuestionIndex];
+            currentQuestionMaxTime = q.isCalculation ? QUIZ_SETTINGS.timeCalculationSec : QUIZ_SETTINGS.timeStandardSec;
+            currentQuestionTimeLeft = currentQuestionMaxTime;
+
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                currentQuestionTimeLeft--;
+                updateTimerDisplay();
+
+                if (currentQuestionTimeLeft <= 0) {
+                    stopQuestionTimer();
+                    if (currentQuestionIndex < activeQuestions.length - 1) {
+                        currentQuestionIndex++;
+                        renderCurrentQuestion();
+                    } else {
+                        finishQuiz();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerText = document.getElementById('timerCountdown');
+            const timerBadge = document.getElementById('questionTimerDisplay');
+            const timeBarFill = document.getElementById('timeProgressBarFill');
+
+            if (isUnlimitedTime) {
+                if (timerText) timerText.textContent = "Illimitato";
+                if (timerBadge) {
+                    timerBadge.className = "px-3 py-1 bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm";
+                }
+                if (timeBarFill) {
+                    timeBarFill.style.width = "100%";
+                    timeBarFill.className = "bg-emerald-500 h-1.5 rounded-full";
+                }
+                return;
+            }
+
+            if (timerText) timerText.textContent = `${currentQuestionTimeLeft}s`;
+
+            const pct = Math.max(0, (currentQuestionTimeLeft / currentQuestionMaxTime) * 100);
+            if (timeBarFill) timeBarFill.style.width = `${pct}%`;
+
+            if (currentQuestionTimeLeft <= 15) {
+                if (timerBadge) {
+                    timerBadge.className = "px-3 py-1 bg-rose-100 text-rose-900 border border-rose-400 font-mono font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-sm timer-alert";
+                }
+                if (timeBarFill) timeBarFill.className = "bg-rose-600 h-1.5 rounded-full transition-all duration-1000";
+            } else {
+                if (timerBadge) {
+                    timerBadge.className = "px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 font-mono font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-sm";
+                }
+                if (timeBarFill) timeBarFill.className = "bg-amber-500 h-1.5 rounded-full transition-all duration-1000";
+            }
+        }
+
+        function useJolly() {
+            if (isJollyUsed || isProcessingAdvance) return;
+
+            const currentQIsCalc = activeQuestions[currentQuestionIndex].isCalculation;
+            
+            let suitableSpareIndex = spareQuestions.findIndex(q => Boolean(q.isCalculation) === currentQIsCalc);
+            if (suitableSpareIndex === -1) suitableSpareIndex = 0; 
+
+            if (spareQuestions.length === 0) {
+                alert("Jolly non disponibile: il sistema non ha trovato domande di riserva alternative.");
+                return;
+            }
+
+            let newQ = spareQuestions.splice(suitableSpareIndex, 1)[0]; 
+            const correctStr = newQ.options[newQ.correctIndex];
+            const mixedOpts = shuffleArray([...newQ.options]);
+
+            activeQuestions[currentQuestionIndex] = {
+                question: newQ.question,
+                options: mixedOpts,
+                correctIndex: mixedOpts.indexOf(correctStr),
+                isCalculation: Boolean(newQ.isCalculation)
+            };
+            studentAnswers[currentQuestionIndex] = null;
+            isJollyUsed = true;
+
+            renderCurrentQuestion();
+        }
+
+        function finishQuiz() {
+            isQuizActive = false;
+            stopQuestionTimer();
+
+            const endTime = new Date();
+            const diffSec = Math.floor((endTime - quizStartTime) / 1000);
+            const minutes = Math.floor(diffSec / 60).toString().padStart(2, '0');
+            const seconds = (diffSec % 60).toString().padStart(2, '0');
+
+            let correct = 0, wrong = 0, skipped = 0;
+            activeQuestions.forEach((q, idx) => {
+                const ans = studentAnswers[idx];
+                if (ans === null) skipped++;
+                else if (ans === q.correctIndex) correct++;
+                else wrong++;
+            });
+
+            const accuracy = Math.round((correct / activeQuestions.length) * 100);
+
+            document.getElementById('completedPseudonym').textContent = studentName;
+            document.getElementById('resCorrect').textContent = correct;
+            document.getElementById('resWrong').textContent = wrong;
+            document.getElementById('resSkipped').textContent = skipped;
+            document.getElementById('resAccuracy').textContent = `${accuracy}%`;
+            document.getElementById('resTotalScoreText').textContent = `${correct} esatte su ${activeQuestions.length} quesiti somministrati`;
+            document.getElementById('completionTimeDisplay').textContent = `Durata: ${minutes}:${seconds}`;
+
+            const resTimerMode = document.getElementById('resTimerModeDisplay');
+            if (resTimerMode) {
+                resTimerMode.textContent = isUnlimitedTime ? "Timer: Disattivato" : "Timer: Standard (60s / 150s)";
+            }
+
+            const vigBox = document.getElementById('vigilanceReportBox');
+            const vigIcon = document.getElementById('vigilanceReportIcon');
+            const vigTitle = document.getElementById('vigilanceReportTitle');
+            const vigSubtitle = document.getElementById('vigilanceReportSubtitle');
+            const vigBadge = document.getElementById('vigilanceReportBadge');
+
+            if (vigBox && vigBadge) {
+                if (exitCount === 0) {
+                    vigBox.className = "p-3.5 rounded-xl border flex items-center justify-between text-xs text-left bg-emerald-50 border-emerald-200";
+                    if (vigIcon) vigIcon.className = "fa-solid fa-shield-halved text-emerald-600 text-lg";
+                    if (vigTitle) { vigTitle.textContent = "Integrità Sessione: Regolare"; vigTitle.className = "block font-bold text-emerald-900"; }
+                    if (vigSubtitle) { vigSubtitle.textContent = "Nessuna uscita dalla schermata della prova rilevata durante il test."; vigSubtitle.className = "text-emerald-700"; }
+                    vigBadge.className = "px-2.5 py-1 rounded-lg text-xs font-black bg-emerald-200 text-emerald-900";
+                    vigBadge.textContent = "0 uscite";
+                } else {
+                    vigBox.className = "p-3.5 rounded-xl border flex items-center justify-between text-xs text-left bg-rose-50 border-rose-300";
+                    if (vigIcon) vigIcon.className = "fa-solid fa-triangle-exclamation text-rose-600 text-lg";
+                    if (vigTitle) { vigTitle.textContent = "Avviso Vigilanza: Rilevate Uscite dalla Scheda"; vigTitle.className = "block font-bold text-rose-950"; }
+                    if (vigSubtitle) { vigSubtitle.textContent = `Lo studente è uscito dalla prova ${exitCount} volt${exitCount === 1 ? 'a' : 'e'}. Evento registrato nel verbale docente.`; vigSubtitle.className = "text-rose-800"; }
+                    vigBadge.className = "px-2.5 py-1 rounded-lg text-xs font-black bg-rose-600 text-white shadow-sm";
+                    vigBadge.textContent = `${exitCount} uscit${exitCount === 1 ? 'a' : 'e'}`;
+                }
+            }
+
+            saveResultRecord(correct, accuracy, isUnlimitedTime, exitCount);
+
+            document.getElementById('screenQuiz').classList.add('hidden');
+            document.getElementById('progressBarFill').style.width = '100%';
+            document.getElementById('screenCompleted').classList.remove('hidden');
+        }
+
+        function saveResultRecord(correct, accuracy, timerDisabled, exits) {
+            let history = JSON.parse(localStorage.getItem(QUIZ_SETTINGS.storageKey) || "[]");
+            const record = {
+                date: new Date().toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                student: studentName,
+                score: `${correct}/${activeQuestions.length}`,
+                accuracy: `${accuracy}%`,
+                timerMode: timerDisabled ? "Disattivato" : "Attivo",
+                exits: exits
+            };
+
+            history.unshift(record);
+            localStorage.setItem(QUIZ_SETTINGS.storageKey, JSON.stringify(history));
+
+            if (QUIZ_SETTINGS.googleSheetUrl) {
+                fetch(QUIZ_SETTINGS.googleSheetUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(record)
+                }).catch(err => console.debug("Google Sheets sync note:", err));
+            }
+        }
+
+        function restartQuiz() {
+            isQuizActive = false;
+            stopQuestionTimer();
+            dismissExitAlert();
+            document.getElementById('screenCompleted').classList.add('hidden');
+            document.getElementById('screenStart').classList.remove('hidden');
+            document.getElementById('progressBarFill').style.width = '0%';
+            document.getElementById('nameErrorMsg').classList.add('hidden');
+            checkDeadlineStatus();
+        }
+
+        function openTeacherModal() {
+            document.getElementById('teacherModal').classList.remove('hidden');
+            document.getElementById('teacherAuthSection').classList.remove('hidden');
+            document.getElementById('teacherDashboardSection').classList.add('hidden');
+            document.getElementById('teacherPinInput').value = '';
+            document.getElementById('teacherAuthError').classList.add('hidden');
+            document.getElementById('sheetUrlSetting').value = QUIZ_SETTINGS.googleSheetUrl;
+
+            renderLoadedFilesList();
+            updateUIConfigDisplays();
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacherModal').classList.add('hidden');
+        }
+
+        function verifyTeacherPin() {
+            const pin = document.getElementById('teacherPinInput').value;
+            if (pin === QUIZ_SETTINGS.teacherPin) {
+                document.getElementById('teacherAuthSection').classList.add('hidden');
+                document.getElementById('teacherDashboardSection').classList.remove('hidden');
+                renderLoadedFilesList();
+                loadTeacherTable();
+            } else {
+                document.getElementById('teacherAuthError').classList.remove('hidden');
+            }
+        }
+
+        function saveSheetUrlSetting() {
+            const val = document.getElementById('sheetUrlSetting').value.trim();
+            localStorage.setItem('PHYSICS_SHEET_URL', val);
+            QUIZ_SETTINGS.googleSheetUrl = val;
+            const btn = document.getElementById('sheetSaveBtn');
+            btn.textContent = "Salvato ✓";
+            setTimeout(() => { btn.textContent = "Salva"; }, 1500);
+        }
+
+        function loadTeacherTable() {
+            const tbody = document.getElementById('teacherTableBody');
+            tbody.innerHTML = '';
+            let history = JSON.parse(localStorage.getItem(QUIZ_SETTINGS.storageKey) || "[]");
+
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-500 italic">Nessun esito presente nel registro.</td></tr>`;
+                return;
+            }
+
+            history.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                const timerBadge = row.timerMode === "Disattivato"
+                    ? `<span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold">Disattivato</span>`
+                    : `<span class="bg-indigo-100 text-indigo-900 px-2 py-0.5 rounded text-[10px] font-bold">Attivo</span>`;
+
+                const exitsVal = row.exits !== undefined ? row.exits : 0;
+                const exitBadge = exitsVal > 0 
+                    ? `<span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[10px] border border-rose-300">${exitsVal} uscit${exitsVal === 1 ? 'a' : 'e'}</span>`
+                    : `<span class="text-emerald-700 font-mono text-[11px] font-bold">0</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-2.5 border-r border-slate-100 whitespace-nowrap text-slate-500">${row.date}</td>
+                    <td class="p-2.5 border-r border-slate-100 font-bold text-slate-800">${row.student}</td>
+                    <td class="p-2.5 border-r border-slate-100 font-bold text-slate-800">${row.score}</td>
+                    <td class="p-2.5 border-r border-slate-100 text-indigo-600 font-bold">${row.accuracy}</td>
+                    <td class="p-2.5 border-r border-slate-100">${timerBadge}</td>
+                    <td class="p-2.5">${exitBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function promptClearHistory() {
+            localStorage.removeItem(QUIZ_SETTINGS.storageKey);
+            loadTeacherTable();
+        }
+
+        function applyDynamicText() {
+            const subject = localStorage.getItem('QUIZ_SUBJECT') || "Fisica";
+            const topic = localStorage.getItem('QUIZ_TOPIC') || "Quantità di moto";
+            const subtopics = localStorage.getItem('QUIZ_SUBTOPICS') || "Impulso, Urti e Conservazione";
+
+            const headerTopic = document.getElementById('headerSubjectTopic');
+            if (headerTopic) headerTopic.textContent = `Verifica di ${subject} Liceo`;
+
+            const headerSub = document.getElementById('headerSubtopics');
+            if (headerSub) headerSub.textContent = subtopics;
+
+            const startTopic = document.getElementById('startScreenTopic');
+            if (startTopic) startTopic.textContent = topic;
+
+            const teacherSubjInput = document.getElementById('teacherSubjectInput');
+            if (teacherSubjInput && !teacherSubjInput.value) teacherSubjInput.value = subject !== "Fisica" ? subject : "";
+
+            const teacherTopicInput = document.getElementById('teacherTopicInput');
+            if (teacherTopicInput && !teacherTopicInput.value) teacherTopicInput.value = topic !== "Quantità di moto" ? topic : "";
+            
+            const teacherSubtInput = document.getElementById('teacherSubtopicsInput');
+            if (teacherSubtInput && !teacherSubtInput.value) teacherSubtInput.value = subtopics !== "Impulso, Urti e Conservazione" ? subtopics : "";
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            applyDynamicText();
+            renderLoadedFilesList();
+            updateUIConfigDisplays();
+        });
+    </script>
+</body>
+</html>
