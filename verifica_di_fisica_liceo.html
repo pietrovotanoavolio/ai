@@ -159,7 +159,7 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Origine Quesiti</span>
-                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">Materiale / Indicazioni</strong>
+                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">Materiale / Master</strong>
                     </div>
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">N. Quesiti</span>
@@ -477,7 +477,7 @@
                             Carica File di Riferimento (PDF, DOC, DOCX, PPT, PPTX, XLSX, TXT)
                         </label>
                         <p class="text-[11px] text-slate-500">
-                            I file e le indicazioni inseriti qui verranno salvati come configurazione master per tutti gli studenti che apriranno il link.
+                            I file e le indicazioni inseriti qui possono essere salvati come configurazione master.
                         </p>
                         
                         <input type="file" id="referenceFileInput" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xlsx,.xls,.txt,.md" onchange="handleTextReferenceFiles(event)"
@@ -504,7 +504,7 @@
                     <div class="bg-indigo-50/80 p-3 rounded-lg border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-2">
                         <div class="text-[11px] text-indigo-950 font-medium">
                             <strong class="block font-bold"><i class="fa-solid fa-globe text-indigo-600 mr-1"></i> Sincronizzazione Master Globale:</strong>
-                            Esporta il file di configurazione master (`master_config.json`) da ricaricare o inviare agli studenti per allineare istantaneamente tutti i PC.
+                            Esporta il file di configurazione master (`master_config.json`) da ricaricare o incollare nel preset del sito web.
                         </div>
                         <div class="flex gap-2 shrink-0">
                             <button onclick="exportTeacherConfig()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow transition cursor-pointer">
@@ -577,13 +577,17 @@
 
     <script>
         const QUIZ_SETTINGS = {
-            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V6',
-            masterStorageKey: 'LICEO_FISICA_MASTER_CONFIG_V1',
+            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V7',
+            masterStorageKey: 'LICEO_FISICA_MASTER_CONFIG_V2',
             teacherPin: '3548',
             googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw6H3XF7Cg_a5cKqX7h8K9z7mX6Cg_a5cKqX7h8K9z7mX6Cg/exec',
             timeStandardSec: 60,
             timeCalculationSec: 150
         };
+
+        // PRESET MASTER INTEGRATO: Se vuoi pre-caricare i file o le indicazioni direttamente sul sito web per tutti gli studenti,
+        // puoi incollare qui l'oggetto JSON del tuo master tra le parentesi graffe { ... } al posto di null.
+        const EMBEDDED_MASTER_PRESET = null; 
 
         if (typeof pdfjsLib !== 'undefined') {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -612,6 +616,10 @@
 
         function loadMasterConfig() {
             try {
+                if (EMBEDDED_MASTER_PRESET && !localStorage.getItem(QUIZ_SETTINGS.masterStorageKey)) {
+                    localStorage.setItem(QUIZ_SETTINGS.masterStorageKey, JSON.stringify(EMBEDDED_MASTER_PRESET));
+                }
+
                 const rawMaster = localStorage.getItem(QUIZ_SETTINGS.masterStorageKey);
                 if (rawMaster) {
                     const parsed = JSON.parse(rawMaster);
@@ -960,7 +968,7 @@
             if (directivesArea) directivesArea.value = savedDirectives;
 
             if (startSource) {
-                let topicLabel = "Materiale / Indicazioni";
+                let topicLabel = "Materiale / Master";
                 const combined = (loadedReferenceFiles.map(f => f.text).join(" ") + " " + savedDirectives).toLowerCase();
                 if (combined.includes('elettr') || combined.includes('coulomb') || combined.includes('campo') || combined.includes('carich')) {
                     topicLabel = "Elettrostatica";
@@ -1037,7 +1045,7 @@
                     },
                     {
                         question: `Per quale motivo nelle zone a minor raggio di curvatura di un conduttore (punte) il campo elettrico è massimo?`,
-                        options: [`Perché vi si concentra la maggiore densità superficiale di carica $\\sigma$`, `Perché la massa degli elettroni aumenta`, `Perché il potenziale si annulla`, `Perché la costante dielettrica raddoppia`],
+                        options: [`Perché vi si concentra la maggiore densità superficiale di carica $\\sigma$`, `Perché la massa degli elettroni aumenta`, `Perché il potenziale si azzera`, `Perché la costante dielettrica raddoppia`],
                         correctIndex: 0, isCalculation: false
                     },
                     {
@@ -1528,7 +1536,7 @@
                 renderLoadedFilesList();
                 loadTeacherTable();
             } else {
-                document.getElementById('teacherAuthError').classList.remove('hidden');
+                document.getElementById('teacherAuthError').classList.add('hidden');
             }
         }
 
