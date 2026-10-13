@@ -377,7 +377,7 @@
         <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center text-white px-4">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-indigo-400 mb-4"></i>
             <h3 class="text-xl font-bold mb-2 text-center">Generazione Quesiti in Corso...</h3>
-            <p class="text-slate-300 text-sm text-center max-w-md">Il sistema sta preparando i quesiti randomizzati basandosi rigorosamente sui file e sulle indicazioni caricate. Attendi qualche istante.</p>
+            <p class="text-slate-300 text-sm text-center max-w-md">Il sistema sta preparando i quesiti basandosi rigorosamente sui file e sulle indicazioni caricate. Attendi qualche istante.</p>
         </div>
 
         <!-- MODALE CONFERMA TERMINA PROVA -->
@@ -560,7 +560,7 @@
 
     <script>
         const QUIZ_SETTINGS = {
-            storageKey: 'LICEO_FISICA_ESITI_GENERAL',
+            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V2',
             teacherPin: '3548',
             googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw6H3XF7Cg_a5cKqX7h8K9z7mX6Cg_a5cKqX7h8K9z7mX6Cg/exec',
             timeStandardSec: 60,
@@ -906,12 +906,12 @@
             const apiKey = "";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
-            const systemPrompt = "Sei un docente di fisica di liceo scientifico severo ed esperto. Il tuo compito è generare quesiti a risposta multipla rigorosi e impeccabili basati ESCLUSIVAMENTE sugli argomenti, le formule, le definizioni e i contesti forniti nei file di riferimento o nelle indicazioni del docente.";
+            const systemPrompt = "Sei un docente di fisica di liceo scientifico severo ed esperto. Il tuo compito è generare quesiti a risposta multipla rigorosi e impeccabili basati ESCLUSIVAMENTE e STRETTAMENTE sugli argomenti, le formule e i contesti forniti nei file di riferimento o nelle indicazioni del docente.";
             
             const userQuery = `Genera esattamente ${count} quesiti originali e inediti di fisica per una verifica scolastica.
             
             REGOLE RIGOROSE:
-            1. UTILIZZA SOLO E SOLTANTO GLI ARGOMENTI, LE LEGGI E I TERMINI PRESENTI NEL SEGUENTE MATERIALE E NELLE INDICAZIONI DEL DOCENTE. NON USARE ARGOMENTI ESTERNI (es. se i file parlano di elettrostatica, genera SOLO su elettrostatica; se parlano di termodinamica, genera SOLO su termodinamica):
+            1. UTILIZZA ESCLUSIVAMENTE GLI ARGOMENTI, LE LEGGI E I TERMINI PRESENTI NEL SEGUENTE MATERIALE E NELLE INDICAZIONI DEL DOCENTE. SE IL MATERIALE PARLA DI ELETTROSTATICA, GENERA SOLO SU ELETTROSTATICA. SE PARLA DI TERMODINAMICA, GENERA SOLO SU TERMODINAMICA. NON USARE MAI CINEMATICA O ALTRI ARGOMENTI SE NON PRESENTI NEL TESTO:
             --- INIZIO MATERIALE DI RIFERIMENTO ---
             ${referenceText || "Nessun file caricato."}
             --- FINE MATERIALE DI RIFERIMENTO ---
@@ -919,9 +919,9 @@
             INDICAZIONI AGGIUNTIVE DEL DOCENTE:
             ${directives || "Nessuna indicazione specifica."}
             
-            2. DISTRIBUZIONE EQUA: Esplora tutti i concetti presenti nel testo in modo rigoroso.
-            3. OPZIONI EQUILIBRATE: Tutte e 4 le opzioni di risposta devono avere una lunghezza e un livello di dettaglio simili ed equilibrati. La risposta esatta non deve mai essere la più lunga.
-            4. FORMATTAZIONE: Utilizza la sintassi LaTeX standard con $ o $$ per formule ed equazioni.
+            2. DISTRIBUZIONE: Esplora i concetti presenti nel testo.
+            3. OPZIONI EQUILIBRATE: Tutte e 4 le opzioni di risposta devono avere una lunghezza simile.
+            4. FORMATTAZIONE: Utilizza la sintassi LaTeX standard con $ o $$ per formule.
             5. Restituisci l'output ESATTAMENTE nel formato JSON richiesto dallo schema.`;
 
             const payload = {
@@ -967,7 +967,7 @@
                     await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
                 }
             }
-            throw new Error("Impossibile generare i quesiti con l'IA.");
+            throw new Error("Impossibile generare i quesiti.");
         }
 
         async function startSelectedQuiz() {
