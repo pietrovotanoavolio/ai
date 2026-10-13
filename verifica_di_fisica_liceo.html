@@ -577,7 +577,7 @@
 
     <script>
         const QUIZ_SETTINGS = {
-            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V4',
+            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V5',
             teacherPin: '3548',
             googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw6H3XF7Cg_a5cKqX7h8K9z7mX6Cg_a5cKqX7h8K9z7mX6Cg/exec',
             timeStandardSec: 60,
@@ -607,7 +607,6 @@
         let exitCount = 0;
         let lastExitTimestamp = 0;
 
-        // SE INSERISCI QUI SOTTO DEL TESTO O CONFIGURAZIONE DI DEFAULT, TUTTI GLI STUDENTI LO VEDRANNO AUTOMATICAMENTE
         const EMBEDDED_TEACHER_PRESET = {
             directives: "",
             files: []
@@ -1051,6 +1050,16 @@
                         question: `La polarizzazione per deformazione nei dielettrici apolari consiste in:`,
                         options: [`Una leggera distorsione della nuvola elettronica indotta dal campo esterno`, `Il libero movimento degli elettroni nel reticolo`, `La fusione del materiale isolante`, `La ionizzazione completa molecolare`],
                         correctIndex: 0, isCalculation: false
+                    },
+                    {
+                        question: `Due cariche puntiformi $q_1$ e $q_2$ si attraggono con forza $F$. Raddoppiando la distanza $r$ tra di esse, la forza elettrostatica diventa:`,
+                        options: [`$F/4$`, `$2F$`, `$4F$`, `$F/2$`],
+                        correctIndex: 0, isCalculation: false
+                    },
+                    {
+                        question: `Il lavoro compiuto dal campo elettrico per spostare una carica $q$ lungo una superficie equipotenziale è:`,
+                        options: [`Sempre nullo ($W = 0$)`, `Massimo e pari a $qEd$`, `Negativo`, `Proporzionale al percorso`],
+                        correctIndex: 0, isCalculation: false
                     }
                 ];
             } else if (combined.includes('term') || combined.includes('calore') || combined.includes('gas') || combined.includes('temperat')) {
@@ -1112,7 +1121,9 @@
                 });
             }
 
-            return bank.slice(0, count);
+            // RIMESCOLA INTERAMENTE IL BANCO DI DOMANDE AD OGNI AVVIO PER OGNI STUDENTE
+            let shuffledBank = shuffleArray(bank);
+            return shuffledBank.slice(0, count + 2);
         }
 
         async function startSelectedQuiz() {
@@ -1141,6 +1152,7 @@
                     let combinedText = loadedReferenceFiles.map(f => `FILE: ${f.name}\n${f.text}`).join("\n\n");
                     let directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
 
+                    // GENERA E RIMESCOLA UN SOTTOSETTORE UNICO PER OGNI SINGOLO STUDENTE
                     let generatedQuestions = generateSmartPhysicsQuestions(count + 2, combinedText, directives);
 
                     let pool = generatedQuestions.slice(0, count);
