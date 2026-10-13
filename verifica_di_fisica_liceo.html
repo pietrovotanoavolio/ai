@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifica di Fisica Liceo</title>
+    <title>Verifica di Fisica: Elettrostatica - Liceo Scientifico</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
-    <!-- Librerie client-side robuste per estrazione da PDF, DOC, DOCX, PPT, PPTX, XLSX, TXT -->
+    <!-- Librerie client-side robuste per estrazione da file -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -118,9 +118,10 @@
                 </div>
                 <div>
                     <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
-                        <span>Verifica di Fisica Liceo</span>
+                        <span>Verifica di Fisica: Elettrostatica</span>
+                        <span class="bg-indigo-950 text-indigo-300 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-indigo-700/60">4° Liceo</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Prova formale basata sul programma del Liceo Scientifico</p>
+                    <p class="text-xs text-slate-400">Coulomb • Campo Elettrico • Sovrapposizione • Conduttori</p>
                 </div>
             </div>
             <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -145,33 +146,29 @@
                 </button>
             </div>
 
-            <!-- RIEPILOGO PARAMETRI FISSATI DAL DOCENTE -->
+            <!-- RIEPILOGO PARAMETRI FISSATI -->
             <div class="bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                         <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Parametri della Verifica
                     </span>
-                    <span id="groundingSourceBadge" class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
-                        Pronto per l'avvio
+                    <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
+                        Liceo Scientifico Ufficiale
                     </span>
                 </div>
                 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
-                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Argomento</span>
-                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">Elettrostatica</strong>
+                        <strong class="text-xs font-bold text-slate-800 block truncate">Elettrostatica (Liceo)</strong>
                     </div>
-                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">N. Quesiti</span>
-                        <strong id="activeQuestionCountDisplay" class="text-xs font-bold text-slate-800 block truncate">Standard (10)</strong>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Numero Quesiti</span>
+                        <strong class="text-xs font-bold text-slate-800 block">10 Quesiti Casualità Individuale</strong>
                     </div>
-                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Difficoltà</span>
-                        <strong class="text-xs font-bold text-slate-800 block truncate">Liceo Scientifico</strong>
-                    </div>
-                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Timer</span>
-                        <strong id="activeTimerModeDisplay" class="text-xs font-bold text-indigo-600 block truncate">Attivo</strong>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Regola Timer</span>
+                        <strong class="text-xs font-bold text-indigo-600 block">Attivo (60s / 150s)</strong>
                     </div>
                 </div>
             </div>
@@ -182,8 +179,9 @@
                 <div class="space-y-1">
                     <strong class="block font-bold">Norme formali di svolgimento:</strong>
                     <p class="text-amber-800 leading-relaxed">
-                        • <strong>Un solo clic per rispondere:</strong> clicca sull'opzione desiderata per selezionarla e confermarla; il test passerà automaticamente alla domanda successiva.<br>
+                        • Cliccando su una delle opzioni, <strong>la risposta viene acquisita e la domanda avanza da sola immediatamente</strong>.<br>
                         • <strong>Monitoraggio vigilanza attivo:</strong> ogni uscita dalla scheda o cambio finestra verrà segnalato a schermo e registrato nel verbale d'esame.<br>
+                        • È possibile disattivare il timer in alto a destra se necessario.<br>
                         • Al termine <strong>non verrà resa visibile la correzione o la revisione degli errori</strong>.
                     </p>
                 </div>
@@ -203,7 +201,7 @@
                 </p>
             </div>
 
-            <button id="startQuizBtn" onclick="startSelectedQuiz()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+            <button onclick="startSelectedQuiz()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                 <span>Inizia la Prova</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
@@ -212,7 +210,7 @@
         <!-- ==================== SCHERMATA 2: TEST IN CORSO ==================== -->
         <section id="screenQuiz" class="hidden space-y-4">
             
-            <!-- BANNER ALERT RILEVAMENTO USCITA / CAMBIO SCHEDA -->
+            <!-- BANNER ALERT RILEVAMENTO USCITA -->
             <div id="exitAlertBanner" class="hidden bg-rose-50 border-2 border-rose-500 text-rose-950 p-3.5 rounded-2xl text-xs flex items-center justify-between shadow-lg alert-shake">
                 <div class="flex items-center gap-2.5 font-bold">
                     <div class="w-7 h-7 bg-rose-600 text-white rounded-lg flex items-center justify-center shrink-0">
@@ -238,29 +236,25 @@
                 <div class="flex justify-between items-center text-xs font-bold text-slate-600 flex-wrap gap-2">
                     <div class="flex items-center gap-2">
                         <span id="calcTypeBadge" class="px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
-                            Quesito (60s)
+                            Teoria (60s)
                         </span>
 
-                        <!-- Badge Vigilanza Uscite in Tempo Reale -->
                         <span id="liveExitsMonitorBadge" class="hidden px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-rose-100 text-rose-800 border border-rose-300">
                             <i class="fa-solid fa-eye mr-1"></i> Uscite: <span id="liveExitsCountText">0</span>
                         </span>
                     </div>
 
                     <div class="flex items-center gap-2 flex-wrap">
-                        <!-- Pulsante Jolly -->
-                        <button id="jollyBtn" onclick="useJolly()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Sostituisci questo quesito con uno nuovo (Usabile 1 sola volta)">
+                        <button id="cancelTimerBtn" onclick="toggleTimerQuiz()" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-ban text-rose-600"></i>
+                            <span id="cancelTimerBtnText">Annulla Timer</span>
+                        </button>
+
+                        <button id="jollyBtn" onclick="useJolly()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Sostituisci questo quesito con uno nuovo">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                             <span>Usa Jolly 🃏</span>
                         </button>
 
-                        <!-- Tasto Termina Prova in anticipo -->
-                        <button onclick="confirmEarlyExit()" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Consegna la verifica in anticipo">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span class="hidden sm:inline">Termina Prova</span>
-                        </button>
-
-                        <!-- Display Timer Quesito -->
                         <div id="questionTimerDisplay" class="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 font-mono font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-sm">
                             <i class="fa-solid fa-stopwatch text-amber-600"></i>
                             <span id="timerCountdown">60s</span>
@@ -272,12 +266,10 @@
                     </div>
                 </div>
 
-                <!-- Barra tempo residuo domanda -->
                 <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden border border-slate-200">
                     <div id="timeProgressBarFill" class="bg-amber-500 h-1.5 rounded-full transition-all duration-1000" style="width: 100%"></div>
                 </div>
 
-                <!-- Barra progresso globale verifica -->
                 <div class="w-full bg-slate-200 rounded-full h-1 overflow-hidden">
                     <div id="progressBarFill" class="bg-indigo-600 h-1 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
@@ -289,7 +281,6 @@
                     <!-- Quesito inserito dinamicamente -->
                 </div>
 
-                <!-- Lista Opzioni Risposta -->
                 <div id="optionsContainer">
                     <!-- Opzioni inserite dinamicamente -->
                 </div>
@@ -312,7 +303,6 @@
                     <p class="text-xs text-slate-400 mt-0.5">La prova è stata registrata regolarmente nel verbale d'esame.</p>
                 </div>
 
-                <!-- Scheda Esito Vigilanza / Uscite dalla prova -->
                 <div id="vigilanceReportBox" class="p-3.5 rounded-xl border flex items-center justify-between text-xs text-left bg-emerald-50 border-emerald-200">
                     <div class="flex items-center gap-2.5">
                         <i id="vigilanceReportIcon" class="fa-solid fa-shield-halved text-emerald-600 text-lg"></i>
@@ -324,7 +314,6 @@
                     <span id="vigilanceReportBadge" class="px-2.5 py-1 rounded-lg text-xs font-black bg-emerald-200 text-emerald-900">0 uscite</span>
                 </div>
 
-                <!-- Riepilogo Punteggio -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
                         <span class="text-xs font-bold text-slate-500 uppercase block">Esatte</span>
@@ -367,43 +356,18 @@
             </div>
         </section>
 
-        <!-- OVERLAY CARICAMENTO GENERAZIONE -->
-        <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center text-white px-4">
-            <i class="fa-solid fa-circle-notch fa-spin text-5xl text-indigo-400 mb-4"></i>
-            <h3 class="text-xl font-bold mb-2 text-center">Preparazione Quesiti in Corso...</h3>
-            <p class="text-slate-300 text-sm text-center max-w-md">Il sistema sta formulando i quesiti di fisica rigorosamente liceali. Attendi qualche istante.</p>
-        </div>
-
-        <!-- MODALE CONFERMA TERMINA PROVA -->
-        <div id="earlyExitModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-            <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-rose-100 text-center space-y-4">
-                <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-2xl">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-slate-900">Terminare la prova?</h3>
-                    <p class="text-sm text-slate-500 mt-2">Sei sicuro di voler consegnare in anticipo? Le domande a cui non hai ancora risposto verranno valutate con 0 punti.</p>
-                </div>
-                <div class="flex gap-3 pt-2">
-                    <button onclick="closeEarlyExitModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition cursor-pointer">Annulla</button>
-                    <button onclick="executeEarlyExit()" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow transition cursor-pointer">Conferma</button>
-                </div>
-            </div>
-        </div>
-
     </main>
 
-    <!-- ==================== MODALE: PANNELLO DOCENTE ==================== -->
+    <!-- MODALE: PANNELLO DOCENTE -->
     <div id="teacherModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 space-y-5 max-h-[90vh] overflow-y-auto">
             
-            <!-- Login Docente -->
             <div id="teacherAuthSection" class="space-y-4 text-center py-2">
                 <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl">
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900">Accesso Riservato Docente</h3>
-                <p class="text-xs text-slate-500">Inserisci il PIN docente per gestire le impostazioni e il registro.</p>
+                <p class="text-xs text-slate-500">Inserisci il PIN docente (Predefinito: 1234) per gestire il registro.</p>
 
                 <div class="max-w-xs mx-auto space-y-3">
                     <input type="password" id="teacherPinInput" placeholder="Inserisci PIN" 
@@ -416,124 +380,16 @@
                 </div>
             </div>
 
-            <!-- Dashboard Docente -->
             <div id="teacherDashboardSection" class="hidden space-y-5">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                     <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-indigo-600"></i> Configurazione Prova Globale
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Registro Prove Studenti
                     </h3>
                     <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
 
-                <!-- Parametri di Somministrazione e Scadenza -->
-                <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200 space-y-3">
-                    <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-2 border-b border-indigo-200/60 pb-2">
-                        <i class="fa-solid fa-sliders text-indigo-600"></i> Parametri di Somministrazione
-                    </h4>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
-                                <i class="fa-solid fa-list-ol mr-1"></i> Numero Quesiti:
-                            </label>
-                            <input type="number" id="teacherQuestionCountInput" min="1" max="50" placeholder="10" oninput="saveTeacherSettings()"
-                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
-                                <i class="fa-solid fa-hourglass-half mr-1"></i> Gestione Timer:
-                            </label>
-                            <select id="teacherTimerModeSelect" onchange="saveTeacherSettings()" class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
-                                <option value="standard">⏱️ Attivo (60s/150s)</option>
-                                <option value="unlimited">♾️ Illimitato</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- SCADENZA PROVA CONFIGURABILE -->
-                    <div class="pt-2">
-                        <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
-                            <i class="fa-solid fa-calendar-xmark mr-1"></i> Data e Ora di Scadenza Prova (Opzionale):
-                        </label>
-                        <input type="datetime-local" id="teacherDeadlineInput" onchange="saveTeacherSettings()"
-                               class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
-                        <span class="text-[10px] text-indigo-700 mt-1 block">Se impostata, oltre questo orario la prova non potrà più essere avviata dagli studenti.</span>
-                    </div>
-                </div>
-
-                <!-- CARICAMENTO FILE E INDICAZIONI + SINCRONIZZAZIONE GLOBALE -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-                    <div class="space-y-2">
-                        <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
-                            <i class="fa-solid fa-file-arrow-up text-indigo-600"></i>
-                            Carica File di Riferimento (PDF, DOC, DOCX, PPT, PPTX, XLSX, TXT)
-                        </label>
-                        <p class="text-[11px] text-slate-500">
-                            I file e le indicazioni inseriti qui possono essere salvati come configurazione master.
-                        </p>
-                        
-                        <input type="file" id="referenceFileInput" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xlsx,.xls,.txt,.md" onchange="handleTextReferenceFiles(event)"
-                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 border border-slate-300 rounded-lg bg-white p-1 cursor-pointer">
-                        
-                        <!-- Elenco dei file caricati -->
-                        <div id="loadedFilesContainer" class="pt-2 space-y-1.5 hidden">
-                            <div class="flex justify-between items-center text-[11px] font-bold text-slate-700 border-b border-slate-200 pb-1">
-                                <span><i class="fa-solid fa-layer-group text-indigo-600 mr-1"></i> File caricati (<span id="loadedFilesCountBadge">0</span>):</span>
-                                <button onclick="clearAllReferenceFiles()" class="text-rose-600 hover:text-rose-800 text-[10px] font-bold cursor-pointer">
-                                    <i class="fa-solid fa-trash-can mr-1"></i> Rimuovi tutti
-                                </button>
-                            </div>
-                            <div id="loadedFilesList" class="max-h-36 overflow-y-auto space-y-1 pr-1"></div>
-                        </div>
-
-                        <textarea id="teacherDirectivesInput" rows="3" oninput="saveTeacherDirectives()" placeholder="Scrivi qui indicazioni specifiche (es. Elettrostatica, Coulomb, campo)..." 
-                                  class="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2"></textarea>
-
-                        <div id="fileUploadStatusMsg" class="text-[11px] font-semibold text-emerald-700 hidden"></div>
-                    </div>
-
-                    <!-- BOTTONI SINCRONIZZAZIONE CONFIGURAZIONE MASTER -->
-                    <div class="bg-indigo-50/80 p-3 rounded-lg border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <div class="text-[11px] text-indigo-950 font-medium">
-                            <strong class="block font-bold"><i class="fa-solid fa-globe text-indigo-600 mr-1"></i> Sincronizzazione Master Globale:</strong>
-                            Esporta il file di configurazione master (`master_config.json`) da ricaricare o incollare nel preset del sito web.
-                        </div>
-                        <div class="flex gap-2 shrink-0">
-                            <button onclick="exportTeacherConfig()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow transition cursor-pointer">
-                                <i class="fa-solid fa-download mr-1"></i> Esporta Master
-                            </button>
-                            <label class="px-3 py-1.5 bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-300 text-xs font-bold rounded-lg shadow-sm transition cursor-pointer">
-                                <i class="fa-solid fa-upload mr-1"></i> Importa Master
-                                <input type="file" accept=".json" onchange="importTeacherConfig(event)" class="hidden">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
-                        <button onclick="applyFileAndDirectives()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-1.5 cursor-pointer">
-                            <i class="fa-solid fa-check"></i>
-                            <span>Applica e Salva Impostazioni Master</span>
-                        </button>
-                        <span id="referenceSourceBadgeStatus" class="text-[11px] text-slate-600 font-semibold">Pronto</span>
-                    </div>
-                </div>
-
-                <!-- Configurazione Google Sheets -->
-                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase"><i class="fa-brands fa-google mr-1 text-emerald-600"></i> Google Sheets (Agganciato)</label>
-                        <p class="text-[11px] text-slate-500">URL della Web App di Google Apps Script per sincronizzare i risultati in cloud.</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="sheetUrlSetting" placeholder="https://script.google.com/macros/s/.../exec" 
-                               class="flex-grow px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono focus:outline-none focus:border-indigo-500 transition">
-                        <button id="sheetSaveBtn" onclick="saveSheetUrlSetting()" class="px-3.5 py-1.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-700 transition cursor-pointer">Salva</button>
-                    </div>
-                </div>
-
-                <!-- Tabella Consegne con Colonna Uscite -->
                 <div class="overflow-x-auto border border-slate-200 rounded-xl">
                     <table class="w-full text-left text-xs text-slate-700">
                         <thead class="bg-slate-100 text-slate-900 uppercase font-bold border-b border-slate-200">
@@ -566,24 +422,17 @@
     </div>
 
     <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500 mt-auto">
-        <p>Verifica di Fisica Liceo</p>
+        <p>Verifica Istituzionale di Fisica • 4° Anno Liceo Scientifico e Scienze Applicate</p>
     </footer>
 
     <script>
         const QUIZ_SETTINGS = {
-            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V7',
-            masterStorageKey: 'LICEO_FISICA_MASTER_CONFIG_V2',
-            teacherPin: '3548',
+            storageKey: 'LICEO_FISICA_ELETTROSTATICA_ESITI_V9',
+            teacherPin: '1234',
             googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || '',
             timeStandardSec: 60,
             timeCalculationSec: 150
         };
-
-        const EMBEDDED_MASTER_PRESET = null; 
-
-        if (typeof pdfjsLib !== 'undefined') {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        }
 
         let activeQuestions = [];
         let studentAnswers = [];
@@ -593,7 +442,6 @@
         let isUnlimitedTime = false;
         let isJollyUsed = false;
         let isProcessingAdvance = false;
-        let spareQuestions = [];
 
         let timerInterval = null;
         let currentQuestionTimeLeft = 60;
@@ -603,51 +451,7 @@
         let exitCount = 0;
         let lastExitTimestamp = 0;
 
-        let loadedReferenceFiles = [];
-
-        function loadMasterConfig() {
-            try {
-                if (EMBEDDED_MASTER_PRESET && !localStorage.getItem(QUIZ_SETTINGS.masterStorageKey)) {
-                    localStorage.setItem(QUIZ_SETTINGS.masterStorageKey, JSON.stringify(EMBEDDED_MASTER_PRESET));
-                }
-
-                const rawMaster = localStorage.getItem(QUIZ_SETTINGS.masterStorageKey);
-                if (rawMaster) {
-                    const parsed = JSON.parse(rawMaster);
-                    if (parsed.files) loadedReferenceFiles = parsed.files;
-                    if (parsed.directives !== undefined && !localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES')) {
-                        localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', parsed.directives);
-                    }
-                    if (parsed.count && !localStorage.getItem('PHYSICS_QUESTIONS_COUNT')) {
-                        localStorage.setItem('PHYSICS_QUESTIONS_COUNT', parsed.count);
-                    }
-                    if (parsed.timer && !localStorage.getItem('PHYSICS_TIMER_MODE')) {
-                        localStorage.setItem('PHYSICS_TIMER_MODE', parsed.timer);
-                    }
-                    if (parsed.deadline && !localStorage.getItem('PHYSICS_DEADLINE_TIME')) {
-                        localStorage.setItem('PHYSICS_DEADLINE_TIME', parsed.deadline);
-                    }
-                } else {
-                    const rawStoredFiles = localStorage.getItem('PHYSICS_LOADED_FILES_LIST');
-                    if (rawStoredFiles) loadedReferenceFiles = JSON.parse(rawStoredFiles);
-                }
-            } catch(e) { loadedReferenceFiles = []; }
-        }
-
-        function saveMasterConfig() {
-            const configData = {
-                files: loadedReferenceFiles,
-                directives: localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '',
-                count: localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '10',
-                timer: localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard',
-                deadline: localStorage.getItem('PHYSICS_DEADLINE_TIME') || ''
-            };
-            localStorage.setItem(QUIZ_SETTINGS.masterStorageKey, JSON.stringify(configData));
-            localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
-        }
-
-        loadMasterConfig();
-
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
         function shuffleArray(array) {
             const arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -679,7 +483,7 @@
             if (!isQuizActive) return;
 
             const now = Date.now();
-            if (now - lastExitTimestamp < 1200) return; 
+            if (now - lastExitTimestamp < 1200) return;
             lastExitTimestamp = now;
 
             exitCount++;
@@ -690,7 +494,7 @@
                 badge.textContent = `Uscite: ${exitCount}`;
                 banner.classList.remove('hidden');
                 banner.classList.remove('alert-shake');
-                void banner.offsetWidth; 
+                void banner.offsetWidth;
                 banner.classList.add('alert-shake');
             }
 
@@ -712,411 +516,184 @@
                 recordStudentExit('visibility_hidden');
             }
         });
+
         window.addEventListener('blur', function() {
             recordStudentExit('window_blur');
         });
 
-        function exportTeacherConfig() {
-            const configData = {
-                files: loadedReferenceFiles,
-                directives: localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '',
-                count: localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '10',
-                timer: localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard',
-                deadline: localStorage.getItem('PHYSICS_DEADLINE_TIME') || ''
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(configData));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "master_config_verifica_fisica.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
+        // BANCA DATI ESCLUSIVA ELETTROSTATICA LICEO SCIENTIFICO
+        function generateElectrostaticsLiceoPool() {
+            const list = [];
+            const k0 = 8.99e9;
 
-        function importTeacherConfig(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if (parsed.files) loadedReferenceFiles = parsed.files;
-                    if (parsed.directives !== undefined) localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', parsed.directives);
-                    if (parsed.count) localStorage.setItem('PHYSICS_QUESTIONS_COUNT', parsed.count);
-                    if (parsed.timer) localStorage.setItem('PHYSICS_TIMER_MODE', parsed.timer);
-                    if (parsed.deadline) localStorage.setItem('PHYSICS_DEADLINE_TIME', parsed.deadline);
-
-                    saveMasterConfig();
-                    renderLoadedFilesList();
-                    updateUIConfigDisplays();
-                    alert("Configurazione Master importata e sincronizzata con successo!");
-                } catch(err) {
-                    alert("File di configurazione non valido.");
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        async function handleTextReferenceFiles(event) {
-            const files = Array.from(event.target.files);
-            if (!files || files.length === 0) return;
-
-            const statusDiv = document.getElementById('fileUploadStatusMsg');
-            if (statusDiv) {
-                statusDiv.classList.remove('hidden');
-                statusDiv.className = "text-[11px] font-semibold text-indigo-700";
-                statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Lettura file in corso...`;
-            }
-
-            for (const file of files) {
-                try {
-                    const ext = file.name.split('.').pop().toLowerCase();
-                    let text = "";
-                    if (ext === 'pdf') {
-                        const buf = await file.arrayBuffer();
-                        text = await extractTextFromPDF(buf);
-                    } else if (ext === 'docx' || ext === 'doc') {
-                        const buf = await file.arrayBuffer();
-                        text = await extractTextFromWord(buf);
-                    } else if (ext === 'pptx' || ext === 'ppt') {
-                        const buf = await file.arrayBuffer();
-                        text = await extractTextFromPPTX(buf);
-                    } else if (ext === 'xlsx' || ext === 'xls') {
-                        const buf = await file.arrayBuffer();
-                        text = await extractTextFromExcel(buf);
-                    } else {
-                        text = await file.text();
-                    }
-
-                    loadedReferenceFiles.push({ name: file.name, text: text });
-                } catch (err) {
-                    console.error("Errore file:", err);
-                }
-            }
-
-            saveMasterConfig();
-            renderLoadedFilesList();
-
-            event.target.value = '';
-            if (statusDiv) {
-                statusDiv.className = "text-[11px] font-semibold text-emerald-700";
-                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> File caricati e sincronizzati.`;
-            }
-            updateUIConfigDisplays();
-        }
-
-        function extractTextFromPDF(arrayBuffer) {
-            if (typeof pdfjsLib === 'undefined') return Promise.resolve("");
-            return pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(pdf => {
-                const pagePromises = [];
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    pagePromises.push(
-                        pdf.getPage(i).then(page => 
-                            page.getTextContent().then(tc => tc.items.map(it => it.str).join(" "))
-                        )
-                    );
-                }
-                return Promise.all(pagePromises).then(pages => pages.join("\n\n"));
+            const q1_uC = getRandomInt(2, 6);
+            const q2_uC = getRandomInt(2, 5);
+            const d_cm = getRandomInt(3, 8);
+            const d_m = d_cm / 100;
+            const F = (k0 * (q1_uC * 1e-6) * (q2_uC * 1e-6)) / (d_m * d_m);
+            const fStr = F >= 10 ? F.toFixed(1) : F.toFixed(2);
+            list.push({
+                question: `Due cariche puntiformi nel vuoto $q_1 = +${q1_uC}\\,\\mu\\text{C}$ e $q_2 = -${q2_uC}\\,\\mu\\text{C}$ sono poste a distanza $r = ${d_cm}\\,\\text{cm}$. Assumendo $k_0 \\approx 8{,}99 \\times 10^9\\,\\text{N}\\cdot\\text{m}^2/\\text{C}^2$, qual è il modulo della forza elettrostatica attrattiva tra le cariche?`,
+                options: [
+                    `$F \\approx ${fStr}\\,\\text{N}$`,
+                    `$F \\approx ${(F * 10).toFixed(1)}\\,\\text{N}$`,
+                    `$F \\approx ${(F / 10).toFixed(2)}\\,\\text{N}$`,
+                    `$F \\approx ${(F * 0.25).toFixed(2)}\\,\\text{N}$`
+                ],
+                correctIndex: 0,
+                isCalculation: true
             });
-        }
 
-        function extractTextFromWord(arrayBuffer) {
-            if (typeof mammoth === 'undefined') return Promise.resolve("");
-            return mammoth.extractRawText({ arrayBuffer: arrayBuffer }).then(result => result.value).catch(() => "");
-        }
-
-        function extractTextFromPPTX(arrayBuffer) {
-            if (typeof JSZip === 'undefined') return Promise.resolve("");
-            return JSZip.loadAsync(arrayBuffer).then(zip => {
-                const slideFiles = Object.keys(zip.files).filter(f => f.startsWith("ppt/slides/slide") && f.endsWith(".xml"));
-                const promises = slideFiles.map(file => zip.files[file].async("string").then(xml => {
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xml, "text/xml");
-                    const nodes = xmlDoc.getElementsByTagName("a:t");
-                    let txt = [];
-                    for (let j = 0; j < nodes.length; j++) {
-                        const val = nodes[j].textContent.trim();
-                        if (val) txt.push(val);
-                    }
-                    return txt.join(" ");
-                }));
-                return Promise.all(promises).then(slides => slides.join("\n\n"));
+            const q_pt_uC = getRandomInt(2, 8);
+            const r_pt_cm = getRandomInt(10, 30);
+            const r_pt_m = r_pt_cm / 100;
+            const E_calc = (k0 * (q_pt_uC * 1e-6)) / (r_pt_m * r_pt_m);
+            const E_sci = (E_calc).toExponential(2).replace('e+', ' \\times 10^');
+            list.push({
+                question: `Determina l'intensità del campo elettrico $\\vec{E}$ generato nel vuoto da una carica puntiforme $q = +${q_pt_uC}\\,\\mu\\text{C}$ in un punto $P$ a distanza $r = ${r_pt_cm}\\,\\text{cm}$. ($k_0 = 8{,}99 \\times 10^9\\,\\text{N}\\cdot\\text{m}^2/\\text{C}^2$)`,
+                options: [
+                    `$E \\approx ${E_sci}\\,\\text{N/C}$`,
+                    `$E \\approx ${(E_calc * 10).toExponential(2).replace('e+', ' \\times 10^')}\\,\\text{N/C}$`,
+                    `$E \\approx ${(E_calc / 10).toExponential(2).replace('e+', ' \\times 10^')}\\,\\text{N/C}$`,
+                    `$E \\approx ${(E_calc * 0.5).toExponential(2).replace('e+', ' \\times 10^')}\\,\\text{N/C}$`
+                ],
+                correctIndex: 0,
+                isCalculation: true
             });
-        }
 
-        function extractTextFromExcel(arrayBuffer) {
-            if (typeof XLSX === 'undefined') return Promise.resolve("");
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            let combinedText = [];
-            workbook.SheetNames.forEach(sheetName => {
-                const sheet = workbook.Sheets[sheetName];
-                combinedText.push(XLSX.utils.sheet_to_csv(sheet));
+            const qMid = getRandomInt(3, 9);
+            const dTot = (getRandomInt(2, 5) * 0.2).toFixed(1);
+            list.push({
+                question: `Due cariche puntiformi identiche $q_1 = q_2 = +${qMid}\\,\\mu\\text{C}$ sono fissate ad una distanza $d = ${dTot}\\,\\text{m}$ nel vuoto. Per il <strong>principio di sovrapposizione vettoriale</strong>, quanto vale il modulo del campo elettrico risultante nel punto medio del segmento?`,
+                options: [
+                    `$E_{\\text{tot}} = 0\\,\\text{N/C}$, poiché i due campi generati hanno lo stesso modulo e direzione ma verso opposto.`,
+                    `$E_{\\text{tot}} = 2 \\cdot \\frac{k_0 q}{(d/2)^2}\\,\\text{N/C}$, sommando scalarmente i moduli.`,
+                    `$E_{\\text{tot}} = \\frac{k_0 q^2}{d^2}\\,\\text{N/C}$.`,
+                    `$E_{\\text{tot}} = \\sqrt{2}\\,\\frac{k_0 q}{(d/2)^2}\\,\\text{N/C}$.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
             });
-            return Promise.resolve(combinedText.join("\n\n"));
-        }
 
-        function renderLoadedFilesList() {
-            const container = document.getElementById('loadedFilesContainer');
-            const list = document.getElementById('loadedFilesList');
-            const badge = document.getElementById('loadedFilesCountBadge');
-            if (!container || !list) return;
-
-            if (loadedReferenceFiles.length === 0) {
-                container.classList.add('hidden');
-                list.innerHTML = '';
-                return;
-            }
-
-            container.classList.remove('hidden');
-            if (badge) badge.textContent = loadedReferenceFiles.length;
-            list.innerHTML = '';
-
-            loadedReferenceFiles.forEach((fileItem, idx) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = "flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200 text-xs shadow-sm";
-                itemDiv.innerHTML = `
-                    <div class="flex items-center gap-2 truncate max-w-[80%]">
-                        <i class="fa-solid fa-file-lines text-slate-500 text-sm shrink-0"></i>
-                        <span class="font-bold text-slate-800 truncate">${fileItem.name}</span>
-                    </div>
-                    <button onclick="removeReferenceFile(${idx})" class="text-rose-500 hover:text-rose-700 p-1 cursor-pointer">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                `;
-                list.appendChild(itemDiv);
+            const E1 = getRandomInt(3, 6) * 100;
+            const E2 = getRandomInt(3, 6) * 100;
+            const Etot = Math.round(Math.sqrt(E1 * E1 + E2 * E2));
+            list.push({
+                question: `In un punto $P$ agiscono due campi elettrici ortogonali: $\\vec{E}_1$ con $E_1 = ${E1}\\,\\text{N/C}$ e $\\vec{E}_2$ con $E_2 = ${E2}\\,\\text{N/C}$. Per il principio di sovrapposizione, l'intensità del campo risultante è:`,
+                options: [
+                    `$E \\approx ${Etot}\\,\\text{N/C}$`,
+                    `$E = ${E1 + E2}\\,\\text{N/C}$`,
+                    `$E = ${Math.abs(E1 - E2)}\\,\\text{N/C}$`,
+                    `$E = ${(E1 * E2) / 100}\\,\\text{N/C}$`
+                ],
+                correctIndex: 0,
+                isCalculation: true
             });
+
+            list.push({
+                question: `All'interno di un conduttore metallico solido isolato in condizioni di <strong>equilibrio elettrostatico</strong>:`,
+                options: [
+                    `Il campo elettrico interno è identicamente nullo ($\\vec{E} = \\vec{0}$) e la carica in eccesso si distribuisce sulla superficie esterna.`,
+                    `Il campo elettrico interno è costante e diverso da zero.`,
+                    `La carica netta in eccesso si distribuisce omogeneamente in tutto il volume.`,
+                    `Il campo elettrico interno è parallelo alla superficie limite.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
+            list.push({
+                question: `In prossimità immediata della superficie esterna di un conduttore carico in equilibrio elettrostatico, il vettore campo elettrico soddisfa il <strong>Teorema di Coulomb</strong>:`,
+                options: [
+                    `È perpendicolare alla superficie e ha modulo $E = \\frac{|\\sigma|}{\\varepsilon_0}$, dove $\\sigma$ è la densità superficiale di carica.`,
+                    `È parallelo alla superficie con modulo $E = \\frac{\\sigma}{2\\varepsilon_0}$.`,
+                    `È nullo su tutta la superficie.`,
+                    `Ha modulo costante $E = \\frac{Q}{4\\pi \\varepsilon_0 R}$`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
+            list.push({
+                question: `Per quale ragione in un conduttore irregolare in equilibrio elettrostatico il campo elettrico è massimo nelle zone con minor raggio di curvatura (<strong>potere delle punte</strong>)?`,
+                options: [
+                    `Nelle punte la densità superficiale di carica $\\sigma$ è massima, determinando un campo locale $E = \\frac{\\sigma}{\\varepsilon_0}$ molto intenso.`,
+                    `Nelle punte gli elettroni acquistano un'accelerazione relativistica.`,
+                    `Nelle punte la costante dielettrica si azzera.`,
+                    `Nelle punte la massa degli elettroni diminuisce.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
+            list.push({
+                question: `Il principio della <strong>schermatura elettrostatica</strong> (gabbia di Faraday) stabilisce che:`,
+                options: [
+                    `All'interno di una cavità conduttrice chiusa in equilibrio elettrostatico, il campo elettrico $\\vec{E}$ è rigorosamente nullo.`,
+                    `Il materiale metallico distrugge le cariche elettriche per annichilazione.`,
+                    `La cavità genera un campo magnetico che devia le linee di forza.`,
+                    `La schermatura richiede una corrente elettrica stazionaria.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
+            const eps_r = getRandomInt(2, 6);
+            list.push({
+                question: `Se lo spazio tra due cariche puntiformi viene riempito con un dielettrico avente costante relativa $\\varepsilon_r = ${eps_r}$, la forza di Coulomb $F$ rispetto al vuoto $F_0$:`,
+                options: [
+                    `Diminuisce di un fattore $${eps_r}$, risultando $F = \\frac{F_0}{${eps_r}}$.`,
+                    `Aumenta di un fattore $${eps_r}$, risultando $F = ${eps_r} \\cdot F_0$.`,
+                    `Rimane invariata.`,
+                    `Si annulla completamente.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
+            const q_carica_nC = getRandomInt(2, 8);
+            const E_modulo = getRandomInt(2, 7) * 1000;
+            const F_microN = (q_carica_nC * 1e-9 * E_modulo * 1e6).toFixed(1);
+            list.push({
+                question: `Una carica di prova $q = +${q_carica_nC}\\,\\text{nC}$ è immersa in un campo elettrico di intensità $E = ${E_modulo}\\,\\text{N/C}$. Qual è il modulo della forza elettrostatica $\\vec{F} = q\\vec{E}$?`,
+                options: [
+                    `$F = ${F_microN}\\,\\mu\\text{N}$`,
+                    `$F = ${(F_microN * 10).toFixed(1)}\\,\\mu\\text{N}$`,
+                    `$F = ${(F_microN / 10).toFixed(2)}\\,\\mu\\text{N}$`,
+                    `$F = ${(F_microN * 2).toFixed(1)}\\,\\mu\\text{N}$`
+                ],
+                correctIndex: 0,
+                isCalculation: true
+            });
+
+            list.push({
+                question: `Cosa si intende per <strong>induzione elettrostatica</strong> in un conduttore neutro?`,
+                options: [
+                    `La ridistribuzione temporanea degli elettroni liberi causata dalla presenza vicina di un corpo carico, senza contatto diretto.`,
+                    `Il trasferimento permanente di protoni attraverso il vuoto.`,
+                    `La trasformazione del metallo in un isolante perfetto.`,
+                    `La creazione di una corrente elettrica continua all'interno del conduttore.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
+            list.push({
+                question: `Qual è la differenza tra materiali <strong>conduttori</strong> e <strong>isolanti</strong> (dielettrici) dal punto di vista microscopico?`,
+                options: [
+                    `Nei conduttori vi sono elettroni liberi di muoversi nel reticolo cristallino; negli isolanti gli elettroni sono strettamente legati ai rispettivi nuclei atomici.`,
+                    `Negli isolanti non esistono elettroni in nessun atomo.`,
+                    `Nei conduttori i protoni possono viaggiare liberamente.`,
+                    `Gli isolanti possiedono carica netta positiva intrinseca.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
+            return list;
         }
 
-        function removeReferenceFile(index) {
-            loadedReferenceFiles.splice(index, 1);
-            saveMasterConfig();
-            renderLoadedFilesList();
-            updateUIConfigDisplays();
-        }
-
-        function clearAllReferenceFiles() {
-            loadedReferenceFiles = [];
-            saveMasterConfig();
-            renderLoadedFilesList();
-            updateUIConfigDisplays();
-        }
-
-        function checkDeadlineStatus() {
-            const deadlineVal = localStorage.getItem('PHYSICS_DEADLINE_TIME');
-            const banner = document.getElementById('deadlineNoticeBanner');
-            const noticeText = document.getElementById('deadlineNoticeText');
-            const startBtn = document.getElementById('startQuizBtn');
-
-            if (!deadlineVal) {
-                if (banner) banner.classList.add('hidden');
-                if (startBtn) { startBtn.disabled = false; startBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
-                return false;
-            }
-
-            const deadlineDate = new Date(deadlineVal);
-            const now = new Date();
-
-            if (now > deadlineDate) {
-                if (banner && noticeText) {
-                    noticeText.textContent = `La prova è scaduta il ${deadlineDate.toLocaleString('it-IT')}. Non è più possibile avviarla.`;
-                    banner.classList.remove('hidden');
-                }
-                if (startBtn) {
-                    startBtn.disabled = true;
-                    startBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                }
-                return true;
-            } else {
-                if (banner) banner.classList.add('hidden');
-                if (startBtn) {
-                    startBtn.disabled = false;
-                    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-                return false;
-            }
-        }
-
-        function updateUIConfigDisplays() {
-            const countDisplay = document.getElementById('activeQuestionCountDisplay');
-            const timerDisplay = document.getElementById('activeTimerModeDisplay');
-            const countInput = document.getElementById('teacherQuestionCountInput');
-            const timerSelect = document.getElementById('teacherTimerModeSelect');
-            const groundingBadge = document.getElementById('groundingSourceBadge');
-            const deadlineInput = document.getElementById('teacherDeadlineInput');
-            const startSource = document.getElementById('startScreenSource');
-            const directivesArea = document.getElementById('teacherDirectivesInput');
-
-            const savedCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '10', 10);
-            const savedTimer = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
-            const savedDeadline = localStorage.getItem('PHYSICS_DEADLINE_TIME') || '';
-            const savedDirectives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
-
-            if (countDisplay) countDisplay.textContent = `${savedCount} Quesiti`;
-            if (countInput) countInput.value = savedCount;
-
-            if (timerDisplay) timerDisplay.textContent = savedTimer === 'unlimited' ? "Tempo Illimitato" : "Attivo";
-            if (timerSelect) timerSelect.value = savedTimer;
-
-            if (deadlineInput) deadlineInput.value = savedDeadline;
-            if (directivesArea) directivesArea.value = savedDirectives;
-
-            if (startSource) {
-                let topicLabel = "Elettrostatica";
-                const combined = (loadedReferenceFiles.map(f => f.text).join(" ") + " " + savedDirectives).toLowerCase();
-                if (combined.includes('term') || combined.includes('calore') || combined.includes('gas') || combined.includes('temperat')) {
-                    topicLabel = "Termodinamica";
-                } else if (combined.includes('quantità') || combined.includes('impulso') || combined.includes('urto')) {
-                    topicLabel = "Quantità di Moto";
-                } else if (combined.includes('cinemat') || combined.includes('moto') || combined.includes('velocità')) {
-                    topicLabel = "Cinematica";
-                } else if (combined.includes('elettr') || combined.includes('coulomb') || combined.includes('campo') || combined.includes('carich')) {
-                    topicLabel = "Elettrostatica";
-                }
-                startSource.textContent = topicLabel;
-            }
-            if (groundingBadge) {
-                groundingBadge.textContent = loadedReferenceFiles.length > 0 ? "Basato sui file del docente" : "Pronto per l'avvio";
-            }
-
-            checkDeadlineStatus();
-        }
-
-        function saveTeacherDirectives() {
-            const val = document.getElementById('teacherDirectivesInput').value;
-            localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', val);
-            saveMasterConfig();
-        }
-
-        function applyFileAndDirectives() {
-            saveTeacherDirectives();
-            const deadlineVal = document.getElementById('teacherDeadlineInput').value;
-            localStorage.setItem('PHYSICS_DEADLINE_TIME', deadlineVal);
-            saveMasterConfig();
-            alert("Impostazioni Master salvate e sincronizzate con successo per tutti gli studenti!");
-            updateUIConfigDisplays();
-        }
-
-        function saveTeacherSettings() {
-            const countInput = document.getElementById('teacherQuestionCountInput');
-            const countVal = countInput ? (parseInt(countInput.value, 10) || 10) : 10;
-            const timerSelect = document.getElementById('teacherTimerModeSelect');
-            const timerVal = timerSelect ? timerSelect.value : 'standard';
-            const deadlineInput = document.getElementById('teacherDeadlineInput');
-
-            if (deadlineInput) localStorage.setItem('PHYSICS_DEADLINE_TIME', deadlineInput.value);
-
-            localStorage.setItem('PHYSICS_QUESTIONS_COUNT', countVal);
-            localStorage.setItem('PHYSICS_TIMER_MODE', timerVal);
-            saveMasterConfig();
-            updateUIConfigDisplays();
-        }
-
-        function generateStrictLiceoPhysicsQuestions(count, referenceText, directives) {
-            let combined = (referenceText + " " + directives).toLowerCase();
-            let bank = [];
-
-            if (combined.includes('term') || combined.includes('calore') || combined.includes('gas') || combined.includes('temperat')) {
-                bank = [
-                    {
-                        question: `Nel corso di una trasformazione isobara, un gas perfetto compie un lavoro $W = 300\\,\\text{J}$ assorbendo una quantità di calore $Q = 800\\,\\text{J}$. Qual è la variazione di energia interna $\\Delta U$ del gas secondo il primo principio della termodinamica?`,
-                        options: [`$\\Delta U = 500\\,\\text{J}$`, `$\\Delta U = 1100\\,\\text{J}$`, `$\\Delta U = -500\\,\\text{J}$`, `$\\Delta U = 300\\,\\text{J}$`],
-                        correctIndex: 0, isCalculation: true
-                    },
-                    {
-                        question: `Quale formulazione del secondo principio della termodinamica stabilisce l'impossibilità di realizzare una macchina termica ciclica il cui unico effetto sia la conversione integrale in lavoro del calore assorbito da un'unica sorgente?`,
-                        options: [`Enunciato di Kelvin-Planck`, `Enunciato di Clausius`, `Teorema di Carnot`, `Principio di conservazione dell'energia meccanica`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `In una trasformazione adiabatica reversibile di un gas perfetto, non vi è scambio di calore con l'esterno ($Q = 0$). Di conseguenza, se il gas si espande compiendo lavoro:`,
-                        options: [`La sua temperatura diminuisce e l'energia interna cala`, `La temperatura rimane costante (isoterma)`, `L'energia interna aumenta proporzionalmente`, `La pressione raddoppia`],
-                        correctIndex: 0, isCalculation: false
-                    }
-                ];
-            } else if (combined.includes('quantità') || combined.includes('impulso') || combined.includes('urto')) {
-                bank = [
-                    {
-                        question: `Un corpo di massa $m = 2\\,\\text{kg}$ viaggia alla velocità costante di $5\\,\\text{m/s}$. Qual è il modulo della sua quantità di moto?`,
-                        options: [`$10\\,\\text{kg}\\cdot\\text{m/s}$`, `$2{,}5\\,\\text{kg}\\cdot\\text{m/s}$`, `$7\\,\\text{kg}\\cdot\\text{m/s}$`, `$25\\,\\text{kg}\\cdot\\text{m/s}$`],
-                        correctIndex: 0, isCalculation: true
-                    },
-                    {
-                        question: `In un urto perfettamente anelastico tra due corpi su un piano liscio:`,
-                        options: [`Si conserva la quantità di moto totale del sistema, ma si ha la massima perdita di energia cinetica`, `Si conserva sia la quantità di moto che l'energia cinetica`, `L'energia cinetica totale aumenta`, `La quantità di moto si annulla`],
-                        correctIndex: 0, isCalculation: false
-                    }
-                ];
-            } else {
-                bank = [
-                    {
-                        question: `Due cariche puntiformi nel vuoto $q_1 = +4\\,\\mu\\text{C}$ e $q_2 = -2\\,\\mu\\text{C}$ sono poste a distanza $r = 5\\,\\text{cm}$. Qual è il modulo della forza elettrostatica attrattiva tra le cariche? ($k_0 \\approx 8{,}99 \\times 10^9\\,\\text{N}\\cdot\\text{m}^2/\\text{C}^2$)`,
-                        options: [`$F \\approx 28{,}8\\,\\text{N}$`, `$F \\approx 14{,}4\\,\\text{N}$`, `$F \\approx 57{,}6\\,\\text{N}$`, `$F \\approx 7{,}2\\,\\text{N}$`],
-                        correctIndex: 0, isCalculation: true
-                    },
-                    {
-                        question: `Qual è l'intensità del campo elettrico $\\vec{E}$ generato nel vuoto da una carica puntiforme $q = +5\\,\\mu\\text{C}$ in un punto $P$ a distanza $r = 20\\,\\text{cm}$? ($k_0 = 8{,}99 \\times 10^9\\,\\text{N}\\cdot\\text{m}^2/\\text{C}^2$)`,
-                        options: [`$E \\approx 1{,}12 \\times 10^6\\,\\text{N/C}$`, `$E \\approx 2{,}25 \\times 10^5\\,\\text{N/C}$`, `$E \\approx 4{,}50 \\times 10^6\\,\\text{N/C}$`, `$E \\approx 8{,}99 \\times 10^5\\,\\text{N/C}$`],
-                        correctIndex: 0, isCalculation: true
-                    },
-                    {
-                        question: `All'interno di un conduttore metallico solido in condizioni di equilibrio elettrostatico, il campo elettrico $\\vec{E}$ è:`,
-                        options: [`Identicamente nullo ($\\vec{E} = \\vec{0}$)`, `Costante e perpendicolare alla superficie`, `Proporzionale al raggio di curvatura`, `Inverso rispetto alla densità superficiale`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Per quale motivo nelle zone a minor raggio di curvatura di un conduttore (punte) il campo elettrico è massimo?`,
-                        options: [`Perché vi si concentra la maggiore densità superficiale di carica $\\sigma$`, `Perché la massa degli elettroni aumenta`, `Perché il potenziale si azzera`, `Perché la costante dielettrica raddoppia`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Se lo spazio tra due cariche viene riempito con un dielettrico avente costante relativa $\\varepsilon_r = 4$, la forza di Coulomb rispetto al vuoto:`,
-                        options: [`Si riduce di un fattore 4 ($F = F_0 / 4$)`, `Aumenta di un fattore 4`, `Rimane invariata`, `Si azzera`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Il principio della schermatura elettrostatica (gabbia di Faraday) garantisce che all'interno di una cavità conduttrice chiusa:`,
-                        options: [`Il campo elettrico esterno non ha alcun effetto ($\\vec{E} = \\vec{0}$)`, `Il campo elettrico viene raddoppiato`, `Le cariche interne si annullano`, `Si genera una corrente stazionaria`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Una carica di prova $q = +3\\,\\text{nC}$ immersa in un campo elettrico uniformemente diretto $E = 4000\\,\\text{N/C}$ sperimenta una forza elettrostatica pari a:`,
-                        options: [`$F = 12\\,\\mu\\text{N}$`, `$F = 1{,}2\\,\\mu\\text{N}$`, `$F = 120\\,\\mu\\text{N}$`, `$F = 0{,}12\\,\\mu\\text{N}$`],
-                        correctIndex: 0, isCalculation: true
-                    },
-                    {
-                        question: `Due cariche uguali e concordi $+q$ poste a distanza $d$ generano nel loro punto medio un campo elettrico risultante pari a:`,
-                        options: [`$E_{\\text{tot}} = 0\\,\\text{N/C}$`, `$\\frac{2k_0 q}{d^2}$`, `$\\frac{k_0 q^2}{d}$`, `$\\sqrt{2} \\frac{k_0 q}{d^2}$`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Due cariche puntiformi $q_1$ e $q_2$ si attraggono con forza $F$. Raddoppiando la distanza $r$ tra di esse, la forza elettrostatica diventa:`,
-                        options: [`$F/4$`, `$2F$`, `$4F$`, `$F/2$`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Il lavoro compiuto dal campo elettrico per spostare una carica $q$ lungo una superficie equipotenziale è:`,
-                        options: [`Sempre nullo ($W = 0$)`, `Massimo e pari a $qEd$`, `Negativo`, `Proporzionale al percorso`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Il potenziale elettrico in un punto dello spazio a distanza $r$ da una carica puntiforme $q$ nel vuoto è espresso dalla relazione:`,
-                        options: [`$V = \\frac{k_0 q}{r}$`, `$V = \\frac{k_0 q}{r^2}$`, `$V = k_0 q r$`, `$V = \\frac{q}{4\\pi \\varepsilon_0 r^2}$`],
-                        correctIndex: 0, isCalculation: false
-                    }
-                ];
-            }
-
-            let shuffledBank = shuffleArray(bank);
-            return shuffledBank.slice(0, count + 2);
-        }
-
-        async function startSelectedQuiz() {
-            if (checkDeadlineStatus()) {
-                alert("Impossibile avviare la prova: la scadenza temporale è stata superata.");
-                return;
-            }
-
+        function startSelectedQuiz() {
             studentName = document.getElementById('studentNameInput').value.trim();
             const errDiv = document.getElementById('nameErrorMsg');
             
@@ -1126,59 +703,44 @@
             }
             errDiv.classList.add('hidden');
 
-            const teacherTimerSetting = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
-            isUnlimitedTime = (teacherTimerSetting === 'unlimited');
+            const timerSetting = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
+            isUnlimitedTime = (timerSetting === 'unlimited');
 
-            document.getElementById('loadingOverlay').classList.remove('hidden');
+            let pool = generateElectrostaticsLiceoPool();
+            pool = shuffleArray(pool);
+            pool = pool.slice(0, 10); // Esattamente 10 quesiti randomizzati individualmente
 
-            setTimeout(() => {
-                try {
-                    loadMasterConfig();
-                    let count = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '10', 10);
-                    let combinedText = loadedReferenceFiles.map(f => `FILE: ${f.name}\n${f.text}`).join("\n\n");
-                    let directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
+            activeQuestions = pool.map(q => {
+                const correctStr = q.options[q.correctIndex];
+                const mixedOpts = shuffleArray([...q.options]);
+                return {
+                    question: q.question,
+                    options: mixedOpts,
+                    correctIndex: mixedOpts.indexOf(correctStr),
+                    isCalculation: Boolean(q.isCalculation)
+                };
+            });
 
-                    let generatedQuestions = generateStrictLiceoPhysicsQuestions(count + 2, combinedText, directives);
+            studentAnswers = new Array(activeQuestions.length).fill(null);
+            currentQuestionIndex = 0;
+            isJollyUsed = false;
+            isProcessingAdvance = false;
 
-                    let pool = generatedQuestions.slice(0, count);
-                    spareQuestions = generatedQuestions.slice(count);
+            exitCount = 0;
+            lastExitTimestamp = 0;
+            isQuizActive = true;
+            quizStartTime = new Date();
 
-                    activeQuestions = pool.map(q => {
-                        const correctStr = q.options[q.correctIndex];
-                        const mixedOpts = shuffleArray([...q.options]);
-                        return {
-                            question: q.question,
-                            options: mixedOpts,
-                            correctIndex: mixedOpts.indexOf(correctStr),
-                            isCalculation: Boolean(q.isCalculation)
-                        };
-                    });
+            dismissExitAlert();
+            const liveMonitor = document.getElementById('liveExitsMonitorBadge');
+            if (liveMonitor) liveMonitor.classList.add('hidden');
 
-                    studentAnswers = new Array(activeQuestions.length).fill(null);
-                    currentQuestionIndex = 0;
-                    isJollyUsed = false;
-                    isProcessingAdvance = false;
+            updateCancelTimerBtnUI();
 
-                    exitCount = 0;
-                    lastExitTimestamp = 0;
-                    isQuizActive = true;
-                    quizStartTime = new Date();
+            document.getElementById('screenStart').classList.add('hidden');
+            document.getElementById('screenQuiz').classList.remove('hidden');
 
-                    dismissExitAlert();
-                    const liveMonitor = document.getElementById('liveExitsMonitorBadge');
-                    if (liveMonitor) liveMonitor.classList.add('hidden');
-
-                    document.getElementById('screenStart').classList.add('hidden');
-                    document.getElementById('screenQuiz').classList.remove('hidden');
-
-                    renderCurrentQuestion();
-                } catch (err) {
-                    console.error("Errore Avvio:", err);
-                    alert("Si è verificato un errore durante l'avvio della prova. Riprova.");
-                } finally {
-                    document.getElementById('loadingOverlay').classList.add('hidden');
-                }
-            }, 300);
+            renderCurrentQuestion();
         }
 
         function renderCurrentQuestion() {
@@ -1195,7 +757,7 @@
                     badge.textContent = "🧮 Calcolo / Problema (150s)";
                     badge.className = "px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-indigo-100 text-indigo-900 border border-indigo-200";
                 } else {
-                    badge.textContent = "📖 Quesito Teorico (60s)";
+                    badge.textContent = "📖 Teoria e Principi (60s)";
                     badge.className = "px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-slate-100 text-slate-700 border border-slate-200";
                 }
             }
@@ -1223,7 +785,7 @@
             q.options.forEach((optText, index) => {
                 const btn = document.createElement('button');
                 btn.className = "option-card-btn";
-                btn.onclick = () => handleOptionClick(index, btn);
+                btn.onclick = () => handleAnswerAndAdvance(index, btn);
 
                 const marker = String.fromCharCode(65 + index);
                 btn.innerHTML = `
@@ -1237,14 +799,16 @@
             startQuestionTimer();
         }
 
-        function handleOptionClick(optionIndex, btnElement) {
+        function handleAnswerAndAdvance(optionIndex, btnElement) {
             if (isProcessingAdvance) return;
-
             isProcessingAdvance = true;
             stopQuestionTimer();
 
             studentAnswers[currentQuestionIndex] = optionIndex;
-            if (btnElement) btnElement.classList.add('selected-state');
+
+            if (btnElement) {
+                btnElement.classList.add('selected-state');
+            }
 
             const allBtns = document.querySelectorAll('#optionsContainer button');
             allBtns.forEach(b => b.disabled = true);
@@ -1257,19 +821,6 @@
                     finishQuiz();
                 }
             }, 250);
-        }
-
-        function confirmEarlyExit() {
-            document.getElementById('earlyExitModal').classList.remove('hidden');
-        }
-
-        function closeEarlyExitModal() {
-            document.getElementById('earlyExitModal').classList.add('hidden');
-        }
-
-        function executeEarlyExit() {
-            closeEarlyExitModal();
-            finishQuiz();
         }
 
         function stopQuestionTimer() {
@@ -1344,15 +895,40 @@
             }
         }
 
+        function toggleTimerQuiz() {
+            isUnlimitedTime = !isUnlimitedTime;
+            updateCancelTimerBtnUI();
+
+            if (isUnlimitedTime) {
+                stopQuestionTimer();
+                updateTimerDisplay();
+            } else {
+                startQuestionTimer();
+            }
+        }
+
+        function updateCancelTimerBtnUI() {
+            const cancelBtn = document.getElementById('cancelTimerBtn');
+            const cancelBtnText = document.getElementById('cancelTimerBtnText');
+            if (!cancelBtn || !cancelBtnText) return;
+
+            if (isUnlimitedTime) {
+                cancelBtn.className = "px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer";
+                cancelBtn.innerHTML = `<i class="fa-solid fa-clock-rotate-left text-emerald-600"></i> <span id="cancelTimerBtnText">Riattiva Timer</span>`;
+            } else {
+                cancelBtn.className = "px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer";
+                cancelBtn.innerHTML = `<i class="fa-solid fa-ban text-rose-600"></i> <span id="cancelTimerBtnText">Annulla Timer</span>`;
+            }
+        }
+
         function useJolly() {
             if (isJollyUsed || isProcessingAdvance) return;
 
-            if (spareQuestions.length === 0) {
-                alert("Jolly non disponibile: nessuna domanda di riserva.");
-                return;
-            }
+            const fullPool = generateElectrostaticsLiceoPool();
+            const currentQuestionsText = activeQuestions.map(q => q.question);
+            const unusedPool = fullPool.filter(q => !currentQuestionsText.includes(q.question));
 
-            let newQ = spareQuestions.shift();
+            let newQ = unusedPool.length > 0 ? unusedPool[Math.floor(Math.random() * unusedPool.length)] : fullPool[0];
             const correctStr = newQ.options[newQ.correctIndex];
             const mixedOpts = shuffleArray([...newQ.options]);
 
@@ -1444,15 +1020,6 @@
 
             history.unshift(record);
             localStorage.setItem(QUIZ_SETTINGS.storageKey, JSON.stringify(history));
-
-            if (QUIZ_SETTINGS.googleSheetUrl) {
-                fetch(QUIZ_SETTINGS.googleSheetUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(record)
-                }).catch(err => console.debug("Google Sheets sync note:", err));
-            }
         }
 
         function restartQuiz() {
@@ -1463,8 +1030,6 @@
             document.getElementById('screenStart').classList.remove('hidden');
             document.getElementById('progressBarFill').style.width = '0%';
             document.getElementById('nameErrorMsg').classList.add('hidden');
-            loadMasterConfig();
-            updateUIConfigDisplays();
         }
 
         function openTeacherModal() {
@@ -1473,11 +1038,6 @@
             document.getElementById('teacherDashboardSection').classList.add('hidden');
             document.getElementById('teacherPinInput').value = '';
             document.getElementById('teacherAuthError').classList.add('hidden');
-            document.getElementById('sheetUrlSetting').value = QUIZ_SETTINGS.googleSheetUrl;
-
-            loadMasterConfig();
-            renderLoadedFilesList();
-            updateUIConfigDisplays();
         }
 
         function closeTeacherModal() {
@@ -1489,21 +1049,10 @@
             if (pin === QUIZ_SETTINGS.teacherPin) {
                 document.getElementById('teacherAuthSection').classList.add('hidden');
                 document.getElementById('teacherDashboardSection').classList.remove('hidden');
-                loadMasterConfig();
-                renderLoadedFilesList();
                 loadTeacherTable();
             } else {
-                document.getElementById('teacherAuthError').classList.add('hidden');
+                document.getElementById('teacherAuthError').classList.remove('hidden');
             }
-        }
-
-        function saveSheetUrlSetting() {
-            const val = document.getElementById('sheetUrlSetting').value.trim();
-            localStorage.setItem('PHYSICS_SHEET_URL', val);
-            QUIZ_SETTINGS.googleSheetUrl = val;
-            const btn = document.getElementById('sheetSaveBtn');
-            btn.textContent = "Salvato ✓";
-            setTimeout(() => { btn.textContent = "Salva"; }, 1500);
         }
 
         function loadTeacherTable() {
@@ -1544,12 +1093,6 @@
             localStorage.removeItem(QUIZ_SETTINGS.storageKey);
             loadTeacherTable();
         }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            loadMasterConfig();
-            renderLoadedFilesList();
-            updateUIConfigDisplays();
-        });
     </script>
 </body>
 </html>
