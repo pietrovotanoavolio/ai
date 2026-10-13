@@ -120,7 +120,7 @@
                     <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
                         <span>Verifica di Fisica Liceo</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Prova basata sui file e sulle indicazioni del docente</p>
+                    <p class="text-xs text-slate-400">Prova basata esclusivamente sui file caricati</p>
                 </div>
             </div>
             <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -152,14 +152,14 @@
                         <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Parametri della Verifica
                     </span>
                     <span id="groundingSourceBadge" class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
-                        File e Indicazioni Docente
+                        File Caricati
                     </span>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Origine Contenuti</span>
-                        <strong class="text-xs font-bold text-indigo-600 block truncate">Materiale Caricato</strong>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Origine Quesiti</span>
+                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">File Docente</strong>
                     </div>
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">N. Quesiti</span>
@@ -373,7 +373,7 @@
             </div>
         </section>
 
-        <!-- OVERLAY CARICAMENTO (SENZA SCRITTE ESPLICITE) -->
+        <!-- OVERLAY CARICAMENTO (SENZA ALCUN TESTO) -->
         <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center text-white px-4">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-indigo-400"></i>
         </div>
@@ -475,7 +475,7 @@
                             Carica File di Riferimento (PDF, Word, PPTX, XLSX, CSV, TXT)
                         </label>
                         <p class="text-[11px] text-slate-500">
-                            L'IA analizzerà questi file estraendo argomenti, concetti, formule ed esempi per generare quesiti coerenti.
+                            I quesiti saranno generati <strong>esclusivamente</strong> analizzando il contenuto, i concetti, i termini e gli esempi presenti nei file caricati.
                         </p>
                         
                         <input type="file" id="referenceFileInput" multiple accept=".pdf,.docx,.doc,.pptx,.ppt,.xlsx,.xls,.csv,.txt,.json,.md" onchange="handleMultipleReferenceFiles(event)"
@@ -495,14 +495,14 @@
                         </div>
                     </div>
 
-                    <!-- Indicazioni del Docente -->
+                    <!-- Indicazioni del Docente (Distribuzione e Direttive) -->
                     <div class="space-y-1.5 pt-2 border-t border-slate-200">
                         <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
                             <i class="fa-solid fa-comment-dots text-indigo-600"></i>
                             Indicazioni del Docente (Distribuzione e Direttive):
                         </label>
                         <textarea id="teacherDirectivesInput" rows="3" oninput="saveTeacherDirectives()"
-                                  placeholder="Es. Distribuisci equamente le domande su tutti i capitoli del file, focalizzati sugli urti elastici..."
+                                  placeholder="Es. Distribuisci equamente le domande su tutti i concetti del file, focalizzati sugli argomenti trattati..."
                                   class="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                     </div>
 
@@ -958,11 +958,11 @@
 
             const prompt = `Sei un docente rigoroso di Fisica per il liceo scientifico. Genera una verifica a risposta multipla originale di ${count} quesiti.
             
-            REGOLE FONDAMENTALI SUL CONTESTO E SULLE FONTI:
-            1. Prendi ispirazione ESCLUSIVAMENTE dai concetti, dalle grandezze, dai fenomeni, dagli argomenti e dagli esempi presenti nel materiale di riferimento fornito dal docente. 
-            2. ${textContext && textContext.trim().length > 0 ? `Testo di riferimento fornito:\n---\n${textContext.substring(0, 40000)}\n---` : 'Nessun file caricato: genera quesiti basati sul programma standard di fisica liceale.'}
+            REGOLE FONDAMENTALI SULLE FONTI E SULL'ARGOMENTO:
+            1. Prendi ispirazione ESCLUSIVAMENTE dai concetti, dalle grandezze, dai fenomeni, dai termini, dalle formule e dagli esempi presenti NEL MATERIALE DI RIFERIMENTO CARICATO DAL DOCENTE. È assolutamente VIETATO generare quesiti su argomenti estranei ai file forniti (non usare argomenti predefiniti se non presenti nel testo).
+            2. Testo di riferimento fornito dal docente:\n---\n${textContext && textContext.trim().length > 0 ? textContext.substring(0, 45000) : 'ATTENZIONE: Nessun file fornito. Genera quesiti basati strettamente sulle indicazioni del docente qui sotto.'}\n---
             
-            ${directives ? `INDICAZIONI SPECIFICHE DEL DOCENTE:\n${directives}\n(Nota: distribuisci equamente le domande su tutti i concetti e capitoli trattati nel materiale se non diversamente specificato).\n` : ''}
+            ${directives ? `INDICAZIONI SPECIFICHE DEL DOCENTE:\n${directives}\n(Nota: distribuisci equamente le domande su tutti i concetti, capitoli e idee presenti nel materiale fornito).\n` : ''}
             
             REGOLE FORMATO:
             1. Genera esattamente ${count} domande.
@@ -1007,45 +1007,6 @@
             throw new Error("Risposta LLM non valida");
         }
 
-        // Fallback locale in caso di assenza di rete o file
-        function getFallbackQuestions() {
-            return [
-                {
-                    question: "Secondo il principio di conservazione, in un sistema isolato la quantità di moto totale:",
-                    options: [
-                        "Rimane costante nel tempo.",
-                        "È direttamente proporzionale al tempo trascorso.",
-                        "Si azzera istantaneamente dopo ogni urto.",
-                        "Dipende esclusivamente dalla massa totale del sistema."
-                    ],
-                    correctIndex: 0,
-                    isCalculation: false
-                },
-                {
-                    question: "Un corpo di massa $m = 2\\,\\text{kg}$ si muove a velocità $v = 5\\,\\text{m/s}$. Qual è il modulo della sua quantità di moto $p$?",
-                    options: [
-                        "$p = 10\\,\\text{kg}\\cdot\\text{m/s}$",
-                        "$p = 2,5\\,\\text{kg}\\cdot\\text{m/s}$",
-                        "$p = 7\\,\\text{kg}\\cdot\\text{m/s}$",
-                        "$p = 25\\,\\text{kg}\\cdot\\text{m/s}$"
-                    ],
-                    correctIndex: 0,
-                    isCalculation: true
-                },
-                {
-                    question: "Durante un urto perfettamente anelastico tra due corpi:",
-                    options: [
-                        "I corpi rimangono uniti dopo l'impatto e si muovono con la stessa velocità finale.",
-                        "L'energia cinetica totale del sistema si conserva perfettamente.",
-                        "La quantità di moto totale del sistema non si conserva.",
-                        "I corpi rimbalzano conservando inalterata la propria velocità iniziale."
-                    ],
-                    correctIndex: 0,
-                    isCalculation: false
-                }
-            ];
-        }
-
         async function startSelectedQuiz() {
             if (checkDeadlineStatus()) {
                 alert("Impossibile avviare la prova: la scadenza temporale è stata superata.");
@@ -1061,6 +1022,15 @@
             }
             errDiv.classList.add('hidden');
 
+            if (!loadedReferenceFiles || loadedReferenceFiles.length === 0) {
+                const customDirs = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || "";
+                if (!customDirs.trim()) {
+                    alert("Attenzione: non hai caricato alcun file di riferimento né inserito indicazioni nel Pannello Docente. Carica almeno un file o scrivi le indicazioni prima di avviare la verifica.");
+                    openTeacherModal();
+                    return;
+                }
+            }
+
             const teacherTimerSetting = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
             isUnlimitedTime = (teacherTimerSetting === 'unlimited');
 
@@ -1073,16 +1043,10 @@
                 const textContext = loadedReferenceFiles.map(f => `--- File: ${f.name} ---\n` + f.content).join("\n\n");
                 const directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || "";
 
-                let generatedPool = [];
-                try {
-                    generatedPool = await generateQuestionsWithLLM(textContext, directives, targetCount + 2);
-                } catch(e) {
-                    console.debug("Uso fallback locale:", e);
-                    generatedPool = getFallbackQuestions();
-                }
+                const generatedPool = await generateQuestionsWithLLM(textContext, directives, targetCount + 2);
 
                 if (!generatedPool || generatedPool.length === 0) {
-                    generatedPool = getFallbackQuestions();
+                    throw new Error("Nessun quesito generato dal materiale.");
                 }
 
                 let pool = generatedPool.slice(0, targetCount);
@@ -1119,7 +1083,7 @@
                 renderCurrentQuestion();
             } catch (err) {
                 console.error("Errore Avvio:", err);
-                alert("Si è verificato un errore durante l'avvio della prova.");
+                alert("Si è verificato un errore durante la generazione della prova dai file forniti. Assicurati di aver caricato materiale leggibile o inserito indicazioni valide.");
             } finally {
                 document.getElementById('loadingOverlay').classList.add('hidden');
             }
@@ -1441,7 +1405,7 @@
                 renderLoadedFilesList();
                 loadTeacherTable();
             } else {
-                document.getElementById('teacherAuthError').classList.remove('hidden');
+                document.getElementById('teacherAuthError').classList.add('hidden');
             }
         }
 
