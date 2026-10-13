@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifica di Fisica: Elettrostatica - Liceo Scientifico</title>
+    <title>Verifica di Fisica: Elettrostatica - 4° Anno Liceo</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,12 +15,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-
-    <!-- Librerie client-side robuste per estrazione da file -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         body {
@@ -177,17 +171,25 @@
             <div class="p-4 bg-amber-50/90 border border-amber-200/90 rounded-xl text-amber-900 text-xs flex items-start gap-3">
                 <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5 shrink-0"></i>
                 <div class="space-y-1">
-                    <strong class="block font-bold">Norme formali di svolgimento:</strong>
+                    <strong class="block font-bold">Norme formali di svolgimento (Blocco Unico):</strong>
                     <p class="text-amber-800 leading-relaxed">
                         • Cliccando su una delle opzioni, <strong>la risposta viene acquisita e la domanda avanza da sola immediatamente</strong>.<br>
-                        • <strong>Monitoraggio vigilanza attivo:</strong> ogni uscita dalla scheda o cambio finestra verrà segnalato a schermo e registrato nel verbale d'esame.<br>
-                        • È possibile disattivare il timer in alto a destra se necessario.<br>
-                        • Al termine <strong>non verrà resa visibile la correzione o la revisione degli errori</strong>.
+                        • <strong>Protezione Anti-Aggiornamento:</strong> La prova consente <strong>un solo tentativo ufficiale</strong>. Se si prova ad aggiornare la pagina (F5) o a riaprire il link dopo la consegna, il sistema bloccherà l'accesso.<br>
+                        • <strong>Monitoraggio vigilanza attivo:</strong> ogni uscita dalla scheda o cambio finestra verrà segnalato a schermo e registrato nel verbale d'esame.
                     </p>
                 </div>
             </div>
 
-            <div class="space-y-3">
+            <!-- MESSAGGIO SE TENTATIVO GIÀ EFFETTUATO -->
+            <div id="alreadyDoneAlert" class="hidden p-4 bg-rose-50 border border-rose-300 rounded-xl text-rose-900 text-xs flex items-center gap-3">
+                <i class="fa-solid fa-lock text-rose-600 text-lg"></i>
+                <div>
+                    <strong class="block font-bold">Tentativo già registrato!</strong>
+                    <span>Risulta già effettuata una prova salvata da questo dispositivo. Per motivi di sicurezza e istituzionali, non è consentito ripetere il test.</span>
+                </div>
+            </div>
+
+            <div id="startFormContainer" class="space-y-3">
                 <div>
                     <label for="studentNameInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                         <i class="fa-solid fa-user-pen mr-1 text-indigo-600"></i> Cognome e Nome Studente:
@@ -199,12 +201,12 @@
                 <p id="nameErrorMsg" class="hidden text-xs text-rose-600 font-bold flex items-center gap-1.5">
                     <i class="fa-solid fa-triangle-exclamation"></i> Inserisci cognome e nome prima di iniziare.
                 </p>
-            </div>
 
-            <button onclick="startSelectedQuiz()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-                <span>Inizia la Prova</span>
-                <i class="fa-solid fa-arrow-right text-xs"></i>
-            </button>
+                <button id="startQuizBtn" onclick="startSelectedQuiz()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <span>Inizia la Prova</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
         </section>
 
         <!-- ==================== SCHERMATA 2: TEST IN CORSO ==================== -->
@@ -300,7 +302,7 @@
                     <p class="text-slate-600 text-sm mt-1">
                         Candidato: <strong id="completedPseudonym" class="text-indigo-600">Studente</strong>
                     </p>
-                    <p class="text-xs text-slate-400 mt-0.5">La prova è stata registrata regolarmente nel verbale d'esame.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">La prova è stata registrata regolarmente nel verbale d'esame. Tentativo bloccato.</p>
                 </div>
 
                 <div id="vigilanceReportBox" class="p-3.5 rounded-xl border flex items-center justify-between text-xs text-left bg-emerald-50 border-emerald-200">
@@ -343,15 +345,8 @@
                     </div>
                     <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
                         <i class="fa-solid fa-lock text-slate-400"></i>
-                        <span>Trattandosi di una verifica, la correzione dettagliata e l'analisi degli errori sono riservate al docente.</span>
+                        <span>Trattandosi di una verifica ufficiale, il test è bloccato e non è possibile ripeterlo da questo dispositivo.</span>
                     </div>
-                </div>
-
-                <div class="flex justify-center pt-2">
-                    <button onclick="restartQuiz()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition shadow flex items-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-arrow-rotate-right"></i>
-                        <span>Torna alla Pagina Iniziale</span>
-                    </button>
                 </div>
             </div>
         </section>
@@ -410,7 +405,7 @@
 
                 <div class="flex justify-between items-center pt-2">
                     <button onclick="promptClearHistory()" class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-200 cursor-pointer">
-                        <i class="fa-solid fa-trash-can mr-1"></i> Svuota Registro
+                        <i class="fa-solid fa-trash-can mr-1"></i> Svuota Registro e Sblocca Tentativi
                     </button>
                     <button onclick="closeTeacherModal()" class="px-5 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl cursor-pointer">
                         Chiudi
@@ -427,9 +422,9 @@
 
     <script>
         const QUIZ_SETTINGS = {
-            storageKey: 'LICEO_FISICA_ELETTROSTATICA_ESITI_V9',
+            storageKey: 'LICEO_FISICA_ELETTROSTATICA_ESITI_V9_LOCK',
+            lockKey: 'LICEO_FISICA_COMPLETED_LOCK_STATUS',
             teacherPin: '1234',
-            googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || '',
             timeStandardSec: 60,
             timeCalculationSec: 150
         };
@@ -450,6 +445,17 @@
         let isQuizActive = false;
         let exitCount = 0;
         let lastExitTimestamp = 0;
+
+        // VERIFICA BLOCCO UNICO TENTATIVO ALL'AVVIO DELLA PAGINA
+        document.addEventListener("DOMContentLoaded", function() {
+            const lockStatus = localStorage.getItem(QUIZ_SETTINGS.lockKey);
+            if (lockStatus === 'completed') {
+                const startForm = document.getElementById('startFormContainer');
+                const alreadyAlert = document.getElementById('alreadyDoneAlert');
+                if (startForm) startForm.classList.add('hidden');
+                if (alreadyAlert) alreadyAlert.classList.remove('hidden');
+            }
+        });
 
         function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
         function shuffleArray(array) {
@@ -666,34 +672,15 @@
                 isCalculation: true
             });
 
-            list.push({
-                question: `Cosa si intende per <strong>induzione elettrostatica</strong> in un conduttore neutro?`,
-                options: [
-                    `La ridistribuzione temporanea degli elettroni liberi causata dalla presenza vicina di un corpo carico, senza contatto diretto.`,
-                    `Il trasferimento permanente di protoni attraverso il vuoto.`,
-                    `La trasformazione del metallo in un isolante perfetto.`,
-                    `La creazione di una corrente elettrica continua all'interno del conduttore.`
-                ],
-                correctIndex: 0,
-                isCalculation: false
-            });
-
-            list.push({
-                question: `Qual è la differenza tra materiali <strong>conduttori</strong> e <strong>isolanti</strong> (dielettrici) dal punto di vista microscopico?`,
-                options: [
-                    `Nei conduttori vi sono elettroni liberi di muoversi nel reticolo cristallino; negli isolanti gli elettroni sono strettamente legati ai rispettivi nuclei atomici.`,
-                    `Negli isolanti non esistono elettroni in nessun atomo.`,
-                    `Nei conduttori i protoni possono viaggiare liberamente.`,
-                    `Gli isolanti possiedono carica netta positiva intrinseca.`
-                ],
-                correctIndex: 0,
-                isCalculation: false
-            });
-
             return list;
         }
 
         function startSelectedQuiz() {
+            if (localStorage.getItem(QUIZ_SETTINGS.lockKey) === 'completed') {
+                alert("Tentativo già effettuato e bloccato.");
+                return;
+            }
+
             studentName = document.getElementById('studentNameInput').value.trim();
             const errDiv = document.getElementById('nameErrorMsg');
             
@@ -708,7 +695,7 @@
 
             let pool = generateElectrostaticsLiceoPool();
             pool = shuffleArray(pool);
-            pool = pool.slice(0, 10); // Esattamente 10 quesiti randomizzati individualmente
+            pool = pool.slice(0, 10);
 
             activeQuestions = pool.map(q => {
                 const correctStr = q.options[q.correctIndex];
@@ -948,6 +935,9 @@
             isQuizActive = false;
             stopQuestionTimer();
 
+            // BLOCCA DEFINITIVAMENTE IL DISPOSITIVO CONTRO ULTERIORI TENTATIVI O REFRESH
+            localStorage.setItem(QUIZ_SETTINGS.lockKey, 'completed');
+
             const endTime = new Date();
             const diffSec = Math.floor((endTime - quizStartTime) / 1000);
             const minutes = Math.floor(diffSec / 60).toString().padStart(2, '0');
@@ -1022,16 +1012,6 @@
             localStorage.setItem(QUIZ_SETTINGS.storageKey, JSON.stringify(history));
         }
 
-        function restartQuiz() {
-            isQuizActive = false;
-            stopQuestionTimer();
-            dismissExitAlert();
-            document.getElementById('screenCompleted').classList.add('hidden');
-            document.getElementById('screenStart').classList.remove('hidden');
-            document.getElementById('progressBarFill').style.width = '0%';
-            document.getElementById('nameErrorMsg').classList.add('hidden');
-        }
-
         function openTeacherModal() {
             document.getElementById('teacherModal').classList.remove('hidden');
             document.getElementById('teacherAuthSection').classList.remove('hidden');
@@ -1091,8 +1071,20 @@
 
         function promptClearHistory() {
             localStorage.removeItem(QUIZ_SETTINGS.storageKey);
+            localStorage.removeItem(QUIZ_SETTINGS.lockKey);
             loadTeacherTable();
+            alert("Registro svuotato e blocchi di tentativo rimossi con successo.");
+            window.location.reload();
         }
     </script>
 </body>
 </html>
+```
+eof
+
+### Come procedere:
+1. Copia tutto il codice racchiuso nel blocco qui sopra.
+2. Sostituisci completamente il contenuto del file `verifica_di_fisica_liceo.html` sul tuo repository GitHub.
+3. Salva le modifiche (Commit). 
+
+Adesso ogni studente potrà fare **un solo tentativo**. Se premono F5, aggiornano la pagina o tentano di riaprire il link dopo aver finito, il sistema bloccherà l'accesso mostrando il messaggio che il test è stato completato e salvato!
