@@ -16,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
-    <!-- Librerie client-side per estrazione da PDF, PPTX, XLSX/XLS, CSV e DOCX -->
+    <!-- Librerie client-side per estrazione da PDF, DOCX, PPTX, XLSX e CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -120,7 +120,7 @@
                     <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
                         <span>Verifica di Fisica Liceo</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Prova basata esclusivamente sui file caricati</p>
+                    <p class="text-xs text-slate-400">Prova basata sui file e indicazioni del docente</p>
                 </div>
             </div>
             <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -152,14 +152,14 @@
                         <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Parametri della Verifica
                     </span>
                     <span id="groundingSourceBadge" class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
-                        File Caricati
+                        Pronto per l'avvio
                     </span>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Origine Quesiti</span>
-                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">File Docente</strong>
+                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">File / Indicazioni Docente</strong>
                     </div>
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">N. Quesiti</span>
@@ -373,7 +373,7 @@
             </div>
         </section>
 
-        <!-- OVERLAY CARICAMENTO (SENZA ALCUN TESTO) -->
+        <!-- OVERLAY CARICAMENTO -->
         <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center text-white px-4">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-indigo-400"></i>
         </div>
@@ -424,7 +424,7 @@
             <div id="teacherDashboardSection" class="hidden space-y-5">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                     <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-indigo-600"></i> Configurazione Prova da File e Direttive
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Configurazione Prova da File
                     </h3>
                     <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                         <i class="fa-solid fa-xmark text-lg"></i>
@@ -442,7 +442,7 @@
                             <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
                                 <i class="fa-solid fa-list-ol mr-1"></i> Numero Quesiti:
                             </label>
-                            <input type="number" id="teacherQuestionCountInput" min="0" max="100" placeholder="0 = Predefinito (10)" oninput="saveTeacherSettings()"
+                            <input type="number" id="teacherQuestionCountInput" min="0" max="100" placeholder="0 = Tutti i quesiti" oninput="saveTeacherSettings()"
                                    class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
                         </div>
                         <div>
@@ -467,15 +467,15 @@
                     </div>
                 </div>
 
-                <!-- CARICAMENTO FILE E DIRETTIVE -->
+                <!-- CARICAMENTO FILE E ESTRAZIONE QUESITI -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
                             <i class="fa-solid fa-folder-open text-indigo-600"></i>
-                            Carica File di Riferimento (PDF, Word, PPTX, XLSX, CSV, TXT)
+                            Carica File con le Domande (PDF, Word, PPTX, XLSX, CSV, TXT)
                         </label>
                         <p class="text-[11px] text-slate-500">
-                            I quesiti saranno generati <strong>esclusivamente</strong> analizzando il contenuto, i concetti, i termini e gli esempi presenti nei file caricati.
+                            I quesiti della verifica verranno estratti direttamente dai file che carichi qui sotto.
                         </p>
                         
                         <input type="file" id="referenceFileInput" multiple accept=".pdf,.docx,.doc,.pptx,.ppt,.xlsx,.xls,.csv,.txt,.json,.md" onchange="handleMultipleReferenceFiles(event)"
@@ -493,17 +493,6 @@
                             </div>
                             <div id="loadedFilesList" class="max-h-36 overflow-y-auto space-y-1 pr-1"></div>
                         </div>
-                    </div>
-
-                    <!-- Indicazioni del Docente (Distribuzione e Direttive) -->
-                    <div class="space-y-1.5 pt-2 border-t border-slate-200">
-                        <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
-                            <i class="fa-solid fa-comment-dots text-indigo-600"></i>
-                            Indicazioni del Docente (Distribuzione e Direttive):
-                        </label>
-                        <textarea id="teacherDirectivesInput" rows="3" oninput="saveTeacherDirectives()"
-                                  placeholder="Es. Distribuisci equamente le domande su tutti i concetti del file, focalizzati sugli argomenti trattati..."
-                                  class="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                     </div>
 
                     <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
@@ -602,6 +591,12 @@
             if (rawStoredFiles) loadedReferenceFiles = JSON.parse(rawStoredFiles);
         } catch(e) { loadedReferenceFiles = []; }
 
+        let parsedQuestionsBank = [];
+        try {
+            const rawBank = localStorage.getItem('PHYSICS_PARSED_QUESTIONS_BANK');
+            if (rawBank) parsedQuestionsBank = JSON.parse(rawBank);
+        } catch(e) { parsedQuestionsBank = []; }
+
         function shuffleArray(array) {
             const arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -678,17 +673,23 @@
             if (statusDiv) {
                 statusDiv.classList.remove('hidden');
                 statusDiv.className = "text-[11px] font-semibold text-indigo-700";
-                statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Acquisizione e analisi di ${files.length} file in corso...`;
+                statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Acquisizione ed estrazione quesiti da ${files.length} file in corso...`;
             }
 
             for (const file of files) {
                 try {
-                    const extractedText = await processSingleFile(file);
+                    const result = await processSingleFile(file);
                     loadedReferenceFiles = loadedReferenceFiles.filter(f => f.name !== file.name);
                     loadedReferenceFiles.push({
                         name: file.name,
                         ext: file.name.split('.').pop().toLowerCase(),
-                        content: extractedText
+                        questionsCount: result.questions.length
+                    });
+
+                    result.questions.forEach(q => {
+                        if (!parsedQuestionsBank.some(existing => existing.question === q.question)) {
+                            parsedQuestionsBank.push(q);
+                        }
                     });
                 } catch (err) {
                     console.error("Errore file:", err);
@@ -696,11 +697,12 @@
             }
 
             localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+            localStorage.setItem('PHYSICS_PARSED_QUESTIONS_BANK', JSON.stringify(parsedQuestionsBank));
             event.target.value = '';
 
             if (statusDiv) {
                 statusDiv.className = "text-[11px] font-semibold text-emerald-700";
-                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> File caricati e indicizzati con successo!`;
+                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Quesiti estratti con successo! Totale in banca dati: ${parsedQuestionsBank.length}.`;
             }
 
             renderLoadedFilesList();
@@ -711,25 +713,109 @@
             const ext = file.name.split('.').pop().toLowerCase();
             return new Promise((resolve, reject) => {
                 if (ext === 'pdf') {
-                    file.arrayBuffer().then(buf => extractTextFromPDF(buf)).then(resolve).catch(reject);
+                    file.arrayBuffer().then(buf => extractTextFromPDF(buf))
+                        .then(text => resolve({ questions: parseQuestionsFromText(text) })).catch(reject);
                 } else if (ext === 'docx' || ext === 'doc') {
-                    file.arrayBuffer().then(buf => extractTextFromWord(buf)).then(resolve).catch(reject);
+                    file.arrayBuffer().then(buf => extractTextFromWord(buf))
+                        .then(text => resolve({ questions: parseQuestionsFromText(text) })).catch(reject);
                 } else if (ext === 'pptx' || ext === 'ppt') {
-                    file.arrayBuffer().then(buf => extractTextFromPPTX(buf)).then(resolve).catch(reject);
+                    file.arrayBuffer().then(buf => extractTextFromPPTX(buf))
+                        .then(text => resolve({ questions: parseQuestionsFromText(text) })).catch(reject);
                 } else if (ext === 'xlsx' || ext === 'xls') {
-                    file.arrayBuffer().then(buf => extractTextFromExcel(buf)).then(resolve).catch(reject);
+                    file.arrayBuffer().then(buf => extractTextFromExcel(buf))
+                        .then(text => resolve({ questions: parseQuestionsFromText(text) })).catch(reject);
                 } else if (ext === 'csv') {
                     const reader = new FileReader();
-                    reader.onload = function(e) { resolve(e.target.result); };
+                    reader.onload = function(e) { resolve({ questions: parseQuestionsFromCSV(e.target.result) }); };
                     reader.onerror = reject;
                     reader.readAsText(file);
                 } else {
                     const reader = new FileReader();
-                    reader.onload = function(e) { resolve(e.target.result); };
+                    reader.onload = function(e) {
+                        const content = e.target.result;
+                        let qs = [];
+                        try {
+                            const parsed = JSON.parse(content);
+                            if (Array.isArray(parsed)) qs = parsed;
+                            else if (parsed.questions && Array.isArray(parsed.questions)) qs = parsed.questions;
+                        } catch(err) {
+                            qs = parseQuestionsFromText(content);
+                        }
+                        resolve({ questions: qs });
+                    };
                     reader.onerror = reject;
                     reader.readAsText(file);
                 }
             });
+        }
+
+        function parseQuestionsFromText(text) {
+            const blocks = text.split(/(?:Domanda|Q:|\n\d+\.)/i).filter(b => b.trim().length > 0);
+            const questions = [];
+
+            blocks.forEach(block => {
+                const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                if (lines.length < 2) return;
+
+                let qText = lines[0].replace(/^[\d\.\-\:\?]+/, '').trim();
+                let opts = [];
+                let cIndex = 0;
+
+                lines.slice(1).forEach(l => {
+                    const m = l.match(/^(?:[A-D]\)|[A-D]\.|\*|-)\s*(.+)/i);
+                    if (m) {
+                        opts.push(m[1].trim());
+                        if (l.includes('[X]') || l.toLowerCase().includes('(corretta)')) {
+                            cIndex = opts.length - 1;
+                        }
+                    }
+                });
+
+                if (opts.length >= 2 && qText.length > 5) {
+                    questions.push({
+                        question: qText,
+                        options: opts,
+                        correctIndex: Math.min(cIndex, opts.length - 1),
+                        isCalculation: qText.toLowerCase().includes('calcol') || qText.toLowerCase().includes('quanto')
+                    });
+                }
+            });
+
+            return questions;
+        }
+
+        function parseQuestionsFromCSV(csvText) {
+            const rows = csvText.split('\n').map(r => r.trim()).filter(r => r.length > 0);
+            if (rows.length < 2) return [];
+
+            const questions = [];
+            const startIdx = rows[0].toLowerCase().includes('domanda') || rows[0].toLowerCase().includes('question') ? 1 : 0;
+
+            for (let i = startIdx; i < rows.length; i++) {
+                const parts = rows[i].split(/[,;\t]/).map(p => p.replace(/^["']|["']$/g, '').trim());
+                if (parts.length >= 3) {
+                    const qText = parts[0];
+                    let opts = parts.slice(1, 5).filter(o => o.length > 0);
+                    let correctIdx = 0;
+
+                    if (parts.length >= 6) {
+                        const cVal = parts[5].toUpperCase().trim();
+                        if (cVal === 'B' || cVal === '1') correctIdx = 1;
+                        else if (cVal === 'C' || cVal === '2') correctIdx = 2;
+                        else if (cVal === 'D' || cVal === '3') correctIdx = 3;
+                    }
+
+                    if (qText.length > 5 && opts.length >= 2) {
+                        questions.push({
+                            question: qText,
+                            options: opts,
+                            correctIndex: Math.min(correctIdx, opts.length - 1),
+                            isCalculation: false
+                        });
+                    }
+                }
+            }
+            return questions;
         }
 
         function extractTextFromWord(arrayBuffer) {
@@ -805,7 +891,7 @@
                 itemDiv.innerHTML = `
                     <div class="flex items-center gap-2 truncate max-w-[80%]">
                         <i class="fa-solid fa-file-lines text-slate-500 text-sm shrink-0"></i>
-                        <span class="font-bold text-slate-800 truncate">${fileItem.name}</span>
+                        <span class="font-bold text-slate-800 truncate">${fileItem.name} (${fileItem.questionsCount} quesiti)</span>
                     </div>
                     <button onclick="removeReferenceFile(${idx})" class="text-rose-500 hover:text-rose-700 p-1 cursor-pointer">
                         <i class="fa-solid fa-xmark"></i>
@@ -824,7 +910,9 @@
 
         function clearAllReferenceFiles() {
             loadedReferenceFiles = [];
+            parsedQuestionsBank = [];
             localStorage.removeItem('PHYSICS_LOADED_FILES_LIST');
+            localStorage.removeItem('PHYSICS_PARSED_QUESTIONS_BANK');
             renderLoadedFilesList();
             updateUIConfigDisplays();
         }
@@ -868,15 +956,14 @@
             const timerSelect = document.getElementById('teacherTimerModeSelect');
             const groundingBadge = document.getElementById('groundingSourceBadge');
             const deadlineInput = document.getElementById('teacherDeadlineInput');
-            const directivesInput = document.getElementById('teacherDirectivesInput');
+            const startSource = document.getElementById('startScreenSource');
 
             const savedCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '0', 10);
             const savedTimer = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
             const savedDeadline = localStorage.getItem('PHYSICS_DEADLINE_TIME') || '';
-            const savedDirectives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
 
             if (countDisplay) {
-                countDisplay.textContent = savedCount > 0 ? `${savedCount} Quesiti configurati` : "Standard (10)";
+                countDisplay.textContent = savedCount > 0 ? `${savedCount} Quesiti configurati` : "Tutti i quesiti dai file";
             }
             if (countInput) {
                 countInput.value = savedCount > 0 ? savedCount : '';
@@ -893,34 +980,26 @@
                 deadlineInput.value = savedDeadline;
             }
 
-            if (directivesInput) {
-                directivesInput.value = savedDirectives;
-            }
-
             const statusBadge = document.getElementById('referenceSourceBadgeStatus');
             if (statusBadge) {
-                if (loadedReferenceFiles.length > 0) {
-                    statusBadge.textContent = `${loadedReferenceFiles.length} file attivi per generazione contestuale`;
-                    if (groundingBadge) groundingBadge.textContent = `${loadedReferenceFiles.length} File contestuali`;
+                if (parsedQuestionsBank.length > 0) {
+                    statusBadge.textContent = `${parsedQuestionsBank.length} quesiti pronti`;
+                    if (groundingBadge) groundingBadge.textContent = `${parsedQuestionsBank.length} Quesiti estratti`;
+                    if (startSource) startSource.textContent = `${parsedQuestionsBank.length} Quesiti da File`;
                 } else {
-                    statusBadge.textContent = "In attesa di file di riferimento";
-                    if (groundingBadge) groundingBadge.textContent = "Standard Liceo";
+                    statusBadge.textContent = "Nessun quesito trovato nei file";
+                    if (groundingBadge) groundingBadge.textContent = "Carica File";
+                    if (startSource) startSource.textContent = "Carica File";
                 }
             }
 
             checkDeadlineStatus();
         }
 
-        function saveTeacherDirectives() {
-            const val = document.getElementById('teacherDirectivesInput').value;
-            localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', val);
-        }
-
         function applyFileAndDirectives() {
             const deadlineVal = document.getElementById('teacherDeadlineInput').value;
             localStorage.setItem('PHYSICS_DEADLINE_TIME', deadlineVal);
-            saveTeacherDirectives();
-            alert("Configurazione e indicazioni salvate con successo!");
+            alert("Configurazione salvata con successo!");
             updateUIConfigDisplays();
         }
 
@@ -939,75 +1018,7 @@
             updateUIConfigDisplays();
         }
 
-        async function fetchWithRetry(url, options, retries = 3, backoff = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return await response.json();
-                } catch (e) {
-                    if (i === retries - 1) throw e;
-                    await new Promise(r => setTimeout(r, backoff * Math.pow(2, i)));
-                }
-            }
-        }
-
-        async function generateQuestionsWithLLM(textContext, directives, count) {
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const prompt = `Sei un docente rigoroso di Fisica per il liceo scientifico. Genera una verifica a risposta multipla originale di ${count} quesiti.
-            
-            REGOLE FONDAMENTALI SULLE FONTI E SULL'ARGOMENTO:
-            1. Prendi ispirazione ESCLUSIVAMENTE dai concetti, dalle grandezze, dai fenomeni, dai termini, dalle formule e dagli esempi presenti NEL MATERIALE DI RIFERIMENTO CARICATO DAL DOCENTE. È assolutamente VIETATO generare quesiti su argomenti estranei ai file forniti (non usare argomenti predefiniti se non presenti nel testo).
-            2. Testo di riferimento fornito dal docente:\n---\n${textContext && textContext.trim().length > 0 ? textContext.substring(0, 45000) : 'ATTENZIONE: Nessun file fornito. Genera quesiti basati strettamente sulle indicazioni del docente qui sotto.'}\n---
-            
-            ${directives ? `INDICAZIONI SPECIFICHE DEL DOCENTE:\n${directives}\n(Nota: distribuisci equamente le domande su tutti i concetti, capitoli e idee presenti nel materiale fornito).\n` : ''}
-            
-            REGOLE FORMATO:
-            1. Genera esattamente ${count} domande.
-            2. Ogni domanda deve avere esattamente 4 opzioni di risposta (di cui una sola corretta).
-            3. Assicurati che le opzioni (sia quella corretta che i distrattori) abbiano una lunghezza e un livello di dettaglio simili, evitando che la risposta corretta si distingua per la lunghezza.
-            4. Circa il 30-40% dei quesiti può richiedere calcoli (imposta isCalculation: true), mentre i restanti devono essere concettuali/teorici (isCalculation: false).
-            5. Usa la sintassi LaTeX tra $ o $$ per le formule (es. $F = m \\cdot a$).`;
-
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        items: {
-                            type: "OBJECT",
-                            properties: {
-                                "question": { type: "STRING" },
-                                "options": {
-                                    type: "ARRAY",
-                                    items: { type: "STRING" },
-                                    description: "Esattamente 4 opzioni di lunghezza simile."
-                                },
-                                "correctIndex": { type: "INTEGER", description: "Indice dell'opzione corretta (0, 1, 2, o 3)" },
-                                "isCalculation": { type: "BOOLEAN" }
-                            },
-                            required: ["question", "options", "correctIndex", "isCalculation"]
-                        }
-                    }
-                }
-            };
-
-            const result = await fetchWithRetry(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts.length > 0) {
-                return JSON.parse(result.candidates[0].content.parts[0].text);
-            }
-            throw new Error("Risposta LLM non valida");
-        }
-
-        async function startSelectedQuiz() {
+        function startSelectedQuiz() {
             if (checkDeadlineStatus()) {
                 alert("Impossibile avviare la prova: la scadenza temporale è stata superata.");
                 return;
@@ -1022,13 +1033,10 @@
             }
             errDiv.classList.add('hidden');
 
-            if (!loadedReferenceFiles || loadedReferenceFiles.length === 0) {
-                const customDirs = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || "";
-                if (!customDirs.trim()) {
-                    alert("Attenzione: non hai caricato alcun file di riferimento né inserito indicazioni nel Pannello Docente. Carica almeno un file o scrivi le indicazioni prima di avviare la verifica.");
-                    openTeacherModal();
-                    return;
-                }
+            if (!parsedQuestionsBank || parsedQuestionsBank.length === 0) {
+                alert("Attenzione: nessun file con quesiti validi è stato caricato dal docente. Carica prima almeno un file nel Pannello Docente.");
+                openTeacherModal();
+                return;
             }
 
             const teacherTimerSetting = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
@@ -1036,57 +1044,51 @@
 
             document.getElementById('loadingOverlay').classList.remove('hidden');
 
-            try {
-                let targetCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '0', 10);
-                if (targetCount === 0) targetCount = 10;
+            setTimeout(() => {
+                try {
+                    let bank = shuffleArray(parsedQuestionsBank);
+                    let targetCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '0', 10);
+                    if (targetCount === 0 || targetCount > bank.length) targetCount = bank.length;
 
-                const textContext = loadedReferenceFiles.map(f => `--- File: ${f.name} ---\n` + f.content).join("\n\n");
-                const directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || "";
+                    let pool = bank.slice(0, targetCount);
+                    spareQuestions = bank.slice(targetCount);
 
-                const generatedPool = await generateQuestionsWithLLM(textContext, directives, targetCount + 2);
+                    activeQuestions = pool.map(q => {
+                        const correctStr = q.options[q.correctIndex];
+                        const mixedOpts = shuffleArray([...q.options]);
+                        return {
+                            question: q.question,
+                            options: mixedOpts,
+                            correctIndex: mixedOpts.indexOf(correctStr),
+                            isCalculation: Boolean(q.isCalculation)
+                        };
+                    });
 
-                if (!generatedPool || generatedPool.length === 0) {
-                    throw new Error("Nessun quesito generato dal materiale.");
+                    studentAnswers = new Array(activeQuestions.length).fill(null);
+                    currentQuestionIndex = 0;
+                    isJollyUsed = false;
+                    isProcessingAdvance = false;
+
+                    exitCount = 0;
+                    lastExitTimestamp = 0;
+                    isQuizActive = true;
+                    quizStartTime = new Date();
+
+                    dismissExitAlert();
+                    const liveMonitor = document.getElementById('liveExitsMonitorBadge');
+                    if (liveMonitor) liveMonitor.classList.add('hidden');
+
+                    document.getElementById('screenStart').classList.add('hidden');
+                    document.getElementById('screenQuiz').classList.remove('hidden');
+
+                    renderCurrentQuestion();
+                } catch (err) {
+                    console.error("Errore Avvio:", err);
+                    alert("Si è verificato un errore durante l'avvio della prova.");
+                } finally {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
                 }
-
-                let pool = generatedPool.slice(0, targetCount);
-                spareQuestions = generatedPool.slice(targetCount);
-
-                activeQuestions = pool.map(q => {
-                    const correctStr = q.options[q.correctIndex];
-                    const mixedOpts = shuffleArray([...q.options]);
-                    return {
-                        question: q.question,
-                        options: mixedOpts,
-                        correctIndex: mixedOpts.indexOf(correctStr),
-                        isCalculation: Boolean(q.isCalculation)
-                    };
-                });
-
-                studentAnswers = new Array(activeQuestions.length).fill(null);
-                currentQuestionIndex = 0;
-                isJollyUsed = false;
-                isProcessingAdvance = false;
-
-                exitCount = 0;
-                lastExitTimestamp = 0;
-                isQuizActive = true;
-                quizStartTime = new Date();
-
-                dismissExitAlert();
-                const liveMonitor = document.getElementById('liveExitsMonitorBadge');
-                if (liveMonitor) liveMonitor.classList.add('hidden');
-
-                document.getElementById('screenStart').classList.add('hidden');
-                document.getElementById('screenQuiz').classList.remove('hidden');
-
-                renderCurrentQuestion();
-            } catch (err) {
-                console.error("Errore Avvio:", err);
-                alert("Si è verificato un errore durante la generazione della prova dai file forniti. Assicurati di aver caricato materiale leggibile o inserito indicazioni valide.");
-            } finally {
-                document.getElementById('loadingOverlay').classList.add('hidden');
-            }
+            }, 300);
         }
 
         function renderCurrentQuestion() {
@@ -1263,7 +1265,7 @@
             if (isJollyUsed || isProcessingAdvance) return;
 
             if (spareQuestions.length === 0) {
-                alert("Jolly non disponibile: il sistema non ha trovato domande di riserva alternative.");
+                alert("Jolly non disponibile: il sistema non ha trovato domande di riserva alternative nei file.");
                 return;
             }
 
@@ -1405,7 +1407,7 @@
                 renderLoadedFilesList();
                 loadTeacherTable();
             } else {
-                document.getElementById('teacherAuthError').classList.add('hidden');
+                document.getElementById('teacherAuthError').classList.remove('hidden');
             }
         }
 
