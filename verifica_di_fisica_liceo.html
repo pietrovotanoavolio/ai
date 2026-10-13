@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">Verifica di Fisica Liceo</title>
+    <title>Verifica di Fisica Liceo</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
-    <!-- Librerie client-side per estrazione da PDF, PPTX, XLSX/XLS, CSV, DOCX e TXT -->
+    <!-- Librerie client-side per estrazione da PDF, PPTX, XLSX/XLS, CSV e DOCX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -56,21 +56,15 @@
         }
 
         .option-card-btn:hover:not(:disabled) {
-            border-color: #06b6d4;
+            border-color: #4f46e5;
             background-color: #f8fafc;
             transform: translateY(-1px);
         }
 
         .option-card-btn.selected-state {
-            border-color: #06b6d4 !important;
-            background-color: #ecfeff !important;
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25) !important;
-        }
-
-        .option-card-btn.selected-state .option-badge {
-            background-color: #06b6d4 !important;
-            color: #ffffff !important;
-            border-color: #06b6d4 !important;
+            border-color: #4338ca !important;
+            background-color: #eef2ff !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
         }
 
         .option-badge {
@@ -91,9 +85,9 @@
         }
 
         .option-card-btn:hover .option-badge {
-            background-color: #06b6d4;
+            background-color: #4f46e5;
             color: #ffffff;
-            border-color: #06b6d4;
+            border-color: #4f46e5;
         }
 
         @keyframes pulse-red-alert {
@@ -126,7 +120,7 @@
                     <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
                         <span id="headerSubjectTopic">Verifica di Fisica Liceo</span>
                     </h1>
-                    <p id="headerSubtopics" class="text-xs text-slate-400">Impulso, Urti e Conservazione</p>
+                    <p id="headerSubtopics" class="text-xs text-slate-400">Prova basata esclusivamente sui file caricati</p>
                 </div>
             </div>
             <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -158,22 +152,22 @@
                         <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Parametri della Verifica
                     </span>
                     <span id="groundingSourceBadge" class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
-                        Generazione Dinamica
+                        File Caricati
                     </span>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Argomento</span>
-                        <strong id="startScreenTopic" class="text-xs font-bold text-slate-800 block truncate">Quantità di moto</strong>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Origine Quesiti</span>
+                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">File Docente</strong>
                     </div>
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">N. Quesiti</span>
-                        <strong id="activeQuestionCountDisplay" class="text-xs font-bold text-slate-800 block truncate">10 Quesiti</strong>
+                        <strong id="activeQuestionCountDisplay" class="text-xs font-bold text-slate-800 block truncate">Tutti i quesiti</strong>
                     </div>
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Difficoltà</span>
-                        <strong id="activeDifficultyDisplay" class="text-xs font-bold text-slate-800 block truncate">Alto (Max 40% Calcoli)</strong>
+                        <strong id="activeDifficultyDisplay" class="text-xs font-bold text-slate-800 block truncate">Liceo Scientifico</strong>
                     </div>
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Timer</span>
@@ -208,14 +202,6 @@
                     </label>
                     <input type="text" id="studentNameInput" placeholder="Es. Rossi Mario" 
                            class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm">
-                </div>
-
-                <!-- OPZIONE TIMER SOLO ALL'INIZIO (GESTITA DALLO STUDENTE O CONFIGURATA DAL DOCENTE) -->
-                <div id="studentTimerChoiceBox" class="flex items-center gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <input type="checkbox" id="studentDisableTimerCheck" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
-                    <label for="studentDisableTimerCheck" class="text-xs font-bold text-slate-700 cursor-pointer">
-                        Svolgi la prova senza limiti di tempo (Disattiva timer)
-                    </label>
                 </div>
 
                 <p id="nameErrorMsg" class="hidden text-xs text-rose-600 font-bold flex items-center gap-1.5">
@@ -253,12 +239,12 @@
                 </div>
             </div>
 
-            <!-- Barra Superiore Monitor e Timer (Senza tasto timer durante il quiz) -->
+            <!-- Barra Superiore Monitor e Timer -->
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/90 space-y-3">
                 <div class="flex justify-between items-center text-xs font-bold text-slate-600 flex-wrap gap-2">
                     <div class="flex items-center gap-2">
                         <span id="calcTypeBadge" class="px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-slate-100 text-slate-700 border border-slate-200">
-                            Teoria (60s)
+                            Quesito da File (60s)
                         </span>
 
                         <!-- Badge Vigilanza Uscite in Tempo Reale -->
@@ -387,7 +373,7 @@
             </div>
         </section>
 
-        <!-- OVERLAY CARICAMENTO (SENZA NESSUNA MENZIONE ALL'IA) -->
+        <!-- OVERLAY CARICAMENTO -->
         <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center text-white px-4">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-indigo-400"></i>
         </div>
@@ -438,36 +424,11 @@
             <div id="teacherDashboardSection" class="hidden space-y-5">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                     <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-indigo-600"></i> Configurazione Prova
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Configurazione Prova da File
                     </h3>
                     <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
-                </div>
-
-                <!-- SEZIONE: INFORMAZIONI PROVA -->
-                <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200 space-y-3">
-                    <h4 class="text-xs font-bold text-indigo-950 uppercase tracking-wider flex items-center gap-2 border-b border-indigo-200/60 pb-2">
-                        <i class="fa-solid fa-book text-indigo-600"></i> Informazioni Generali Prova
-                    </h4>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Materia:</label>
-                            <input type="text" id="teacherSubjectInput" placeholder="Es. Fisica, Matematica..." oninput="saveTeacherSettings()"
-                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Argomento Principale:</label>
-                            <input type="text" id="teacherTopicInput" placeholder="Es. Quantità di moto..." oninput="saveTeacherSettings()"
-                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">Sottotitoli / Dettagli (Opzionale):</label>
-                            <input type="text" id="teacherSubtopicsInput" placeholder="Es. Elenco degli argomenti trattati..." oninput="saveTeacherSettings()"
-                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Parametri di Somministrazione e Scadenza -->
@@ -476,30 +437,19 @@
                         <i class="fa-solid fa-sliders text-indigo-600"></i> Parametri di Somministrazione
                     </h4>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
                                 <i class="fa-solid fa-list-ol mr-1"></i> Numero Quesiti:
                             </label>
-                            <input type="number" id="teacherQuestionCountInput" min="0" max="100" placeholder="0 = Predefinito" oninput="saveTeacherSettings()"
-                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
-                                <i class="fa-solid fa-calculator mr-1"></i> Quantità Calcoli:
-                            </label>
-                            <select id="teacherCalcRatioSelect" onchange="saveTeacherSettings()" class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
-                                <option value="0.2">Basso (Max 20% Problemi)</option>
-                                <option value="0.3">Medio (Max 30% Problemi)</option>
-                                <option value="0.4" selected>Alto (Max 40% Problemi)</option>
-                                <option value="0.0">Solo Teoria (0% Problemi)</option>
-                            </select>
+                            <input type="number" id="teacherQuestionCountInput" min="0" max="100" placeholder="0 = Tutti i quesiti" oninput="saveTeacherSettings()"
+                                   class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-indigo-900 uppercase mb-1">
                                 <i class="fa-solid fa-hourglass-half mr-1"></i> Gestione Timer:
                             </label>
-                            <select id="teacherTimerModeSelect" onchange="saveTeacherSettings()" class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-[11px] font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
+                            <select id="teacherTimerModeSelect" onchange="saveTeacherSettings()" class="w-full px-3 py-2 bg-white border border-indigo-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm">
                                 <option value="standard">⏱️ Attivo (60s/150s)</option>
                                 <option value="unlimited">♾️ Illimitato</option>
                             </select>
@@ -517,21 +467,15 @@
                     </div>
                 </div>
 
-                <!-- CARICAMENTO FILE E DIRETTIVE -->
+                <!-- CARICAMENTO FILE E ESTRAZIONE QUESITI -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-                    
                     <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
-                                <i class="fa-solid fa-folder-open text-indigo-600"></i>
-                                Carica File di Riferimento (PDF, Word, PPTX, XLSX, TXT)
-                            </label>
-                            <span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">
-                                Copertura equa attiva
-                            </span>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-folder-open text-indigo-600"></i>
+                            Carica File con le Domande (PDF, Word, PPTX, XLSX, CSV, TXT)
+                        </label>
                         <p class="text-[11px] text-slate-500">
-                            Carica i materiali didattici. Le domande verranno distribuite in modo uniforme ed equo tra tutte le idee e concetti presenti nei file, attenendosi rigorosamente ad essi.
+                            I quesiti della verifica verranno estratti direttamente dai file che carichi qui sotto.
                         </p>
                         
                         <input type="file" id="referenceFileInput" multiple accept=".pdf,.docx,.doc,.pptx,.ppt,.xlsx,.xls,.csv,.txt,.json,.md" onchange="handleMultipleReferenceFiles(event)"
@@ -542,28 +486,13 @@
                         <!-- Elenco dinamico dei file caricati -->
                         <div id="loadedFilesContainer" class="pt-2 space-y-1.5 hidden">
                             <div class="flex justify-between items-center text-[11px] font-bold text-slate-700 border-b border-slate-200 pb-1">
-                                <span><i class="fa-solid fa-layer-group text-indigo-600 mr-1"></i> File di riferimento caricati (<span id="loadedFilesCountBadge">0</span>):</span>
+                                <span><i class="fa-solid fa-layer-group text-indigo-600 mr-1"></i> File caricati (<span id="loadedFilesCountBadge">0</span>):</span>
                                 <button onclick="clearAllReferenceFiles()" class="text-rose-600 hover:text-rose-800 text-[10px] font-bold cursor-pointer">
                                     <i class="fa-solid fa-trash-can mr-1"></i> Rimuovi tutti
                                 </button>
                             </div>
-                            <div id="loadedFilesList" class="max-h-36 overflow-y-auto space-y-1 pr-1">
-                                <!-- Elementi file iniettati dinamicamente -->
-                            </div>
+                            <div id="loadedFilesList" class="max-h-36 overflow-y-auto space-y-1 pr-1"></div>
                         </div>
-                    </div>
-
-                    <div class="space-y-1.5 pt-2 border-t border-slate-200">
-                        <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
-                            <i class="fa-solid fa-comment-dots text-indigo-600"></i>
-                            Indicazioni del Docente (Prompt per generazione)
-                        </label>
-                        <p class="text-[11px] text-slate-500">
-                            Specifica linee guida (es. "Focalizzati sugli argomenti del capitolo 2").
-                        </p>
-                        <textarea id="teacherPromptDirectives" rows="3" oninput="saveTeacherDirectives()"
-                                  placeholder="Scrivi qui i tuoi criteri e commenti su come formulare i quesiti..."
-                                  class="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                     </div>
 
                     <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
@@ -571,11 +500,11 @@
                             <i class="fa-solid fa-check"></i>
                             <span>Applica Impostazioni alla Prova</span>
                         </button>
-                        <span id="referenceSourceBadgeStatus" class="text-[11px] text-slate-600 font-semibold"></span>
+                        <span id="referenceSourceBadgeStatus" class="text-[11px] text-slate-600 font-semibold">In attesa di file...</span>
                     </div>
                 </div>
 
-                <!-- Configurazione Google Sheets (Agganciato al tuo foglio di default) -->
+                <!-- Configurazione Google Sheets -->
                 <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase"><i class="fa-brands fa-google mr-1 text-emerald-600"></i> Google Sheets (Per vedere i risultati da un altro PC)</label>
@@ -627,7 +556,7 @@
     <script>
         const QUIZ_SETTINGS = {
             storageKey: 'LICEO_FISICA_ESITI_GENERAL',
-            teacherPin: '3548', // PIN SEGRETO CONFIGURATO
+            teacherPin: '3548',
             googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw6H3XF7Cg_a5cKqX7h8K9z7mX6Cg_a5cKqX7h8K9z7mX6Cg/exec',
             timeStandardSec: 60,
             timeCalculationSec: 150
@@ -662,73 +591,11 @@
             if (rawStoredFiles) loadedReferenceFiles = JSON.parse(rawStoredFiles);
         } catch(e) { loadedReferenceFiles = []; }
 
-        async function fetchWithRetry(url, options, retries = 3, backoff = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return await response.json();
-                } catch (e) {
-                    if (i === retries - 1) throw e;
-                    await new Promise(r => setTimeout(r, backoff * Math.pow(2, i)));
-                }
-            }
-        }
-
-        async function generateQuestionsWithLLM(textContext, subject, topic, subtopics, directives, count, calcRatio) {
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const prompt = `Sei un docente rigoroso. Genera una verifica a risposta multipla inedita e originale di ${subject} sull'argomento: ${topic} (${subtopics}).
-            
-            REGOLE FONDAMENTALI PER I CONTENUTI E LA COPERTURA:
-            ${textContext && textContext.trim().length > 0 ? `Devi attenerti STRETTAMENTE E SOLTANTO alle informazioni presenti nel seguente testo di riferimento allegato dal docente. DISTRIBUISCI le domande in modo UNIFORME ED EQUO tra i vari concetti, capitoli, definizioni e idee presenti nel testo, garantendo una copertura approfondita ed esaustiva di tutto il materiale fornito (a meno che non ci siano indicazioni contrarie nelle 'Indicazioni del Docente'). NON utilizzare terminologia, argomenti, concetti o definizioni che non siano esplicitamente menzionati in questo testo:\n\n---\nINIZIO MATERIALE DOCENTE\n${textContext.substring(0, 45000)}\nFINE MATERIALE DOCENTE\n---\n` : 'Nessun materiale specifico fornito. Basati esclusivamente sulle nozioni standard richieste per questo specifico argomento e livello scolastico.'}
-            
-            ${directives ? `\nINDICAZIONI AGGIUNTIVE DEL DOCENTE:\n${directives}\n` : ''}
-            
-            REGOLE FORMATO E GENERAZIONE:
-            1. Genera ESATTAMENTE ${count} domande.
-            2. Le domande devono essere sempre diverse e inedite ad ogni esecuzione. Non usare i classici esempi banali, crea scenari o formulazioni originali. Non ripetere la stessa domanda due volte.
-            3. Massimo il ${Math.floor(count * calcRatio)} delle domande può richiedere calcoli matematici o risoluzione di problemi numerici (imposta isCalculation: true). Le restanti devono essere teoriche o concettuali (isCalculation: false).
-            4. Se decidi di inserire domande di calcolo per la materia indicata, assicurati che i calcoli siano eseguibili in circa 2 minuti da uno studente (es. usando numeri interi, semplificazioni dirette, etc.), senza l'uso obbligatorio della calcolatrice.
-            5. Ogni domanda deve avere esattamente 4 opzioni di risposta, di cui 1 sola corretta. REGOLE PER LE OPZIONI: Tutte e 4 le opzioni devono avere APPROSSIMATIVAMENTE LA STESSA LUNGHEZZA e struttura sintattica. La risposta corretta NON deve mai essere visibilmente più lunga, articolata o dettagliata delle risposte errate.
-            6. Formatta eventuali formule matematiche usando la sintassi LaTeX standard inclusa tra $ o $$ (es. $F = m \\cdot v$).`;
-
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        items: {
-                            type: "OBJECT",
-                            properties: {
-                                "question": { type: "STRING" },
-                                "options": {
-                                    type: "ARRAY",
-                                    items: { type: "STRING" },
-                                    description: "Esattamente 4 opzioni."
-                                },
-                                "correctIndex": { type: "INTEGER", description: "Indice dell'opzione corretta (0, 1, 2, o 3)" },
-                                "isCalculation": { type: "BOOLEAN" }
-                            },
-                            required: ["question", "options", "correctIndex", "isCalculation"]
-                        }
-                    }
-                }
-            };
-
-            const result = await fetchWithRetry(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts.length > 0) {
-                return JSON.parse(result.candidates[0].content.parts[0].text);
-            }
-            throw new Error("Risposta IA non valida");
-        }
+        let parsedQuestionsBank = [];
+        try {
+            const rawBank = localStorage.getItem('PHYSICS_PARSED_QUESTIONS_BANK');
+            if (rawBank) parsedQuestionsBank = JSON.parse(rawBank);
+        } catch(e) { parsedQuestionsBank = []; }
 
         function shuffleArray(array) {
             const arr = [...array];
@@ -806,7 +673,7 @@
             if (statusDiv) {
                 statusDiv.classList.remove('hidden');
                 statusDiv.className = "text-[11px] font-semibold text-indigo-700";
-                statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Acquisizione di ${files.length} file in corso...`;
+                statusDiv.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Acquisizione ed estrazione quesiti da ${files.length} file in corso...`;
             }
 
             for (const file of files) {
@@ -816,20 +683,26 @@
                     loadedReferenceFiles.push({
                         name: file.name,
                         ext: file.name.split('.').pop().toLowerCase(),
-                        contentLength: result.content.length,
-                        content: result.content 
+                        questionsCount: result.questions.length
+                    });
+
+                    result.questions.forEach(q => {
+                        if (!parsedQuestionsBank.some(existing => existing.question === q.question)) {
+                            parsedQuestionsBank.push(q);
+                        }
                     });
                 } catch (err) {
-                    console.error("Errore elaborazione file:", file.name, err);
+                    console.error("Errore file:", err);
                 }
             }
 
             localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+            localStorage.setItem('PHYSICS_PARSED_QUESTIONS_BANK', JSON.stringify(parsedQuestionsBank));
             event.target.value = '';
 
             if (statusDiv) {
                 statusDiv.className = "text-[11px] font-semibold text-emerald-700";
-                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> ${files.length} file acquisiti! Copertura equa garantita.`;
+                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Quesiti estratti con successo! Totale in banca dati: ${parsedQuestionsBank.length}.`;
             }
 
             renderLoadedFilesList();
@@ -841,41 +714,117 @@
             return new Promise((resolve, reject) => {
                 if (ext === 'pdf') {
                     file.arrayBuffer().then(buf => extractTextFromPDF(buf))
-                        .then(text => resolve({ content: text })).catch(reject);
+                        .then(text => resolve({ questions: parseQuestionsFromText(text) })).catch(reject);
                 } else if (ext === 'docx' || ext === 'doc') {
                     file.arrayBuffer().then(buf => extractTextFromWord(buf))
-                        .then(text => resolve({ content: text })).catch(reject);
+                        .then(text => resolve({ questions: parseQuestionsFromText(text) })).catch(reject);
                 } else if (ext === 'pptx' || ext === 'ppt') {
                     file.arrayBuffer().then(buf => extractTextFromPPTX(buf))
-                        .then(text => resolve({ content: text })).catch(reject);
+                        .then(text => resolve({ questions: parseQuestionsFromText(text) })).catch(reject);
                 } else if (ext === 'xlsx' || ext === 'xls') {
                     file.arrayBuffer().then(buf => extractTextFromExcel(buf))
-                        .then(text => resolve({ content: text })).catch(reject);
+                        .then(text => resolve({ questions: parseQuestionsFromText(text) })).catch(reject);
+                } else if (ext === 'csv') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) { resolve({ questions: parseQuestionsFromCSV(e.target.result) }); };
+                    reader.onerror = reject;
+                    reader.readAsText(file);
                 } else {
                     const reader = new FileReader();
-                    reader.onload = function(e) { resolve({ content: e.target.result }); };
+                    reader.onload = function(e) {
+                        const content = e.target.result;
+                        let qs = [];
+                        try {
+                            const parsed = JSON.parse(content);
+                            if (Array.isArray(parsed)) qs = parsed;
+                            else if (parsed.questions && Array.isArray(parsed.questions)) qs = parsed.questions;
+                        } catch(err) {
+                            qs = parseQuestionsFromText(content);
+                        }
+                        resolve({ questions: qs });
+                    };
                     reader.onerror = reject;
                     reader.readAsText(file);
                 }
             });
         }
 
-        function extractTextFromWord(arrayBuffer) {
-            if (typeof mammoth === 'undefined') {
-                return Promise.reject(new Error("Libreria Word (mammoth) non disponibile."));
-            }
-            return mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-                .then(result => result.value)
-                .catch(err => {
-                    console.error("Errore lettura Word:", err);
-                    return ""; 
+        function parseQuestionsFromText(text) {
+            const blocks = text.split(/(?:Domanda|Q:|\n\d+\.)/i).filter(b => b.trim().length > 0);
+            const questions = [];
+
+            blocks.forEach(block => {
+                const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                if (lines.length < 2) return;
+
+                let qText = lines[0].replace(/^[\d\.\-\:\?]+/, '').trim();
+                let opts = [];
+                let cIndex = 0;
+
+                lines.slice(1).forEach(l => {
+                    const m = l.match(/^(?:[A-D]\)|[A-D]\.|\*|-)\s*(.+)/i);
+                    if (m) {
+                        opts.push(m[1].trim());
+                        if (l.includes('[X]') || l.toLowerCase().includes('(corretta)')) {
+                            cIndex = opts.length - 1;
+                        }
+                    }
                 });
+
+                if (opts.length >= 2 && qText.length > 5) {
+                    questions.push({
+                        question: qText,
+                        options: opts,
+                        correctIndex: Math.min(cIndex, opts.length - 1),
+                        isCalculation: qText.toLowerCase().includes('calcol') || qText.toLowerCase().includes('quanto')
+                    });
+                }
+            });
+
+            return questions;
+        }
+
+        function parseQuestionsFromCSV(csvText) {
+            const rows = csvText.split('\n').map(r => r.trim()).filter(r => r.length > 0);
+            if (rows.length < 2) return [];
+
+            const questions = [];
+            const startIdx = rows[0].toLowerCase().includes('domanda') || rows[0].toLowerCase().includes('question') ? 1 : 0;
+
+            for (let i = startIdx; i < rows.length; i++) {
+                const parts = rows[i].split(/[,;\t]/).map(p => p.replace(/^["']|["']$/g, '').trim());
+                if (parts.length >= 3) {
+                    const qText = parts[0];
+                    let opts = parts.slice(1, 5).filter(o => o.length > 0);
+                    let correctIdx = 0;
+
+                    if (parts.length >= 6) {
+                        const cVal = parts[5].toUpperCase().trim();
+                        if (cVal === 'B' || cVal === '1') correctIdx = 1;
+                        else if (cVal === 'C' || cVal === '2') correctIdx = 2;
+                        else if (cVal === 'D' || cVal === '3') correctIdx = 3;
+                    }
+
+                    if (qText.length > 5 && opts.length >= 2) {
+                        questions.push({
+                            question: qText,
+                            options: opts,
+                            correctIndex: Math.min(correctIdx, opts.length - 1),
+                            isCalculation: false
+                        });
+                    }
+                }
+            }
+            return questions;
+        }
+
+        function extractTextFromWord(arrayBuffer) {
+            if (typeof mammoth === 'undefined') return Promise.resolve("");
+            return mammoth.extractRawText({ arrayBuffer: arrayBuffer }).then(result => result.value).catch(() => "");
         }
 
         function extractTextFromPDF(arrayBuffer) {
-            if (typeof pdfjsLib === 'undefined') {
-                return Promise.reject(new Error("Libreria PDF non disponibile"));
-            }
+            if (typeof pdfjsLib === 'undefined') return Promise.resolve("");
             return pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(pdf => {
                 const pagePromises = [];
                 for (let i = 1; i <= pdf.numPages; i++) {
@@ -890,16 +839,9 @@
         }
 
         function extractTextFromPPTX(arrayBuffer) {
-            if (typeof JSZip === 'undefined') {
-                return Promise.reject(new Error("Libreria JSZip non disponibile"));
-            }
+            if (typeof JSZip === 'undefined') return Promise.resolve("");
             return JSZip.loadAsync(arrayBuffer).then(zip => {
                 const slideFiles = Object.keys(zip.files).filter(f => f.startsWith("ppt/slides/slide") && f.endsWith(".xml"));
-                slideFiles.sort((a, b) => {
-                    const nA = parseInt((a.match(/\d+/) || [0])[0], 10);
-                    const nB = parseInt((b.match(/\d+/) || [0])[0], 10);
-                    return nA - nB;
-                });
                 const promises = slideFiles.map(file => zip.files[file].async("string").then(xml => {
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xml, "text/xml");
@@ -916,15 +858,12 @@
         }
 
         function extractTextFromExcel(arrayBuffer) {
-            if (typeof XLSX === 'undefined') {
-                return Promise.reject(new Error("Libreria Excel non disponibile"));
-            }
+            if (typeof XLSX === 'undefined') return Promise.resolve("");
             const workbook = XLSX.read(arrayBuffer, { type: 'array' });
             let combinedText = [];
             workbook.SheetNames.forEach(sheetName => {
                 const sheet = workbook.Sheets[sheetName];
-                const csvData = XLSX.utils.sheet_to_csv(sheet);
-                combinedText.push(csvData);
+                combinedText.push(XLSX.utils.sheet_to_csv(sheet));
             });
             return Promise.resolve(combinedText.join("\n\n"));
         }
@@ -948,24 +887,13 @@
 
             loadedReferenceFiles.forEach((fileItem, idx) => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = "flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200 text-xs shadow-sm hover:border-indigo-300 transition";
-                
-                let iconClass = "fa-file-lines text-slate-500";
-                if (fileItem.ext === 'pdf') iconClass = "fa-file-pdf text-rose-500";
-                else if (fileItem.ext === 'docx' || fileItem.ext === 'doc') iconClass = "fa-file-word text-blue-600";
-                else if (fileItem.ext === 'pptx' || fileItem.ext === 'ppt') iconClass = "fa-file-powerpoint text-orange-500";
-                else if (fileItem.ext === 'xlsx' || fileItem.ext === 'xls' || fileItem.ext === 'csv') iconClass = "fa-file-excel text-emerald-600";
-                else if (fileItem.ext === 'json') iconClass = "fa-file-code text-indigo-500";
-
+                itemDiv.className = "flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200 text-xs shadow-sm";
                 itemDiv.innerHTML = `
                     <div class="flex items-center gap-2 truncate max-w-[80%]">
-                        <i class="fa-solid ${iconClass} text-sm shrink-0"></i>
-                        <span class="font-bold text-slate-800 truncate" title="${fileItem.name}">${fileItem.name}</span>
-                        <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
-                            Testo elaborato
-                        </span>
+                        <i class="fa-solid fa-file-lines text-slate-500 text-sm shrink-0"></i>
+                        <span class="font-bold text-slate-800 truncate">${fileItem.name} (${fileItem.questionsCount} quesiti)</span>
                     </div>
-                    <button onclick="removeReferenceFile(${idx})" class="text-rose-500 hover:text-rose-700 p-1 rounded hover:bg-rose-50 cursor-pointer" title="Rimuovi questo file">
+                    <button onclick="removeReferenceFile(${idx})" class="text-rose-500 hover:text-rose-700 p-1 cursor-pointer">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 `;
@@ -982,7 +910,9 @@
 
         function clearAllReferenceFiles() {
             loadedReferenceFiles = [];
+            parsedQuestionsBank = [];
             localStorage.removeItem('PHYSICS_LOADED_FILES_LIST');
+            localStorage.removeItem('PHYSICS_PARSED_QUESTIONS_BANK');
             renderLoadedFilesList();
             updateUIConfigDisplays();
         }
@@ -992,12 +922,10 @@
             const banner = document.getElementById('deadlineNoticeBanner');
             const noticeText = document.getElementById('deadlineNoticeText');
             const startBtn = document.getElementById('startQuizBtn');
-            const timerChoiceBox = document.getElementById('studentTimerChoiceBox');
 
             if (!deadlineVal) {
                 if (banner) banner.classList.add('hidden');
                 if (startBtn) { startBtn.disabled = false; startBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
-                if (timerChoiceBox) timerChoiceBox.classList.remove('hidden');
                 return false;
             }
 
@@ -1013,12 +941,10 @@
                     startBtn.disabled = true;
                     startBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 }
-                if (timerChoiceBox) timerChoiceBox.classList.add('hidden');
                 return true;
             } else {
                 if (banner) banner.classList.add('hidden');
                 if (startBtn) { startBtn.disabled = false; startBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
-                if (timerChoiceBox) timerChoiceBox.classList.remove('hidden');
                 return false;
             }
         }
@@ -1030,26 +956,21 @@
             const timerSelect = document.getElementById('teacherTimerModeSelect');
             const groundingBadge = document.getElementById('groundingSourceBadge');
             const deadlineInput = document.getElementById('teacherDeadlineInput');
+            const startSource = document.getElementById('startScreenSource');
 
             const savedCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '0', 10);
             const savedTimer = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
             const savedDeadline = localStorage.getItem('PHYSICS_DEADLINE_TIME') || '';
 
             if (countDisplay) {
-                countDisplay.textContent = savedCount > 0 ? `${savedCount} Quesiti configurati` : "10 Quesiti (Predefinito)";
+                countDisplay.textContent = savedCount > 0 ? `${savedCount} Quesiti configurati` : "Tutti i quesiti dai file";
             }
             if (countInput) {
                 countInput.value = savedCount > 0 ? savedCount : '';
             }
 
             if (timerDisplay) {
-                if (savedTimer === 'unlimited') {
-                    timerDisplay.textContent = "Tempo Illimitato";
-                    timerDisplay.className = "text-xs font-bold text-amber-600 block truncate";
-                } else {
-                    timerDisplay.textContent = "Attivo";
-                    timerDisplay.className = "text-xs font-bold text-indigo-600 block truncate";
-                }
+                timerDisplay.textContent = savedTimer === 'unlimited' ? "Tempo Illimitato" : "Attivo";
             }
             if (timerSelect) {
                 timerSelect.value = savedTimer;
@@ -1059,43 +980,26 @@
                 deadlineInput.value = savedDeadline;
             }
 
-            const directivesArea = document.getElementById('teacherPromptDirectives');
-            if (directivesArea) {
-                directivesArea.value = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
-            }
-
             const statusBadge = document.getElementById('referenceSourceBadgeStatus');
             if (statusBadge) {
-                if (loadedReferenceFiles.length > 0) {
-                    statusBadge.innerHTML = `<span class="text-indigo-700 font-bold"><i class="fa-solid fa-brain mr-1"></i> ${loadedReferenceFiles.length} file forniti. Copertura equa attiva.</span>`;
-                    if (groundingBadge) groundingBadge.textContent = `${loadedReferenceFiles.length} File caricati`;
+                if (parsedQuestionsBank.length > 0) {
+                    statusBadge.textContent = `${parsedQuestionsBank.length} quesiti pronti`;
+                    if (groundingBadge) groundingBadge.textContent = `${parsedQuestionsBank.length} Quesiti estratti`;
+                    if (startSource) startSource.textContent = `${parsedQuestionsBank.length} Quesiti da File`;
                 } else {
-                    statusBadge.textContent = "Generazione dinamica (basata sull'argomento)";
-                    if (groundingBadge) groundingBadge.textContent = "Generazione Dinamica";
+                    statusBadge.textContent = "Nessun quesito trovato nei file";
+                    if (groundingBadge) groundingBadge.textContent = "Carica File";
+                    if (startSource) startSource.textContent = "Carica File";
                 }
             }
 
             checkDeadlineStatus();
         }
 
-        function saveTeacherDirectives() {
-            const val = document.getElementById('teacherPromptDirectives').value;
-            localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', val);
-        }
-
         function applyFileAndDirectives() {
-            saveTeacherDirectives();
-            let msg = "Configurazione salvata con successo!";
-            if (loadedReferenceFiles.length > 0) {
-                msg += `\n• La verifica genererà domande distribuendole equamente tra i ${loadedReferenceFiles.length} file forniti.`;
-            } else {
-                msg += `\n• Nessun file caricato: la prova verrà generata usando conoscenze standard relative all'argomento impostato.`;
-            }
-            
             const deadlineVal = document.getElementById('teacherDeadlineInput').value;
             localStorage.setItem('PHYSICS_DEADLINE_TIME', deadlineVal);
-
-            alert(msg);
+            alert("Configurazione salvata con successo!");
             updateUIConfigDisplays();
         }
 
@@ -1104,28 +1008,17 @@
             const countVal = countInput ? (parseInt(countInput.value, 10) || 0) : 0;
             const timerSelect = document.getElementById('teacherTimerModeSelect');
             const timerVal = timerSelect ? timerSelect.value : 'standard';
-            const ratioSelect = document.getElementById('teacherCalcRatioSelect');
-            const ratioVal = ratioSelect ? ratioSelect.value : '0.4';
-
-            const subjInput = document.getElementById('teacherSubjectInput');
-            const topInput = document.getElementById('teacherTopicInput');
-            const subtInput = document.getElementById('teacherSubtopicsInput');
             const deadlineInput = document.getElementById('teacherDeadlineInput');
-            
-            if (subjInput) localStorage.setItem('QUIZ_SUBJECT', subjInput.value.trim() || "Fisica");
-            if (topInput) localStorage.setItem('QUIZ_TOPIC', topInput.value.trim() || "Quantità di moto");
-            if (subtInput) localStorage.setItem('QUIZ_SUBTOPICS', subtInput.value.trim());
+
             if (deadlineInput) localStorage.setItem('PHYSICS_DEADLINE_TIME', deadlineInput.value);
 
-            localStorage.setItem('PHYSICS_CALC_RATIO', ratioVal);
             localStorage.setItem('PHYSICS_QUESTIONS_COUNT', countVal);
             localStorage.setItem('PHYSICS_TIMER_MODE', timerVal);
             
-            applyDynamicText();
             updateUIConfigDisplays();
         }
 
-        async function startSelectedQuiz() {
+        function startSelectedQuiz() {
             if (checkDeadlineStatus()) {
                 alert("Impossibile avviare la prova: la scadenza temporale è stata superata.");
                 return;
@@ -1140,63 +1033,62 @@
             }
             errDiv.classList.add('hidden');
 
-            const disableTimerChecked = document.getElementById('studentDisableTimerCheck').checked;
+            if (!parsedQuestionsBank || parsedQuestionsBank.length === 0) {
+                alert("Attenzione: nessun file con quesiti validi è stato caricato dal docente. Carica prima almeno un file nel Pannello Docente.");
+                openTeacherModal();
+                return;
+            }
+
             const teacherTimerSetting = localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard';
-            isUnlimitedTime = disableTimerChecked || (teacherTimerSetting === 'unlimited');
+            isUnlimitedTime = (teacherTimerSetting === 'unlimited');
 
             document.getElementById('loadingOverlay').classList.remove('hidden');
 
-            try {
-                const subject = localStorage.getItem('QUIZ_SUBJECT') || "Fisica";
-                const topic = localStorage.getItem('QUIZ_TOPIC') || "Quantità di moto";
-                const subtopics = localStorage.getItem('QUIZ_SUBTOPICS') || "Impulso, Urti e Conservazione";
-                const directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || "";
-                const calcRatio = parseFloat(localStorage.getItem('PHYSICS_CALC_RATIO') || '0.4');
-                
-                let textContext = loadedReferenceFiles.map(f => f.content).join("\n\n");
-                let targetCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '0', 10);
-                if (targetCount === 0 || targetCount > 20) targetCount = 10;
+            setTimeout(() => {
+                try {
+                    let bank = shuffleArray(parsedQuestionsBank);
+                    let targetCount = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '0', 10);
+                    if (targetCount === 0 || targetCount > bank.length) targetCount = bank.length;
 
-                let generatedPool = await generateQuestionsWithLLM(textContext, subject, topic, subtopics, directives, targetCount + 2, calcRatio);
-                
-                let pool = generatedPool.slice(0, targetCount);
-                spareQuestions = generatedPool.slice(targetCount);
+                    let pool = bank.slice(0, targetCount);
+                    spareQuestions = bank.slice(targetCount);
 
-                activeQuestions = pool.map(q => {
-                    const correctStr = q.options[q.correctIndex];
-                    const mixedOpts = shuffleArray([...q.options]);
-                    return {
-                        question: q.question,
-                        options: mixedOpts,
-                        correctIndex: mixedOpts.indexOf(correctStr),
-                        isCalculation: Boolean(q.isCalculation)
-                    };
-                });
+                    activeQuestions = pool.map(q => {
+                        const correctStr = q.options[q.correctIndex];
+                        const mixedOpts = shuffleArray([...q.options]);
+                        return {
+                            question: q.question,
+                            options: mixedOpts,
+                            correctIndex: mixedOpts.indexOf(correctStr),
+                            isCalculation: Boolean(q.isCalculation)
+                        };
+                    });
 
-                studentAnswers = new Array(activeQuestions.length).fill(null);
-                currentQuestionIndex = 0;
-                isJollyUsed = false;
-                isProcessingAdvance = false;
+                    studentAnswers = new Array(activeQuestions.length).fill(null);
+                    currentQuestionIndex = 0;
+                    isJollyUsed = false;
+                    isProcessingAdvance = false;
 
-                exitCount = 0;
-                lastExitTimestamp = 0;
-                isQuizActive = true;
-                quizStartTime = new Date();
+                    exitCount = 0;
+                    lastExitTimestamp = 0;
+                    isQuizActive = true;
+                    quizStartTime = new Date();
 
-                dismissExitAlert();
-                const liveMonitor = document.getElementById('liveExitsMonitorBadge');
-                if (liveMonitor) liveMonitor.classList.add('hidden');
+                    dismissExitAlert();
+                    const liveMonitor = document.getElementById('liveExitsMonitorBadge');
+                    if (liveMonitor) liveMonitor.classList.add('hidden');
 
-                document.getElementById('screenStart').classList.add('hidden');
-                document.getElementById('screenQuiz').classList.remove('hidden');
+                    document.getElementById('screenStart').classList.add('hidden');
+                    document.getElementById('screenQuiz').classList.remove('hidden');
 
-                renderCurrentQuestion();
-            } catch (err) {
-                console.error("Errore Generazione:", err);
-                alert("Si è verificato un errore durante la generazione della prova. Verifica la connessione e riprova. Dettaglio: " + err.message);
-            } finally {
-                document.getElementById('loadingOverlay').classList.add('hidden');
-            }
+                    renderCurrentQuestion();
+                } catch (err) {
+                    console.error("Errore Avvio:", err);
+                    alert("Si è verificato un errore durante l'avvio della prova.");
+                } finally {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            }, 300);
         }
 
         function renderCurrentQuestion() {
@@ -1214,7 +1106,7 @@
                     badge.textContent = "🧮 Calcolo / Problema (150s)";
                     badge.className = "px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-indigo-100 text-indigo-900 border border-indigo-200";
                 } else {
-                    badge.textContent = "📖 Teoria e Principi (60s)";
+                    badge.textContent = "📖 Quesito da File (60s)";
                     badge.className = "px-2.5 py-1 rounded-md text-[10px] uppercase font-extrabold bg-slate-100 text-slate-700 border border-slate-200";
                 }
             }
@@ -1260,7 +1152,6 @@
             if (isProcessingAdvance) return;
 
             if (currentSelectedOption === optionIndex) {
-                // Secondo Clic sulla stessa opzione: Conferma e Avanza
                 isProcessingAdvance = true;
                 stopQuestionTimer();
 
@@ -1278,7 +1169,6 @@
                     }
                 }, 250);
             } else {
-                // Primo Clic: Seleziona l'opzione colorandola di ciano
                 currentSelectedOption = optionIndex;
                 const allBtns = document.querySelectorAll('#optionsContainer button');
                 allBtns.forEach(b => b.classList.remove('selected-state'));
@@ -1374,17 +1264,12 @@
         function useJolly() {
             if (isJollyUsed || isProcessingAdvance) return;
 
-            const currentQIsCalc = activeQuestions[currentQuestionIndex].isCalculation;
-            
-            let suitableSpareIndex = spareQuestions.findIndex(q => Boolean(q.isCalculation) === currentQIsCalc);
-            if (suitableSpareIndex === -1) suitableSpareIndex = 0; 
-
             if (spareQuestions.length === 0) {
-                alert("Jolly non disponibile: il sistema non ha trovato domande di riserva alternative.");
+                alert("Jolly non disponibile: il sistema non ha trovato domande di riserva alternative nei file.");
                 return;
             }
 
-            let newQ = spareQuestions.splice(suitableSpareIndex, 1)[0]; 
+            let newQ = spareQuestions.shift();
             const correctStr = newQ.options[newQ.correctIndex];
             const mixedOpts = shuffleArray([...newQ.options]);
 
@@ -1574,32 +1459,7 @@
             loadTeacherTable();
         }
 
-        function applyDynamicText() {
-            const subject = localStorage.getItem('QUIZ_SUBJECT') || "Fisica";
-            const topic = localStorage.getItem('QUIZ_TOPIC') || "Quantità di moto";
-            const subtopics = localStorage.getItem('QUIZ_SUBTOPICS') || "Impulso, Urti e Conservazione";
-
-            const headerTopic = document.getElementById('headerSubjectTopic');
-            if (headerTopic) headerTopic.textContent = `Verifica di ${subject} Liceo`;
-
-            const headerSub = document.getElementById('headerSubtopics');
-            if (headerSub) headerSub.textContent = subtopics;
-
-            const startTopic = document.getElementById('startScreenTopic');
-            if (startTopic) startTopic.textContent = topic;
-
-            const teacherSubjInput = document.getElementById('teacherSubjectInput');
-            if (teacherSubjInput && !teacherSubjInput.value) teacherSubjInput.value = subject !== "Fisica" ? subject : "";
-
-            const teacherTopicInput = document.getElementById('teacherTopicInput');
-            if (teacherTopicInput && !teacherTopicInput.value) teacherTopicInput.value = topic !== "Quantità di moto" ? topic : "";
-            
-            const teacherSubtInput = document.getElementById('teacherSubtopicsInput');
-            if (teacherSubtInput && !teacherSubtInput.value) teacherSubtInput.value = subtopics !== "Impulso, Urti e Conservazione" ? subtopics : "";
-        }
-
         document.addEventListener("DOMContentLoaded", function() {
-            applyDynamicText();
             renderLoadedFilesList();
             updateUIConfigDisplays();
         });
