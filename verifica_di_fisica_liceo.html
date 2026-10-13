@@ -104,6 +104,7 @@
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between antialiased selection:bg-indigo-600 selection:text-white">
 
+    <!-- ==================== HEADER ==================== -->
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30 border-b border-slate-800">
         <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -115,7 +116,7 @@
                         <span>Verifica di Fisica: Elettrostatica</span>
                         <span class="bg-indigo-950 text-indigo-300 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-indigo-700/60">4° Liceo</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Coulomb • Campo Elettrico • Sovrapposizione • Conduttori</p>
+                    <p class="text-xs text-slate-400">Coulomb • Campo Elettrico • Conduttori</p>
                 </div>
             </div>
             <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -134,82 +135,81 @@
                     <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Accesso alla Prova</h2>
                     <p class="text-slate-500 text-xs mt-0.5">Inserisci le tue generalità prima di iniziare la sessione di verifica.</p>
                 </div>
-                <button onclick="openTeacherModal()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold border border-indigo-200 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Configura Prova</span>
-                </button>
-            </div>
-
-            <div class="bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Parametri della Verifica
-                    </span>
-                    <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
-                        Liceo Scientifico Ufficiale
-                    </span>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Argomento</span>
-                        <strong class="text-xs font-bold text-slate-800 block truncate">Elettrostatica (Liceo)</strong>
-                    </div>
-                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Numero Quesiti</span>
-                        <strong class="text-xs font-bold text-slate-800 block">10 Quesiti Casualità Individuale</strong>
-                    </div>
-                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Regola Tentativo</span>
-                        <strong class="text-xs font-bold text-indigo-600 block">Blocco Unico Ufficiale</strong>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ISTRUZIONI ESAME CON AVVISO ANTI-USCITA -->
-            <div class="p-4 bg-amber-50/90 border border-amber-200/90 rounded-xl text-amber-900 text-xs flex items-start gap-3">
-                <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5 shrink-0"></i>
-                <div class="space-y-1">
-                    <strong class="block font-bold">Norme formali di svolgimento (Blocco Unico):</strong>
-                    <p class="text-amber-800 leading-relaxed">
-                        • Cliccando su una delle opzioni, <strong>la risposta viene acquisita e la domanda avanza da sola immediatamente</strong>.<br>
-                        • <strong>Protezione Anti-Aggiornamento:</strong> La prova consente <strong>un solo tentativo ufficiale</strong>. Se si prova ad aggiornare la pagina o a riaprire il link dopo la consegna, il sistema bloccherà l'accesso.<br>
-                        • <strong>Monitoraggio vigilanza attivo:</strong> ogni uscita dalla scheda o cambio finestra verrà segnalato a schermo e registrato nel verbale d'esame.
-                    </p>
-                </div>
             </div>
 
             <!-- MESSAGGIO SE TENTATIVO GIÀ EFFETTUATO -->
             <div id="alreadyDoneAlert" class="hidden p-4 bg-rose-50 border border-rose-300 rounded-xl text-rose-900 text-xs flex items-center gap-3">
                 <i class="fa-solid fa-lock text-rose-600 text-lg"></i>
                 <div>
-                    <strong class="block font-bold">Tentativo già registrato!</strong>
-                    <span>Risulta già effettuata una prova salvata da questo dispositivo. Per motivi di sicurezza e istituzionali, non è consentito ripetere il test.</span>
+                    <strong class="block font-bold">Tentativo già registrato o bloccato!</strong>
+                    <span>Risulta già effettuata una prova da questo dispositivo. Per motivi di sicurezza e istituzionali, non è consentito ripetere il test.</span>
                 </div>
             </div>
 
-            <div id="startFormContainer" class="space-y-3">
-                <div>
-                    <label for="studentNameInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                        <i class="fa-solid fa-user-pen mr-1 text-indigo-600"></i> Cognome e Nome Studente:
-                    </label>
-                    <input type="text" id="studentNameInput" placeholder="Es. Rossi Mario" 
-                           class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm">
+            <div id="startFormContainer" class="space-y-4">
+                
+                <div class="bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Parametri della Verifica
+                        </span>
+                        <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">
+                            Liceo Scientifico Ufficiale
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                            <span class="text-[10px] font-bold text-slate-400 block uppercase">Argomento</span>
+                            <strong class="text-xs font-bold text-slate-800 block truncate">Elettrostatica (Liceo)</strong>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                            <span class="text-[10px] font-bold text-slate-400 block uppercase">Numero Quesiti</span>
+                            <strong class="text-xs font-bold text-slate-800 block">10 Quesiti Randomizzati</strong>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                            <span class="text-[10px] font-bold text-slate-400 block uppercase">Regola Tentativo</span>
+                            <strong class="text-xs font-bold text-indigo-600 block">Blocco Unico & Anti-F5</strong>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- OPZIONE TIMER SOLO ALL'INIZIO -->
-                <div class="flex items-center gap-2 pt-1">
-                    <input type="checkbox" id="unlimitedTimeCheckbox" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
-                    <label for="unlimitedTimeCheckbox" class="text-xs font-bold text-slate-700 cursor-pointer">
-                        Svolgi la prova senza limiti di tempo (Disattiva timer)
-                    </label>
+                <!-- ISTRUZIONI ESAME CON AVVISO ANTI-USCITA -->
+                <div class="p-4 bg-amber-50/90 border border-amber-200/90 rounded-xl text-amber-900 text-xs flex items-start gap-3">
+                    <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5 shrink-0"></i>
+                    <div class="space-y-1">
+                        <strong class="block font-bold">Norme formali di svolgimento (Blocco Unico):</strong>
+                        <p class="text-amber-800 leading-relaxed">
+                            • Cliccando su una delle opzioni, <strong>la risposta viene acquisita e la domanda avanza da sola immediatamente</strong>.<br>
+                            • <strong>Protezione Anti-Aggiornamento (F5):</strong> In caso di chiusura accidentale o refresh della pagina, la prova riprenderà dal punto esatto. Un tentativo completato blocca l'accesso in modo permanente.<br>
+                            • <strong>Monitoraggio vigilanza attivo:</strong> ogni uscita dalla scheda o cambio finestra verrà segnalato a schermo.
+                        </p>
+                    </div>
                 </div>
 
-                <p id="nameErrorMsg" class="hidden text-xs text-rose-600 font-bold flex items-center gap-1.5">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Inserisci cognome e nome prima di iniziare.
-                </p>
+                <div class="space-y-3">
+                    <div>
+                        <label for="studentNameInput" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            <i class="fa-solid fa-user-pen mr-1 text-indigo-600"></i> Cognome e Nome Studente:
+                        </label>
+                        <input type="text" id="studentNameInput" placeholder="Es. Rossi Mario" 
+                               class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm">
+                    </div>
 
-                <button id="startQuizBtn" onclick="startSelectedQuiz()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <!-- OPZIONE TIMER SOLO ALL'INIZIO -->
+                    <div class="flex items-center gap-2 pt-1 pb-1">
+                        <input type="checkbox" id="unlimitedTimeCheckbox" class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500 cursor-pointer">
+                        <label for="unlimitedTimeCheckbox" class="text-xs font-bold text-slate-700 cursor-pointer">
+                            Svolgi la prova senza limiti di tempo (Disattiva timer)
+                        </label>
+                    </div>
+
+                    <p id="nameErrorMsg" class="hidden text-xs text-rose-600 font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Inserisci cognome e nome prima di iniziare.
+                    </p>
+                </div>
+
+                <button id="startQuizBtn" onclick="startQuiz()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                     <span>Inizia la Prova</span>
                     <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
@@ -254,15 +254,15 @@
                     </div>
 
                     <div class="flex items-center gap-2 flex-wrap">
-                        <!-- TASTO ROSSO INTERROMPI / TERMINA PROVA -->
-                        <button onclick="confirmEarlyExit()" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Consegna la verifica in anticipo">
+                        <!-- TASTO ROSSO INTERROMPI / TERMINA PROVA (Solo durante il test) -->
+                        <button onclick="confirmEarlyExit()" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Consegna la verifica in anticipo e calcola il voto">
                             <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Termina Prova</span>
+                            <span class="hidden sm:inline">Termina Prova</span>
                         </button>
 
                         <button id="jollyBtn" onclick="useJolly()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer" title="Sostituisci questo quesito con uno nuovo">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            <span>Usa Jolly 🃏</span>
+                            <span class="hidden sm:inline">Usa Jolly 🃏</span>
                         </button>
 
                         <div id="questionTimerDisplay" class="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 font-mono font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-sm">
@@ -310,7 +310,7 @@
                     <p class="text-slate-600 text-sm mt-1">
                         Candidato: <strong id="completedPseudonym" class="text-indigo-600">Studente</strong>
                     </p>
-                    <p class="text-xs text-slate-400 mt-0.5">La prova è stata registrata regolarmente nel verbale d'esame. Tentativo bloccato.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">La prova è stata registrata regolarmente nel verbale d'esame. Tentativo bloccato per questo dispositivo.</p>
                 </div>
 
                 <div id="vigilanceReportBox" class="p-3.5 rounded-xl border flex items-center justify-between text-xs text-left bg-emerald-50 border-emerald-200">
@@ -353,7 +353,7 @@
                     </div>
                     <div class="p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
                         <i class="fa-solid fa-lock text-slate-400"></i>
-                        <span>Trattandosi di una verifica ufficiale, il test è bloccato e non è possibile ripeterlo da questo dispositivo.</span>
+                        <span>Trattandosi di una verifica ufficiale, il test è bloccato e non è possibile ripeterlo.</span>
                     </div>
                 </div>
             </div>
@@ -367,18 +367,18 @@
                 </div>
                 <div>
                     <h3 class="text-xl font-bold text-slate-900">Terminare la prova?</h3>
-                    <p class="text-sm text-slate-500 mt-2">Sei sicuro di voler consegnare in anticipo? Le domande a cui non hai risposto verranno valutate con 0 punti.</p>
+                    <p class="text-sm text-slate-500 mt-2">Sei sicuro di voler consegnare in anticipo? Le domande a cui non hai risposto verranno valutate come omesse (0 punti).</p>
                 </div>
                 <div class="flex gap-3 pt-2">
                     <button onclick="closeEarlyExitModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition cursor-pointer">Annulla</button>
-                    <button onclick="executeEarlyExit()" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow transition cursor-pointer">Conferma</button>
+                    <button onclick="executeEarlyExit()" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow transition cursor-pointer">Conferma Consegna</button>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- MODALE: PANNELLO DOCENTE -->
+    <!-- ==================== MODALE: PANNELLO DOCENTE ==================== -->
     <div id="teacherModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 space-y-5 max-h-[90vh] overflow-y-auto">
             
@@ -387,7 +387,7 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900">Accesso Riservato Docente</h3>
-                <p class="text-xs text-slate-500">Inserisci il PIN docente (Predefinito: 1234) per gestire il registro.</p>
+                <p class="text-xs text-slate-500">Inserisci il PIN docente per gestire il registro e sbloccare i tentativi.</p>
 
                 <div class="max-w-xs mx-auto space-y-3">
                     <input type="password" id="teacherPinInput" placeholder="Inserisci PIN" 
@@ -441,15 +441,20 @@
         </div>
     </div>
 
-    <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500 mt-auto">
-        <p>Verifica Istituzionale di Fisica • 4° Anno Liceo Scientifico e Scienze Applicate</p>
+    <!-- FOOTER RIMOSSO DA TESTI INDESIDERATI, SOLO BACKGROUND PULITO -->
+    <footer class="bg-white border-t border-slate-200 py-3 mt-auto">
+        <div class="max-w-2xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>Verifica Istituzionale di Fisica • Liceo Scientifico e Scienze Applicate</p>
+        </div>
     </footer>
 
+    <!-- ==================== CORE SCRIPT & LOGIC ==================== -->
     <script>
         const QUIZ_SETTINGS = {
-            storageKey: 'LICEO_FISICA_ELETTROSTATICA_ESITI_V10_LOCK',
-            lockKey: 'LICEO_FISICA_COMPLETED_LOCK_STATUS_V10',
-            teacherPin: '1234',
+            storageKey: 'LICEO_FISICA_ESITI_V12',
+            lockKey: 'LICEO_FISICA_LOCK_V12',
+            activeQuizKey: 'LICEO_FISICA_ACTIVE_SESSION_V12', // Chiave per il ripristino post F5
+            teacherPin: '3548', // PIN AGGIORNATO COME RICHIESTO
             timeStandardSec: 60,
             timeCalculationSec: 150
         };
@@ -471,18 +476,71 @@
         let exitCount = 0;
         let lastExitTimestamp = 0;
 
-        // VERIFICA BLOCCO UNICO TENTATIVO ALL'AVVIO DELLA PAGINA
+        // =========================================================================
+        // GESTIONE AVVIO E RIPRISTINO SESSIONE (ANTI F5 / REFRESH)
+        // =========================================================================
         document.addEventListener("DOMContentLoaded", function() {
-            const lockStatus = localStorage.getItem(QUIZ_SETTINGS.lockKey);
-            if (lockStatus === 'completed') {
+            // Controllo 1: L'utente ha già finito la prova?
+            if (localStorage.getItem(QUIZ_SETTINGS.lockKey) === 'completed') {
                 const startForm = document.getElementById('startFormContainer');
                 const alreadyAlert = document.getElementById('alreadyDoneAlert');
                 if (startForm) startForm.classList.add('hidden');
                 if (alreadyAlert) alreadyAlert.classList.remove('hidden');
+                return;
+            }
+
+            // Controllo 2: C'è una prova in corso da ripristinare (studente ha premuto F5)?
+            const savedActiveSession = localStorage.getItem(QUIZ_SETTINGS.activeQuizKey);
+            if (savedActiveSession) {
+                try {
+                    const session = JSON.parse(savedActiveSession);
+                    restoreQuizSession(session);
+                } catch(e) {
+                    console.error("Errore nel ripristino sessione:", e);
+                    localStorage.removeItem(QUIZ_SETTINGS.activeQuizKey);
+                }
             }
         });
 
+        function saveActiveQuizState() {
+            if (!isQuizActive) return;
+            const state = {
+                activeQuestions,
+                studentAnswers,
+                currentQuestionIndex,
+                studentName,
+                isUnlimitedTime,
+                isJollyUsed,
+                currentQuestionTimeLeft,
+                exitCount,
+                quizStartTime: quizStartTime ? quizStartTime.toISOString() : new Date().toISOString()
+            };
+            localStorage.setItem(QUIZ_SETTINGS.activeQuizKey, JSON.stringify(state));
+        }
+
+        function restoreQuizSession(session) {
+            activeQuestions = session.activeQuestions;
+            studentAnswers = session.studentAnswers;
+            currentQuestionIndex = session.currentQuestionIndex;
+            studentName = session.studentName;
+            isUnlimitedTime = session.isUnlimitedTime;
+            isJollyUsed = session.isJollyUsed;
+            currentQuestionTimeLeft = session.currentQuestionTimeLeft;
+            exitCount = session.exitCount;
+            quizStartTime = new Date(session.quizStartTime);
+
+            isQuizActive = true;
+            isProcessingAdvance = false;
+
+            document.getElementById('screenStart').classList.add('hidden');
+            document.getElementById('screenQuiz').classList.remove('hidden');
+
+            renderCurrentQuestion(true); // true = restored
+        }
+
+        // --- FUNZIONI DI UTILITÀ MATEMATICA E FORMATTAZIONE ---
         function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+        
         function shuffleArray(array) {
             const arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -510,6 +568,9 @@
             }
         }
 
+        // =========================================================================
+        // LOGICA DI RILEVAMENTO USCITE DALLA VERIFICA (VISIBILITY & BLUR)
+        // =========================================================================
         function recordStudentExit(reason) {
             if (!isQuizActive) return;
 
@@ -518,6 +579,7 @@
             lastExitTimestamp = now;
 
             exitCount++;
+            saveActiveQuizState();
 
             const banner = document.getElementById('exitAlertBanner');
             const badge = document.getElementById('exitAlertCountBadge');
@@ -552,7 +614,9 @@
             recordStudentExit('window_blur');
         });
 
-        // BANCA DATI ESCLUSIVA ELETTROSTATICA LICEO SCIENTIFICO
+        // =========================================================================
+        // BANCA DATI AUTENTICA LICEO SCIENTIFICO - ELETTROSTATICA
+        // =========================================================================
         function generateElectrostaticsLiceoPool() {
             const list = [];
             const k0 = 8.99e9;
@@ -697,12 +761,40 @@
                 isCalculation: true
             });
 
+            // Extra robust high school questions
+            list.push({
+                question: `Le linee di forza del campo elettrico generato da due cariche puntiformi uguali e opposte (dipolo elettrico):`,
+                options: [
+                    `Escono dalla carica positiva ed entrano nella carica negativa, e non si incrociano mai.`,
+                    `Sono circonferenze concentriche intorno a ciascuna carica.`,
+                    `Si incrociano nel punto medio del segmento che unisce le due cariche.`,
+                    `Escono da entrambe le cariche e divergono all'infinito.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
+            list.push({
+                question: `Cosa succede alla capacità $C$ di un condensatore piano a facce piane e parallele se la distanza $d$ tra le armature viene dimezzata, mantenendo invariata la superficie $S$?`,
+                options: [
+                    `La capacità raddoppia, poiché $C$ è inversamente proporzionale alla distanza $d$.`,
+                    `La capacità si dimezza, essendo direttamente proporzionale a $d$.`,
+                    `La capacità quadruplica.`,
+                    `La capacità rimane invariata.`
+                ],
+                correctIndex: 0,
+                isCalculation: false
+            });
+
             return list;
         }
 
-        function startSelectedQuiz() {
+        // =========================================================================
+        // AVVIO DELLA PROVA
+        // =========================================================================
+        function startQuiz() {
             if (localStorage.getItem(QUIZ_SETTINGS.lockKey) === 'completed') {
-                alert("Tentativo già effettuato e bloccato.");
+                alert("Tentativo già effettuato e bloccato. Impossibile ripetere la prova.");
                 return;
             }
 
@@ -720,7 +812,7 @@
 
             let pool = generateElectrostaticsLiceoPool();
             pool = shuffleArray(pool);
-            pool = pool.slice(0, 10);
+            pool = pool.slice(0, 10); // Standard 10 questions limit
 
             activeQuestions = pool.map(q => {
                 const correctStr = q.options[q.correctIndex];
@@ -743,6 +835,8 @@
             isQuizActive = true;
             quizStartTime = new Date();
 
+            saveActiveQuizState(); // Salva lo stato in caso di F5 immediato
+
             dismissExitAlert();
             const liveMonitor = document.getElementById('liveExitsMonitorBadge');
             if (liveMonitor) liveMonitor.classList.add('hidden');
@@ -750,12 +844,20 @@
             document.getElementById('screenStart').classList.add('hidden');
             document.getElementById('screenQuiz').classList.remove('hidden');
 
-            renderCurrentQuestion();
+            renderCurrentQuestion(false);
         }
 
-        function renderCurrentQuestion() {
+        function renderCurrentQuestion(isRestored = false) {
             isProcessingAdvance = false;
             const q = activeQuestions[currentQuestionIndex];
+
+            // Inizializza o aggiorna il tempo solo se non è stato ripristinato
+            if (!isRestored) {
+                currentQuestionMaxTime = q.isCalculation ? QUIZ_SETTINGS.timeCalculationSec : QUIZ_SETTINGS.timeStandardSec;
+                currentQuestionTimeLeft = currentQuestionMaxTime;
+            } else {
+                currentQuestionMaxTime = q.isCalculation ? QUIZ_SETTINGS.timeCalculationSec : QUIZ_SETTINGS.timeStandardSec;
+            }
 
             document.getElementById('questionCounterText').textContent = `Quesito ${currentQuestionIndex + 1} di ${activeQuestions.length}`;
             const pct = (currentQuestionIndex / activeQuestions.length) * 100;
@@ -777,11 +879,11 @@
                 if (isJollyUsed) {
                     jollyBtn.disabled = true;
                     jollyBtn.className = "px-3 py-1 bg-slate-200 text-slate-400 border border-slate-300 font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-not-allowed";
-                    jollyBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Jolly Usato</span>`;
+                    jollyBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span class="hidden sm:inline">Jolly Usato</span>`;
                 } else {
                     jollyBtn.disabled = false;
                     jollyBtn.className = "px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer";
-                    jollyBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Usa Jolly 🃏</span>`;
+                    jollyBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span class="hidden sm:inline">Usa Jolly 🃏</span>`;
                 }
             }
 
@@ -795,6 +897,7 @@
             q.options.forEach((optText, index) => {
                 const btn = document.createElement('button');
                 btn.className = "option-card-btn";
+                // L'opzione viene cliccata per l'avanzamento
                 btn.onclick = () => handleAnswerAndAdvance(index, btn);
 
                 const marker = String.fromCharCode(65 + index);
@@ -806,9 +909,11 @@
             });
 
             renderMathInTarget(optsContainer);
+            saveActiveQuizState(); // Update saved state on new question
             startQuestionTimer();
         }
 
+        // Avanzamento automatico istantaneo
         function handleAnswerAndAdvance(optionIndex, btnElement) {
             if (isProcessingAdvance) return;
             isProcessingAdvance = true;
@@ -823,6 +928,8 @@
             const allBtns = document.querySelectorAll('#optionsContainer button');
             allBtns.forEach(b => b.disabled = true);
 
+            saveActiveQuizState(); // Update saved state before advancing
+
             setTimeout(() => {
                 if (currentQuestionIndex < activeQuestions.length - 1) {
                     currentQuestionIndex++;
@@ -830,7 +937,7 @@
                 } else {
                     finishQuiz();
                 }
-            }, 250);
+            }, 300);
         }
 
         function stopQuestionTimer() {
@@ -848,15 +955,12 @@
                 return;
             }
 
-            const q = activeQuestions[currentQuestionIndex];
-            currentQuestionMaxTime = q.isCalculation ? QUIZ_SETTINGS.timeCalculationSec : QUIZ_SETTINGS.timeStandardSec;
-            currentQuestionTimeLeft = currentQuestionMaxTime;
-
             updateTimerDisplay();
 
             timerInterval = setInterval(() => {
                 currentQuestionTimeLeft--;
                 updateTimerDisplay();
+                saveActiveQuizState(); // Saves the decremented time for F5 refresh accuracy
 
                 if (currentQuestionTimeLeft <= 0) {
                     stopQuestionTimer();
@@ -938,14 +1042,16 @@
             studentAnswers[currentQuestionIndex] = null;
             isJollyUsed = true;
 
-            renderCurrentQuestion();
+            renderCurrentQuestion(false);
         }
 
         function finishQuiz() {
             isQuizActive = false;
             stopQuestionTimer();
 
+            // Setta il lucchetto anti-refresh a fine test e distrugge la sessione attiva
             localStorage.setItem(QUIZ_SETTINGS.lockKey, 'completed');
+            localStorage.removeItem(QUIZ_SETTINGS.activeQuizKey);
 
             const endTime = new Date();
             const diffSec = Math.floor((endTime - quizStartTime) / 1000);
@@ -972,7 +1078,7 @@
 
             const resTimerMode = document.getElementById('resTimerModeDisplay');
             if (resTimerMode) {
-                resTimerMode.textContent = isUnlimitedTime ? "Timer: Disattivato" : "Timer: Standard (60s / 150s)";
+                resTimerMode.textContent = isUnlimitedTime ? "Timer: Disattivato" : "Timer: Standard";
             }
 
             const vigBox = document.getElementById('vigilanceReportBox');
@@ -1021,6 +1127,9 @@
             localStorage.setItem(QUIZ_SETTINGS.storageKey, JSON.stringify(history));
         }
 
+        // =========================================================================
+        // PANNELLO DOCENTE
+        // =========================================================================
         function openTeacherModal() {
             document.getElementById('teacherModal').classList.remove('hidden');
             document.getElementById('teacherAuthSection').classList.remove('hidden');
@@ -1081,8 +1190,9 @@
         function promptClearHistory() {
             localStorage.removeItem(QUIZ_SETTINGS.storageKey);
             localStorage.removeItem(QUIZ_SETTINGS.lockKey);
+            localStorage.removeItem(QUIZ_SETTINGS.activeQuizKey);
             loadTeacherTable();
-            alert("Registro svuotato e blocchi di tentativo rimossi con successo.");
+            alert("Registro svuotato e blocchi di tentativo rimossi con successo su questo PC.");
             window.location.reload();
         }
     </script>
