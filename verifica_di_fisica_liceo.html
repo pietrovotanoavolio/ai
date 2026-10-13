@@ -120,7 +120,7 @@
                     <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
                         <span>Verifica di Fisica Liceo</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Prova basata sulle indicazioni e sui materiali del docente</p>
+                    <p class="text-xs text-slate-400">Prova formale basata sul programma del Liceo Scientifico</p>
                 </div>
             </div>
             <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -158,8 +158,8 @@
                 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Origine Quesiti</span>
-                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">Materiale / Master</strong>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Argomento</span>
+                        <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">Elettrostatica</strong>
                     </div>
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">N. Quesiti</span>
@@ -182,17 +182,11 @@
                 <div class="space-y-1">
                     <strong class="block font-bold">Norme formali di svolgimento:</strong>
                     <p class="text-amber-800 leading-relaxed">
-                        • <strong>Doppio clic per rispondere:</strong> clicca una volta sull'opzione per selezionarla (diventerà color ciano). Clicca una <strong>seconda volta</strong> sulla stessa opzione per confermare e passare in automatico alla domanda successiva.<br>
+                        • <strong>Un solo clic per rispondere:</strong> clicca sull'opzione desiderata per selezionarla e confermarla; il test passerà automaticamente alla domanda successiva.<br>
                         • <strong>Monitoraggio vigilanza attivo:</strong> ogni uscita dalla scheda o cambio finestra verrà segnalato a schermo e registrato nel verbale d'esame.<br>
                         • Al termine <strong>non verrà resa visibile la correzione o la revisione degli errori</strong>.
                     </p>
                 </div>
-            </div>
-
-            <!-- BANNER SCADENZA PROVA SE CONFIGURATA -->
-            <div id="deadlineNoticeBanner" class="hidden p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-900 text-xs flex items-center gap-2.5">
-                <i class="fa-solid fa-clock-rotate-left text-rose-600 text-sm shrink-0"></i>
-                <span id="deadlineNoticeText" class="font-bold">Scadenza prova superata.</span>
             </div>
 
             <div class="space-y-3">
@@ -377,7 +371,7 @@
         <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center text-white px-4">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-indigo-400 mb-4"></i>
             <h3 class="text-xl font-bold mb-2 text-center">Preparazione Quesiti in Corso...</h3>
-            <p class="text-slate-300 text-sm text-center max-w-md">Il sistema sta formulando i quesiti basandosi rigorosamente sui file e sulle indicazioni caricate. Attendi qualche istante.</p>
+            <p class="text-slate-300 text-sm text-center max-w-md">Il sistema sta formulando i quesiti di fisica rigorosamente liceali. Attendi qualche istante.</p>
         </div>
 
         <!-- MODALE CONFERMA TERMINA PROVA -->
@@ -580,13 +574,11 @@
             storageKey: 'LICEO_FISICA_ESITI_GENERAL_V7',
             masterStorageKey: 'LICEO_FISICA_MASTER_CONFIG_V2',
             teacherPin: '3548',
-            googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw6H3XF7Cg_a5cKqX7h8K9z7mX6Cg_a5cKqX7h8K9z7mX6Cg/exec',
+            googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || '',
             timeStandardSec: 60,
             timeCalculationSec: 150
         };
 
-        // PRESET MASTER INTEGRATO: Se vuoi pre-caricare i file o le indicazioni direttamente sul sito web per tutti gli studenti,
-        // puoi incollare qui l'oggetto JSON del tuo master tra le parentesi graffe { ... } al posto di null.
         const EMBEDDED_MASTER_PRESET = null; 
 
         if (typeof pdfjsLib !== 'undefined') {
@@ -596,7 +588,6 @@
         let activeQuestions = [];
         let studentAnswers = [];
         let currentQuestionIndex = 0;
-        let currentSelectedOption = null;
         let studentName = '';
         let quizStartTime = null;
         let isUnlimitedTime = false;
@@ -938,7 +929,10 @@
                 return true;
             } else {
                 if (banner) banner.classList.add('hidden');
-                if (startBtn) { startBtn.disabled = false; startBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if (startBtn) {
+                    startBtn.disabled = false;
+                    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
                 return false;
             }
         }
@@ -968,18 +962,16 @@
             if (directivesArea) directivesArea.value = savedDirectives;
 
             if (startSource) {
-                let topicLabel = "Materiale / Master";
+                let topicLabel = "Elettrostatica";
                 const combined = (loadedReferenceFiles.map(f => f.text).join(" ") + " " + savedDirectives).toLowerCase();
-                if (combined.includes('elettr') || combined.includes('coulomb') || combined.includes('campo') || combined.includes('carich')) {
-                    topicLabel = "Elettrostatica";
-                } else if (combined.includes('term') || combined.includes('calore') || combined.includes('gas') || combined.includes('temperat')) {
+                if (combined.includes('term') || combined.includes('calore') || combined.includes('gas') || combined.includes('temperat')) {
                     topicLabel = "Termodinamica";
                 } else if (combined.includes('quantità') || combined.includes('impulso') || combined.includes('urto')) {
                     topicLabel = "Quantità di Moto";
                 } else if (combined.includes('cinemat') || combined.includes('moto') || combined.includes('velocità')) {
                     topicLabel = "Cinematica";
-                } else if (loadedReferenceFiles.length > 0) {
-                    topicLabel = loadedReferenceFiles[0].name.replace(/\.[^/.]+$/, "");
+                } else if (combined.includes('elettr') || combined.includes('coulomb') || combined.includes('campo') || combined.includes('carich')) {
+                    topicLabel = "Elettrostatica";
                 }
                 startSource.textContent = topicLabel;
             }
@@ -1020,26 +1012,55 @@
             updateUIConfigDisplays();
         }
 
-        function generateSmartPhysicsQuestions(count, referenceText, directives) {
+        function generateStrictLiceoPhysicsQuestions(count, referenceText, directives) {
             let combined = (referenceText + " " + directives).toLowerCase();
-            let topic = "Fisica Generale";
             let bank = [];
 
-            if (combined.includes('elettr') || combined.includes('coulomb') || combined.includes('campo') || combined.includes('carich') || combined.includes('potenziale')) {
-                topic = "Elettrostatica";
+            if (combined.includes('term') || combined.includes('calore') || combined.includes('gas') || combined.includes('temperat')) {
                 bank = [
                     {
-                        question: `Due cariche puntiformi nel vuoto $q_1 = +4\\,\\mu\\text{C}$ e $q_2 = -2\\,\\mu\\text{C}$ sono poste a distanza $r = 5\\,\\text{cm}$. Qual è il modulo della forza elettrostatica attrattiva tra le cariche? ($k_0 = 8{,}99 \\times 10^9\\,\\text{N}\\cdot\\text{m}^2/\\text{C}^2$)`,
+                        question: `Nel corso di una trasformazione isobara, un gas perfetto compie un lavoro $W = 300\\,\\text{J}$ assorbendo una quantità di calore $Q = 800\\,\\text{J}$. Qual è la variazione di energia interna $\\Delta U$ del gas secondo il primo principio della termodinamica?`,
+                        options: [`$\\Delta U = 500\\,\\text{J}$`, `$\\Delta U = 1100\\,\\text{J}$`, `$\\Delta U = -500\\,\\text{J}$`, `$\\Delta U = 300\\,\\text{J}$`],
+                        correctIndex: 0, isCalculation: true
+                    },
+                    {
+                        question: `Quale formulazione del secondo principio della termodinamica stabilisce l'impossibilità di realizzare una macchina termica ciclica il cui unico effetto sia la conversione integrale in lavoro del calore assorbito da un'unica sorgente?`,
+                        options: [`Enunciato di Kelvin-Planck`, `Enunciato di Clausius`, `Teorema di Carnot`, `Principio di conservazione dell'energia meccanica`],
+                        correctIndex: 0, isCalculation: false
+                    },
+                    {
+                        question: `In una trasformazione adiabatica reversibile di un gas perfetto, non vi è scambio di calore con l'esterno ($Q = 0$). Di conseguenza, se il gas si espande compiendo lavoro:`,
+                        options: [`La sua temperatura diminuisce e l'energia interna cala`, `La temperatura rimane costante (isoterma)`, `L'energia interna aumenta proporzionalmente`, `La pressione raddoppia`],
+                        correctIndex: 0, isCalculation: false
+                    }
+                ];
+            } else if (combined.includes('quantità') || combined.includes('impulso') || combined.includes('urto')) {
+                bank = [
+                    {
+                        question: `Un corpo di massa $m = 2\\,\\text{kg}$ viaggia alla velocità costante di $5\\,\\text{m/s}$. Qual è il modulo della sua quantità di moto?`,
+                        options: [`$10\\,\\text{kg}\\cdot\\text{m/s}$`, `$2{,}5\\,\\text{kg}\\cdot\\text{m/s}$`, `$7\\,\\text{kg}\\cdot\\text{m/s}$`, `$25\\,\\text{kg}\\cdot\\text{m/s}$`],
+                        correctIndex: 0, isCalculation: true
+                    },
+                    {
+                        question: `In un urto perfettamente anelastico tra due corpi su un piano liscio:`,
+                        options: [`Si conserva la quantità di moto totale del sistema, ma si ha la massima perdita di energia cinetica`, `Si conserva sia la quantità di moto che l'energia cinetica`, `L'energia cinetica totale aumenta`, `La quantità di moto si annulla`],
+                        correctIndex: 0, isCalculation: false
+                    }
+                ];
+            } else {
+                bank = [
+                    {
+                        question: `Due cariche puntiformi nel vuoto $q_1 = +4\\,\\mu\\text{C}$ e $q_2 = -2\\,\\mu\\text{C}$ sono poste a distanza $r = 5\\,\\text{cm}$. Qual è il modulo della forza elettrostatica attrattiva tra le cariche? ($k_0 \\approx 8{,}99 \\times 10^9\\,\\text{N}\\cdot\\text{m}^2/\\text{C}^2$)`,
                         options: [`$F \\approx 28{,}8\\,\\text{N}$`, `$F \\approx 14{,}4\\,\\text{N}$`, `$F \\approx 57{,}6\\,\\text{N}$`, `$F \\approx 7{,}2\\,\\text{N}$`],
                         correctIndex: 0, isCalculation: true
                     },
                     {
-                        question: `Qual è l'intensità del campo elettrico $\\vec{E}$ generato nel vuoto da una carica puntiforme $q = +5\\,\\mu\\text{C}$ in un punto $P$ a distanza $r = 20\\,\\text{cm}$?`,
+                        question: `Qual è l'intensità del campo elettrico $\\vec{E}$ generato nel vuoto da una carica puntiforme $q = +5\\,\\mu\\text{C}$ in un punto $P$ a distanza $r = 20\\,\\text{cm}$? ($k_0 = 8{,}99 \\times 10^9\\,\\text{N}\\cdot\\text{m}^2/\\text{C}^2$)`,
                         options: [`$E \\approx 1{,}12 \\times 10^6\\,\\text{N/C}$`, `$E \\approx 2{,}25 \\times 10^5\\,\\text{N/C}$`, `$E \\approx 4{,}50 \\times 10^6\\,\\text{N/C}$`, `$E \\approx 8{,}99 \\times 10^5\\,\\text{N/C}$`],
                         correctIndex: 0, isCalculation: true
                     },
                     {
-                        question: `All'interno di un conduttore metallico in equilibrio elettrostatico, il campo elettrico $\\vec{E}$ è:`,
+                        question: `All'interno di un conduttore metallico solido in condizioni di equilibrio elettrostatico, il campo elettrico $\\vec{E}$ è:`,
                         options: [`Identicamente nullo ($\\vec{E} = \\vec{0}$)`, `Costante e perpendicolare alla superficie`, `Proporzionale al raggio di curvatura`, `Inverso rispetto alla densità superficiale`],
                         correctIndex: 0, isCalculation: false
                     },
@@ -1049,28 +1070,23 @@
                         correctIndex: 0, isCalculation: false
                     },
                     {
-                        question: `Se lo spazio tra due cariche viene riempito con un dielettrico con costante relativa $\\varepsilon_r = 4$, la forza di Coulomb rispetto al vuoto:`,
+                        question: `Se lo spazio tra due cariche viene riempito con un dielettrico avente costante relativa $\\varepsilon_r = 4$, la forza di Coulomb rispetto al vuoto:`,
                         options: [`Si riduce di un fattore 4 ($F = F_0 / 4$)`, `Aumenta di un fattore 4`, `Rimane invariata`, `Si azzera`],
                         correctIndex: 0, isCalculation: false
                     },
                     {
-                        question: `Il principio della <strong>schermatura elettrostatica</strong> (gabbia di Faraday) garantisce che all'interno di una cavità conduttrice chiusa:`,
+                        question: `Il principio della schermatura elettrostatica (gabbia di Faraday) garantisce che all'interno di una cavità conduttrice chiusa:`,
                         options: [`Il campo elettrico esterno non ha alcun effetto ($\\vec{E} = \\vec{0}$)`, `Il campo elettrico viene raddoppiato`, `Le cariche interne si annullano`, `Si genera una corrente stazionaria`],
                         correctIndex: 0, isCalculation: false
                     },
                     {
-                        question: `Una carica di prova $q = +3\\,\\text{nC}$ immersa in un campo elettrico $E = 4000\\,\\text{N/C}$ sperimenta una forza elettrostatica pari a:`,
+                        question: `Una carica di prova $q = +3\\,\\text{nC}$ immersa in un campo elettrico uniformemente diretto $E = 4000\\,\\text{N/C}$ sperimenta una forza elettrostatica pari a:`,
                         options: [`$F = 12\\,\\mu\\text{N}$`, `$F = 1{,}2\\,\\mu\\text{N}$`, `$F = 120\\,\\mu\\text{N}$`, `$F = 0{,}12\\,\\mu\\text{N}$`],
                         correctIndex: 0, isCalculation: true
                     },
                     {
-                        question: `Due cariche uguali e concordi $+q$ distanti $d$ generano nel loro punto medio un campo elettrico risultante pari a:`,
+                        question: `Due cariche uguali e concordi $+q$ poste a distanza $d$ generano nel loro punto medio un campo elettrico risultante pari a:`,
                         options: [`$E_{\\text{tot}} = 0\\,\\text{N/C}$`, `$\\frac{2k_0 q}{d^2}$`, `$\\frac{k_0 q^2}{d}$`, `$\\sqrt{2} \\frac{k_0 q}{d^2}$`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `La polarizzazione per deformazione nei dielettrici apolari consiste in:`,
-                        options: [`Una leggera distorsione della nuvola elettronica indotta dal campo esterno`, `Il libero movimento degli elettroni nel reticolo`, `La fusione del materiale isolante`, `La ionizzazione completa molecolare`],
                         correctIndex: 0, isCalculation: false
                     },
                     {
@@ -1082,65 +1098,13 @@
                         question: `Il lavoro compiuto dal campo elettrico per spostare una carica $q$ lungo una superficie equipotenziale è:`,
                         options: [`Sempre nullo ($W = 0$)`, `Massimo e pari a $qEd$`, `Negativo`, `Proporzionale al percorso`],
                         correctIndex: 0, isCalculation: false
-                    }
-                ];
-            } else if (combined.includes('term') || combined.includes('calore') || combined.includes('gas') || combined.includes('temperat')) {
-                topic = "Termodinamica";
-                bank = [
-                    {
-                        question: `Nel corso di una trasformazione isobara, un gas perfetto compie un lavoro $W = 300\\,\\text{J}$ assorbendo una quantità di calore $Q = 800\\,\\text{J}$. Qual è la variazione di energia interna $\\Delta U$ del gas?`,
-                        options: [`$\\Delta U = 500\\,\\text{J}$`, `$\\Delta U = 1100\\,\\text{J}$`, `$\\Delta U = -500\\,\\text{J}$`, `$\\Delta U = 300\\,\\text{J}$`],
-                        correctIndex: 0, isCalculation: true
                     },
                     {
-                        question: `Quale principio della termodinamica sancisce l'impossibilità di realizzare una macchina termica con rendimento pari al $100\\%$?`,
-                        options: [`Il secondo principio (enunciato di Kelvin-Planck)`, `Il primo principio`, `Il principio zero`, `Il terzo principio`],
+                        question: `Il potenziale elettrico in un punto dello spazio a distanza $r$ da una carica puntiforme $q$ nel vuoto è espresso dalla relazione:`,
+                        options: [`$V = \\frac{k_0 q}{r}$`, `$V = \\frac{k_0 q}{r^2}$`, `$V = k_0 q r$`, `$V = \\frac{q}{4\\pi \\varepsilon_0 r^2}$`],
                         correctIndex: 0, isCalculation: false
                     }
                 ];
-            } else if (combined.includes('quantità') || combined.includes('impulso') || combined.includes('urto')) {
-                topic = "Quantità di Moto";
-                bank = [
-                    {
-                        question: `Un corpo di massa $m = 2\\,\\text{kg}$ viaggia alla velocità di $5\\,\\text{m/s}$. Qual è la sua quantità di moto?`,
-                        options: [`$10\\,\\text{kg}\\cdot\\text{m/s}$`, `$2{,}5\\,\\text{kg}\\cdot\\text{m/s}$`, `$7\\,\\text{kg}\\cdot\\text{m/s}$`, `$25\\,\\text{kg}\\cdot\\text{m/s}$`],
-                        correctIndex: 0, isCalculation: true
-                    },
-                    {
-                        question: `In un urto perfettamente anelastico tra due corpi:`,
-                        options: [`Si conserva la quantità di moto totale ma si ha la massima perdita di energia cinetica`, `Si conserva sia la quantità di moto che l'energia cinetica`, `L'energia cinetica aumenta`, `La quantità di moto totale si annulla`],
-                        correctIndex: 0, isCalculation: false
-                    }
-                ];
-            } else {
-                topic = "Fisica Generale";
-                bank = [
-                    {
-                        question: `Un punto materiale si muove di moto rettilineo uniforme con velocità $v = 10\\,\\text{m/s}$. Qual è lo spazio percorso in $t = 5\\,\\text{s}$?`,
-                        options: [`$50\\,\\text{m}$`, `$2\\,\\text{m}$`, `$15\\,\\text{m}$`, `$500\\,\\text{m}$`],
-                        correctIndex: 0, isCalculation: true
-                    },
-                    {
-                        question: `Il secondo principio della dinamica (legge fondamentale della dinamica) è espresso dalla formula:`,
-                        options: [`$\\vec{F} = m \\cdot \\vec{a}$`, `$E = m c^2$`, `$p = m \\cdot v$`, `$W = F \\cdot s$`],
-                        correctIndex: 0, isCalculation: false
-                    }
-                ];
-            }
-
-            while (bank.length < count + 2) {
-                let idx = bank.length + 1;
-                bank.push({
-                    question: `Quesito integrativo ${idx} sull'argomento (${topic}): Quale delle seguenti affermazioni o relazioni fisiche è corretta in base ai principi studiati?`,
-                    options: [
-                        `Relazione corretta e coerente con i principi fondamentali di ${topic}.`,
-                        `Afferrativa errata basata su un'inversione di formula.`,
-                        `Opzione errata derivata da un errore algebrico nei dati.`,
-                        `Risposta non compatibile con le leggi della fisica.`
-                    ],
-                    correctIndex: 0,
-                    isCalculation: idx % 2 === 0
-                });
             }
 
             let shuffledBank = shuffleArray(bank);
@@ -1174,7 +1138,7 @@
                     let combinedText = loadedReferenceFiles.map(f => `FILE: ${f.name}\n${f.text}`).join("\n\n");
                     let directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
 
-                    let generatedQuestions = generateSmartPhysicsQuestions(count + 2, combinedText, directives);
+                    let generatedQuestions = generateStrictLiceoPhysicsQuestions(count + 2, combinedText, directives);
 
                     let pool = generatedQuestions.slice(0, count);
                     spareQuestions = generatedQuestions.slice(count);
@@ -1219,7 +1183,6 @@
 
         function renderCurrentQuestion() {
             isProcessingAdvance = false;
-            currentSelectedOption = null;
             const q = activeQuestions[currentQuestionIndex];
 
             document.getElementById('questionCounterText').textContent = `Quesito ${currentQuestionIndex + 1} di ${activeQuestions.length}`;
@@ -1277,29 +1240,23 @@
         function handleOptionClick(optionIndex, btnElement) {
             if (isProcessingAdvance) return;
 
-            if (currentSelectedOption === optionIndex) {
-                isProcessingAdvance = true;
-                stopQuestionTimer();
+            isProcessingAdvance = true;
+            stopQuestionTimer();
 
-                studentAnswers[currentQuestionIndex] = optionIndex;
+            studentAnswers[currentQuestionIndex] = optionIndex;
+            if (btnElement) btnElement.classList.add('selected-state');
 
-                const allBtns = document.querySelectorAll('#optionsContainer button');
-                allBtns.forEach(b => b.disabled = true);
+            const allBtns = document.querySelectorAll('#optionsContainer button');
+            allBtns.forEach(b => b.disabled = true);
 
-                setTimeout(() => {
-                    if (currentQuestionIndex < activeQuestions.length - 1) {
-                        currentQuestionIndex++;
-                        renderCurrentQuestion();
-                    } else {
-                        finishQuiz();
-                    }
-                }, 250);
-            } else {
-                currentSelectedOption = optionIndex;
-                const allBtns = document.querySelectorAll('#optionsContainer button');
-                allBtns.forEach(b => b.classList.remove('selected-state'));
-                btnElement.classList.add('selected-state');
-            }
+            setTimeout(() => {
+                if (currentQuestionIndex < activeQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    renderCurrentQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 250);
         }
 
         function confirmEarlyExit() {
