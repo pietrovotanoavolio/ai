@@ -1035,7 +1035,6 @@
                 ];
             }
 
-            // Assicura di avere abbastanza domande riempiendo con varianti
             while (bank.length < count + 2) {
                 let idx = bank.length + 1;
                 bank.push({
@@ -1074,7 +1073,6 @@
 
             document.getElementById('loadingOverlay').classList.remove('hidden');
 
-            // Avvio immediato e privo di errori con il motore smart locale
             setTimeout(() => {
                 try {
                     let count = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '10', 10);
