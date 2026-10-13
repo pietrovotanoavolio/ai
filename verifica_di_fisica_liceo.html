@@ -120,7 +120,7 @@
                     <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
                         <span>Verifica di Fisica Liceo</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Prova basata sui materiali e sulle indicazioni del docente</p>
+                    <p class="text-xs text-slate-400">Prova basata sulle indicazioni e sui materiali del docente</p>
                 </div>
             </div>
             <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -158,7 +158,7 @@
                 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Argomento</span>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Origine Quesiti</span>
                         <strong id="startScreenSource" class="text-xs font-bold text-indigo-600 block truncate">Materiale / Indicazioni</strong>
                     </div>
                     <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-center">
@@ -469,7 +469,7 @@
                     </div>
                 </div>
 
-                <!-- CARICAMENTO FILE E INDICAZIONI -->
+                <!-- CARICAMENTO FILE E INDICAZIONI + EMBEDDED PRESET DI DEFAULT -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
@@ -498,6 +498,23 @@
                                   class="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2"></textarea>
 
                         <div id="fileUploadStatusMsg" class="text-[11px] font-semibold text-emerald-700 hidden"></div>
+                    </div>
+
+                    <!-- BOTTONI SINCRONIZZAZIONE CONFIGURAZIONE PER GLI STUDENTI -->
+                    <div class="bg-indigo-50/80 p-3 rounded-lg border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <div class="text-[11px] text-indigo-950 font-medium">
+                            <strong class="block font-bold"><i class="fa-solid fa-share-nodes text-indigo-600 mr-1"></i> Condividi con gli Studenti:</strong>
+                            Esporta i file e le impostazioni in un file da ricaricare o inviare, oppure incorpora nel codice.
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button onclick="exportTeacherConfig()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow transition cursor-pointer">
+                                <i class="fa-solid fa-download mr-1"></i> Esporta Config
+                            </button>
+                            <label class="px-3 py-1.5 bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-300 text-xs font-bold rounded-lg shadow-sm transition cursor-pointer">
+                                <i class="fa-solid fa-upload mr-1"></i> Importa Config
+                                <input type="file" accept=".json" onchange="importTeacherConfig(event)" class="hidden">
+                            </label>
+                        </div>
                     </div>
 
                     <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
@@ -560,7 +577,7 @@
 
     <script>
         const QUIZ_SETTINGS = {
-            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V3',
+            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V4',
             teacherPin: '3548',
             googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw6H3XF7Cg_a5cKqX7h8K9z7mX6Cg_a5cKqX7h8K9z7mX6Cg/exec',
             timeStandardSec: 60,
@@ -590,11 +607,26 @@
         let exitCount = 0;
         let lastExitTimestamp = 0;
 
+        // SE INSERISCI QUI SOTTO DEL TESTO O CONFIGURAZIONE DI DEFAULT, TUTTI GLI STUDENTI LO VEDRANNO AUTOMATICAMENTE
+        const EMBEDDED_TEACHER_PRESET = {
+            directives: "",
+            files: []
+        };
+
         let loadedReferenceFiles = [];
         try {
             const rawStoredFiles = localStorage.getItem('PHYSICS_LOADED_FILES_LIST');
-            if (rawStoredFiles) loadedReferenceFiles = JSON.parse(rawStoredFiles);
+            if (rawStoredFiles) {
+                loadedReferenceFiles = JSON.parse(rawStoredFiles);
+            } else if (EMBEDDED_TEACHER_PRESET.files.length > 0) {
+                loadedReferenceFiles = EMBEDDED_TEACHER_PRESET.files;
+                localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+            }
         } catch(e) { loadedReferenceFiles = []; }
+
+        if (!localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') && EMBEDDED_TEACHER_PRESET.directives) {
+            localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', EMBEDDED_TEACHER_PRESET.directives);
+        }
 
         function shuffleArray(array) {
             const arr = [...array];
@@ -663,6 +695,52 @@
         window.addEventListener('blur', function() {
             recordStudentExit('window_blur');
         });
+
+        function exportTeacherConfig() {
+            const configData = {
+                files: loadedReferenceFiles,
+                directives: localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '',
+                count: localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '10',
+                timer: localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard',
+                deadline: localStorage.getItem('PHYSICS_DEADLINE_TIME') || ''
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(configData));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "config_verifica_fisica.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importTeacherConfig(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.files) {
+                        loadedReferenceFiles = parsed.files;
+                        localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+                    }
+                    if (parsed.directives !== undefined) {
+                        localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', parsed.directives);
+                    }
+                    if (parsed.count) localStorage.setItem('PHYSICS_QUESTIONS_COUNT', parsed.count);
+                    if (parsed.timer) localStorage.setItem('PHYSICS_TIMER_MODE', parsed.timer);
+                    if (parsed.deadline) localStorage.setItem('PHYSICS_DEADLINE_TIME', parsed.deadline);
+
+                    renderLoadedFilesList();
+                    updateUIConfigDisplays();
+                    alert("Configurazione importata con successo!");
+                } catch(err) {
+                    alert("File di configurazione non valido.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
 
         async function handleTextReferenceFiles(event) {
             const files = Array.from(event.target.files);
@@ -916,7 +994,6 @@
             updateUIConfigDisplays();
         }
 
-        // GENERATORE LOCALE POTENZIATO BASATO SUL TEMA E SUI FILE
         function generateSmartPhysicsQuestions(count, referenceText, directives) {
             let combined = (referenceText + " " + directives).toLowerCase();
             let topic = "Fisica Generale";
@@ -1015,21 +1092,6 @@
                     {
                         question: `Il secondo principio della dinamica (legge fondamentale della dinamica) è espresso dalla formula:`,
                         options: [`$\\vec{F} = m \\cdot \\vec{a}$`, `$E = m c^2$`, `$p = m \\cdot v$`, `$W = F \\cdot s$`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Il lavoro compiuto da una forza costante $\\vec{F}$ che agisce lungo uno spostamento $\\vec{s}$ parallelo alla forza è dato da:`,
-                        options: [`$W = F \\cdot s$`, `$W = F / s$`, `$W = F \\cdot s \\cdot \\sin(\\alpha)$`, `$W = \\frac{1}{2} m v^2$`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `L'energia cinetica di un corpo di massa $m$ che si muove con velocità $v$ si calcola con l'espressione:`,
-                        options: [`$K = \\frac{1}{2} m v^2$`, `$K = m v$`, `$K = m g h$`, `$K = \\frac{1}{2} k x^2$`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Nel Sistema Internazionale, l'unità di misura della potenza è:`,
-                        options: [`Il Watt (W)`, `Il Joule (J)`, `Il Newton (N)`, `Il Pascal (Pa)`],
                         correctIndex: 0, isCalculation: false
                     }
                 ];
@@ -1438,7 +1500,7 @@
                 renderLoadedFilesList();
                 loadTeacherTable();
             } else {
-                document.getElementById('teacherAuthError').classList.remove('hidden');
+                document.getElementById('teacherAuthError').classList.add('hidden');
             }
         }
 
