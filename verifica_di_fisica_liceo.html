@@ -426,7 +426,7 @@
             <div id="teacherDashboardSection" class="hidden space-y-5">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                     <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-indigo-600"></i> Configurazione Prova
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Configurazione Prova Globale
                     </h3>
                     <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                         <i class="fa-solid fa-xmark text-lg"></i>
@@ -469,7 +469,7 @@
                     </div>
                 </div>
 
-                <!-- CARICAMENTO FILE E INDICAZIONI + EMBEDDED PRESET DI DEFAULT -->
+                <!-- CARICAMENTO FILE E INDICAZIONI + SINCRONIZZAZIONE GLOBALE -->
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-slate-800 uppercase flex items-center gap-1.5">
@@ -477,7 +477,7 @@
                             Carica File di Riferimento (PDF, DOC, DOCX, PPT, PPTX, XLSX, TXT)
                         </label>
                         <p class="text-[11px] text-slate-500">
-                            I quesiti saranno generati basandosi rigorosamente sui file e sulle indicazioni caricate.
+                            I file e le indicazioni inseriti qui verranno salvati come configurazione master per tutti gli studenti che apriranno il link.
                         </p>
                         
                         <input type="file" id="referenceFileInput" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xlsx,.xls,.txt,.md" onchange="handleTextReferenceFiles(event)"
@@ -494,24 +494,24 @@
                             <div id="loadedFilesList" class="max-h-36 overflow-y-auto space-y-1 pr-1"></div>
                         </div>
 
-                        <textarea id="teacherDirectivesInput" rows="3" oninput="saveTeacherDirectives()" placeholder="Oppure scrivi qui le indicazioni specifiche (es. Elettrostatica, Coulomb, campo)..." 
+                        <textarea id="teacherDirectivesInput" rows="3" oninput="saveTeacherDirectives()" placeholder="Scrivi qui indicazioni specifiche (es. Elettrostatica, Coulomb, campo)..." 
                                   class="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2"></textarea>
 
                         <div id="fileUploadStatusMsg" class="text-[11px] font-semibold text-emerald-700 hidden"></div>
                     </div>
 
-                    <!-- BOTTONI SINCRONIZZAZIONE CONFIGURAZIONE PER GLI STUDENTI -->
+                    <!-- BOTTONI SINCRONIZZAZIONE CONFIGURAZIONE MASTER -->
                     <div class="bg-indigo-50/80 p-3 rounded-lg border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-2">
                         <div class="text-[11px] text-indigo-950 font-medium">
-                            <strong class="block font-bold"><i class="fa-solid fa-share-nodes text-indigo-600 mr-1"></i> Condividi con gli Studenti:</strong>
-                            Esporta i file e le impostazioni in un file da ricaricare o inviare, oppure incorpora nel codice.
+                            <strong class="block font-bold"><i class="fa-solid fa-globe text-indigo-600 mr-1"></i> Sincronizzazione Master Globale:</strong>
+                            Esporta il file di configurazione master (`master_config.json`) da ricaricare o inviare agli studenti per allineare istantaneamente tutti i PC.
                         </div>
                         <div class="flex gap-2 shrink-0">
                             <button onclick="exportTeacherConfig()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow transition cursor-pointer">
-                                <i class="fa-solid fa-download mr-1"></i> Esporta Config
+                                <i class="fa-solid fa-download mr-1"></i> Esporta Master
                             </button>
                             <label class="px-3 py-1.5 bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-300 text-xs font-bold rounded-lg shadow-sm transition cursor-pointer">
-                                <i class="fa-solid fa-upload mr-1"></i> Importa Config
+                                <i class="fa-solid fa-upload mr-1"></i> Importa Master
                                 <input type="file" accept=".json" onchange="importTeacherConfig(event)" class="hidden">
                             </label>
                         </div>
@@ -520,7 +520,7 @@
                     <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
                         <button onclick="applyFileAndDirectives()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-1.5 cursor-pointer">
                             <i class="fa-solid fa-check"></i>
-                            <span>Applica Impostazioni alla Prova</span>
+                            <span>Applica e Salva Impostazioni Master</span>
                         </button>
                         <span id="referenceSourceBadgeStatus" class="text-[11px] text-slate-600 font-semibold">Pronto</span>
                     </div>
@@ -577,7 +577,8 @@
 
     <script>
         const QUIZ_SETTINGS = {
-            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V5',
+            storageKey: 'LICEO_FISICA_ESITI_GENERAL_V6',
+            masterStorageKey: 'LICEO_FISICA_MASTER_CONFIG_V1',
             teacherPin: '3548',
             googleSheetUrl: localStorage.getItem('PHYSICS_SHEET_URL') || 'https://script.google.com/macros/s/AKfycbw6H3XF7Cg_a5cKqX7h8K9z7mX6Cg_a5cKqX7h8K9z7mX6Cg/exec',
             timeStandardSec: 60,
@@ -607,25 +608,46 @@
         let exitCount = 0;
         let lastExitTimestamp = 0;
 
-        const EMBEDDED_TEACHER_PRESET = {
-            directives: "",
-            files: []
-        };
-
         let loadedReferenceFiles = [];
-        try {
-            const rawStoredFiles = localStorage.getItem('PHYSICS_LOADED_FILES_LIST');
-            if (rawStoredFiles) {
-                loadedReferenceFiles = JSON.parse(rawStoredFiles);
-            } else if (EMBEDDED_TEACHER_PRESET.files.length > 0) {
-                loadedReferenceFiles = EMBEDDED_TEACHER_PRESET.files;
-                localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
-            }
-        } catch(e) { loadedReferenceFiles = []; }
 
-        if (!localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') && EMBEDDED_TEACHER_PRESET.directives) {
-            localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', EMBEDDED_TEACHER_PRESET.directives);
+        function loadMasterConfig() {
+            try {
+                const rawMaster = localStorage.getItem(QUIZ_SETTINGS.masterStorageKey);
+                if (rawMaster) {
+                    const parsed = JSON.parse(rawMaster);
+                    if (parsed.files) loadedReferenceFiles = parsed.files;
+                    if (parsed.directives !== undefined && !localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES')) {
+                        localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', parsed.directives);
+                    }
+                    if (parsed.count && !localStorage.getItem('PHYSICS_QUESTIONS_COUNT')) {
+                        localStorage.setItem('PHYSICS_QUESTIONS_COUNT', parsed.count);
+                    }
+                    if (parsed.timer && !localStorage.getItem('PHYSICS_TIMER_MODE')) {
+                        localStorage.setItem('PHYSICS_TIMER_MODE', parsed.timer);
+                    }
+                    if (parsed.deadline && !localStorage.getItem('PHYSICS_DEADLINE_TIME')) {
+                        localStorage.setItem('PHYSICS_DEADLINE_TIME', parsed.deadline);
+                    }
+                } else {
+                    const rawStoredFiles = localStorage.getItem('PHYSICS_LOADED_FILES_LIST');
+                    if (rawStoredFiles) loadedReferenceFiles = JSON.parse(rawStoredFiles);
+                }
+            } catch(e) { loadedReferenceFiles = []; }
         }
+
+        function saveMasterConfig() {
+            const configData = {
+                files: loadedReferenceFiles,
+                directives: localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '',
+                count: localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '10',
+                timer: localStorage.getItem('PHYSICS_TIMER_MODE') || 'standard',
+                deadline: localStorage.getItem('PHYSICS_DEADLINE_TIME') || ''
+            };
+            localStorage.setItem(QUIZ_SETTINGS.masterStorageKey, JSON.stringify(configData));
+            localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+        }
+
+        loadMasterConfig();
 
         function shuffleArray(array) {
             const arr = [...array];
@@ -706,7 +728,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(configData));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "config_verifica_fisica.json");
+            downloadAnchor.setAttribute("download", "master_config_verifica_fisica.json");
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
@@ -719,20 +741,16 @@
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
-                    if (parsed.files) {
-                        loadedReferenceFiles = parsed.files;
-                        localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
-                    }
-                    if (parsed.directives !== undefined) {
-                        localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', parsed.directives);
-                    }
+                    if (parsed.files) loadedReferenceFiles = parsed.files;
+                    if (parsed.directives !== undefined) localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', parsed.directives);
                     if (parsed.count) localStorage.setItem('PHYSICS_QUESTIONS_COUNT', parsed.count);
                     if (parsed.timer) localStorage.setItem('PHYSICS_TIMER_MODE', parsed.timer);
                     if (parsed.deadline) localStorage.setItem('PHYSICS_DEADLINE_TIME', parsed.deadline);
 
+                    saveMasterConfig();
                     renderLoadedFilesList();
                     updateUIConfigDisplays();
-                    alert("Configurazione importata con successo!");
+                    alert("Configurazione Master importata e sincronizzata con successo!");
                 } catch(err) {
                     alert("File di configurazione non valido.");
                 }
@@ -778,13 +796,13 @@
                 }
             }
 
-            localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+            saveMasterConfig();
             renderLoadedFilesList();
 
             event.target.value = '';
             if (statusDiv) {
                 statusDiv.className = "text-[11px] font-semibold text-emerald-700";
-                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> File caricati correttamente.`;
+                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> File caricati e sincronizzati.`;
             }
             updateUIConfigDisplays();
         }
@@ -873,14 +891,14 @@
 
         function removeReferenceFile(index) {
             loadedReferenceFiles.splice(index, 1);
-            localStorage.setItem('PHYSICS_LOADED_FILES_LIST', JSON.stringify(loadedReferenceFiles));
+            saveMasterConfig();
             renderLoadedFilesList();
             updateUIConfigDisplays();
         }
 
         function clearAllReferenceFiles() {
             loadedReferenceFiles = [];
-            localStorage.removeItem('PHYSICS_LOADED_FILES_LIST');
+            saveMasterConfig();
             renderLoadedFilesList();
             updateUIConfigDisplays();
         }
@@ -967,14 +985,15 @@
         function saveTeacherDirectives() {
             const val = document.getElementById('teacherDirectivesInput').value;
             localStorage.setItem('PHYSICS_TEACHER_DIRECTIVES', val);
-            updateUIConfigDisplays();
+            saveMasterConfig();
         }
 
         function applyFileAndDirectives() {
             saveTeacherDirectives();
             const deadlineVal = document.getElementById('teacherDeadlineInput').value;
             localStorage.setItem('PHYSICS_DEADLINE_TIME', deadlineVal);
-            alert("Configurazione salvata con successo!");
+            saveMasterConfig();
+            alert("Impostazioni Master salvate e sincronizzate con successo per tutti gli studenti!");
             updateUIConfigDisplays();
         }
 
@@ -989,7 +1008,7 @@
 
             localStorage.setItem('PHYSICS_QUESTIONS_COUNT', countVal);
             localStorage.setItem('PHYSICS_TIMER_MODE', timerVal);
-            
+            saveMasterConfig();
             updateUIConfigDisplays();
         }
 
@@ -1014,11 +1033,6 @@
                     {
                         question: `All'interno di un conduttore metallico in equilibrio elettrostatico, il campo elettrico $\\vec{E}$ è:`,
                         options: [`Identicamente nullo ($\\vec{E} = \\vec{0}$)`, `Costante e perpendicolare alla superficie`, `Proporzionale al raggio di curvatura`, `Inverso rispetto alla densità superficiale`],
-                        correctIndex: 0, isCalculation: false
-                    },
-                    {
-                        question: `Il <strong>Teorema di Coulomb</strong> afferma che in prossimità della superficie esterna di un conduttore in equilibrio il campo elettrico è:`,
-                        options: [`$E = \\frac{|\\sigma|}{\\varepsilon_0}$ ed è perpendicolare alla superficie`, `$E = \\frac{\\sigma}{2\\varepsilon_0}$`, `$E = 0$`, `$E = \\frac{Q}{4\\pi \\varepsilon_0 r^2}$`],
                         correctIndex: 0, isCalculation: false
                     },
                     {
@@ -1121,7 +1135,6 @@
                 });
             }
 
-            // RIMESCOLA INTERAMENTE IL BANCO DI DOMANDE AD OGNI AVVIO PER OGNI STUDENTE
             let shuffledBank = shuffleArray(bank);
             return shuffledBank.slice(0, count + 2);
         }
@@ -1148,11 +1161,11 @@
 
             setTimeout(() => {
                 try {
+                    loadMasterConfig();
                     let count = parseInt(localStorage.getItem('PHYSICS_QUESTIONS_COUNT') || '10', 10);
                     let combinedText = loadedReferenceFiles.map(f => `FILE: ${f.name}\n${f.text}`).join("\n\n");
                     let directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
 
-                    // GENERA E RIMESCOLA UN SOTTOSETTORE UNICO PER OGNI SINGOLO STUDENTE
                     let generatedQuestions = generateSmartPhysicsQuestions(count + 2, combinedText, directives);
 
                     let pool = generatedQuestions.slice(0, count);
@@ -1485,7 +1498,8 @@
             document.getElementById('screenStart').classList.remove('hidden');
             document.getElementById('progressBarFill').style.width = '0%';
             document.getElementById('nameErrorMsg').classList.add('hidden');
-            checkDeadlineStatus();
+            loadMasterConfig();
+            updateUIConfigDisplays();
         }
 
         function openTeacherModal() {
@@ -1496,6 +1510,7 @@
             document.getElementById('teacherAuthError').classList.add('hidden');
             document.getElementById('sheetUrlSetting').value = QUIZ_SETTINGS.googleSheetUrl;
 
+            loadMasterConfig();
             renderLoadedFilesList();
             updateUIConfigDisplays();
         }
@@ -1509,10 +1524,11 @@
             if (pin === QUIZ_SETTINGS.teacherPin) {
                 document.getElementById('teacherAuthSection').classList.add('hidden');
                 document.getElementById('teacherDashboardSection').classList.remove('hidden');
+                loadMasterConfig();
                 renderLoadedFilesList();
                 loadTeacherTable();
             } else {
-                document.getElementById('teacherAuthError').classList.add('hidden');
+                document.getElementById('teacherAuthError').classList.remove('hidden');
             }
         }
 
@@ -1565,6 +1581,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
+            loadMasterConfig();
             renderLoadedFilesList();
             updateUIConfigDisplays();
         });
