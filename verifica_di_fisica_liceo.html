@@ -120,7 +120,7 @@
                     <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
                         <span>Verifica di Fisica Liceo</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Prova basata sulle indicazioni e sui materiali del docente</p>
+                    <p class="text-xs text-slate-400">Prova basata sui materiali e sulle indicazioni del docente</p>
                 </div>
             </div>
             <button onclick="openTeacherModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -377,7 +377,7 @@
         <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center text-white px-4">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-indigo-400 mb-4"></i>
             <h3 class="text-xl font-bold mb-2 text-center">Generazione Quesiti in Corso...</h3>
-            <p class="text-slate-300 text-sm text-center max-w-md">Il sistema sta preparando i quesiti randomizzati basandosi sui materiali e sulle indicazioni fornite. Attendi qualche istante.</p>
+            <p class="text-slate-300 text-sm text-center max-w-md">Il sistema sta preparando i quesiti randomizzati basandosi rigorosamente sui file e sulle indicazioni caricate. Attendi qualche istante.</p>
         </div>
 
         <!-- MODALE CONFERMA TERMINA PROVA -->
@@ -477,7 +477,7 @@
                             Carica File di Riferimento (PDF, DOC, DOCX, PPT, PPTX, XLSX, TXT)
                         </label>
                         <p class="text-[11px] text-slate-500">
-                            Il sistema estrarrà i concetti, le formule e gli argomenti da questi file per generare quesiti rigorosi e pertinenti.
+                            I quesiti saranno generati <strong>esclusivamente</strong> in base agli argomenti, alle formule e ai concetti presenti nei file caricati o nelle indicazioni sottostanti.
                         </p>
                         
                         <input type="file" id="referenceFileInput" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xlsx,.xls,.txt,.md" onchange="handleTextReferenceFiles(event)"
@@ -494,7 +494,7 @@
                             <div id="loadedFilesList" class="max-h-36 overflow-y-auto space-y-1 pr-1"></div>
                         </div>
 
-                        <textarea id="teacherDirectivesInput" rows="3" oninput="saveTeacherDirectives()" placeholder="Oppure scrivi qui le indicazioni specifiche (es. Focalizzati sui vettori, livello scientifico)..." 
+                        <textarea id="teacherDirectivesInput" rows="3" oninput="saveTeacherDirectives()" placeholder="Oppure scrivi qui le indicazioni specifiche (es. Focalizzati su elettrostatica, legge di Coulomb, campo elettrico)..." 
                                   class="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2"></textarea>
 
                         <div id="fileUploadStatusMsg" class="text-[11px] font-semibold text-emerald-700 hidden"></div>
@@ -902,97 +902,26 @@
             updateUIConfigDisplays();
         }
 
-        function getLocalFallbackQuestions(count, referenceText, directives) {
-            const pool = [
-                {
-                    question: "Un punto materiale si muove di moto rettilineo uniforme con velocità $v = 5\\,\\text{m/s}$. Qual è lo spazio percorso in un intervallo di tempo $\\Delta t = 4\\,\\text{s}$?",
-                    options: ["$20\\,\\text{m}$", "$10\\,\\text{m}$", "$25\\,\\text{m}$", "$5\\,\\text{m}$"],
-                    correctIndex: 0,
-                    isCalculation: true
-                },
-                {
-                    question: "Nel Sistema Internazionale, l'unità di misura della forza è il Newton ($\\text{N}$). Quale tra le seguenti combinazioni dimensionali equivale a un Newton?",
-                    options: ["$\\text{kg} \\cdot \\text{m} / \\text{s}^2$", "$\\text{kg} \\cdot \\text{m}^2 / \\text{s}$", "$\\text{kg} \\cdot \\text{m} / \\text{s}$", "$\\text{N} \\cdot \\text{m} / \\text{s}$"],
-                    correctIndex: 0,
-                    isCalculation: false
-                },
-                {
-                    question: "Due forze $\\vec{F}_1$ e $\\vec{F}_2$ di eguale modulo agiscono sulla stessa direzione ma con verso opposto applicate allo stesso corpo. La forza risultante è:",
-                    options: ["Pari a zero", "Uguale a $2F$", "Uguale a $F$", "Dipendente dalla massa del corpo"],
-                    correctIndex: 0,
-                    isCalculation: false
-                },
-                {
-                    question: "Un corpo di massa $m = 2\\,\\text{kg}$ è soggetto a un'accelerazione costante $a = 3\\,\\text{m/s}^2$. Per il secondo principio della dinamica ($F = m \\cdot a$), l'intensità della forza applicata è:",
-                    options: ["$6\\,\\text{N}$", "$1.5\\,\\text{N}$", "$5\\,\\text{N}$", "$9\\,\\text{N}$"],
-                    correctIndex: 0,
-                    isCalculation: true
-                },
-                {
-                    question: "Il lavoro $W$ compiuto da una forza costante $\\vec{F}$ che agisce lungo uno spostamento $\\vec{s}$ parallelo alla forza è definito come:",
-                    options: ["$W = F \\cdot s$", "$W = F / s$", "$W = \\frac{1}{2} F s^2$", "$W = F \\cdot s \\cdot \\sin(\\theta)$"],
-                    correctIndex: 0,
-                    isCalculation: false
-                },
-                {
-                    question: "L'energia cinetica $E_k$ di un corpo di massa $m$ che si muove con velocità $v$ si calcola con la formula:",
-                    options: ["$E_k = \\frac{1}{2} m v^2$", "$E_k = m \\cdot v$", "$E_k = m g h$", "$E_k = \\frac{1}{2} m g v$"],
-                    correctIndex: 0,
-                    isCalculation: false
-                },
-                {
-                    question: "Quale principio fisico esprime la conservazione dell'energia meccanica totale in un sistema conservativo?",
-                    options: ["$E_k + E_p = \\text{costante}$", "$E_k - E_p = 0$", "$W = \\Delta E_k$", "$F = -kx$"],
-                    correctIndex: 0,
-                    isCalculation: false
-                },
-                {
-                    question: "La quantità di moto $\\vec{p}$ di un corpo di massa $m$ dotata di velocità $\\vec{v}$ è data da:",
-                    options: ["$\\vec{p} = m \\cdot \\vec{v}$", "$\\vec{p} = \\frac{1}{2} m v^2$", "$\\vec{p} = m \\cdot \\vec{a}$", "$\\vec{p} = \\frac{m}{v}$"],
-                    correctIndex: 0,
-                    isCalculation: false
-                },
-                {
-                    question: "In assenza di forze esterne totali, la quantità di moto totale di un sistema isolato si conserva. Questa è l'enunciazione del:",
-                    options: ["Principio di conservazione della quantità di moto", "Teorema dell'energia cinetica", "Principio di inerzia", "Legge di gravitazione universale"],
-                    correctIndex: 0,
-                    isCalculation: false
-                },
-                {
-                    question: "Un corpo in caduta libera nel vuoto, partendo da fermo, sperimenta:",
-                    options: ["Un'accelerazione costante pari a $g \\approx 9.81\\,\\text{m/s}^2$", "Una velocità costante", "Un moto uniformemente accelerato con velocità dipendente dalla massa", "Una decelerazione costante"],
-                    correctIndex: 0,
-                    isCalculation: false
-                }
-            ];
-
-            let expanded = [...pool];
-            while (expanded.length < count) {
-                expanded.push({...pool[expanded.length % pool.length]});
-            }
-            return expanded.slice(0, count);
-        }
-
         async function fetchQuestionsFromAI(count, referenceText, directives) {
             const apiKey = "";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
-            const systemPrompt = "Sei un docente di fisica di liceo scientifico severo ed esperto. Il tuo compito è generare quesiti a risposta multipla rigorosi e impeccabili basati esclusivamente sugli argomenti, le formule e i contesti forniti nei file di riferimento o nelle indicazioni del docente.";
+            const systemPrompt = "Sei un docente di fisica di liceo scientifico severo ed esperto. Il tuo compito è generare quesiti a risposta multipla rigorosi e impeccabili basati ESCLUSIVAMENTE sugli argomenti, le formule, le definizioni e i contesti forniti nei file di riferimento o nelle indicazioni del docente.";
             
             const userQuery = `Genera esattamente ${count} quesiti originali e inediti di fisica per una verifica scolastica.
             
             REGOLE RIGOROSE:
-            1. PRENDI GLI ARGOMENTI, LE FORMULE E I CONCETTI CHIAVE DAI SEGUENTI MATERIALI E INDICAZIONI DEL DOCENTE E CREA QUESITI SIMILI MA COMPLETAMENTE NUOVI (RANDOMIZZATI):
+            1. UTILIZZA SOLO E SOLTANTO GLI ARGOMENTI, LE LEGGI E I TERMINI PRESENTI NEL SEGUENTE MATERIALE E NELLE INDICAZIONI DEL DOCENTE. NON USARE ARGOMENTI ESTERNI (es. se i file parlano di elettrostatica, genera SOLO su elettrostatica; se parlano di termodinamica, genera SOLO su termodinamica):
             --- INIZIO MATERIALE DI RIFERIMENTO ---
-            ${referenceText || "Nessun file caricato. Genera argomenti di fisica generale coerenti con il livello liceale."}
+            ${referenceText || "Nessun file caricato."}
             --- FINE MATERIALE DI RIFERIMENTO ---
             
-            INICAZIONI AGGIUNTIVE DEL DOCENTE:
+            INDICAZIONI AGGIUNTIVE DEL DOCENTE:
             ${directives || "Nessuna indicazione specifica."}
             
-            2. DISTRIBUZIONE EQUA: Esplora tutti i concetti e argomenti presenti nel testo in modo bilanciato ed equo.
-            3. OPZIONI SENZA DISTORSIONE DI LUNGHEZZA: Tutte e 4 le opzioni di risposta (sia quella corretta che i distrattori) DEVONO avere una lunghezza e un livello di dettaglio simili ed equilibrati. La risposta esatta NON deve MAI essere la più lunga o la più dettagliata.
-            4. FORMATTAZIONE: Utilizza la sintassi LaTeX standard con $ o $$ per formule ed equazioni (es. $F = m \\cdot a$).
+            2. DISTRIBUZIONE EQUA: Esplora tutti i concetti presenti nel testo in modo rigoroso.
+            3. OPZIONI EQUILIBRATE: Tutte e 4 le opzioni di risposta devono avere una lunghezza e un livello di dettaglio simili ed equilibrati. La risposta esatta non deve mai essere la più lunga.
+            4. FORMATTAZIONE: Utilizza la sintassi LaTeX standard con $ o $$ per formule ed equazioni.
             5. Restituisci l'output ESATTAMENTE nel formato JSON richiesto dallo schema.`;
 
             const payload = {
@@ -1014,13 +943,13 @@
                                 "correctIndex": { "type": "INTEGER", "description": "Indice dell'opzione corretta (da 0 a 3)" },
                                 "isCalculation": { "type": "BOOLEAN", "description": "True se richiede calcoli numerici, false se è teoria." }
                             },
-                            required: ["question", "options", "correctIndex", "isCalculation"]
+                            "required": ["question", "options", "correctIndex", "isCalculation"]
                         }
                     }
                 }
             };
 
-            for (let attempt = 0; attempt < 2; attempt++) {
+            for (let attempt = 0; attempt < 3; attempt++) {
                 try {
                     const response = await fetch(apiUrl, {
                         method: 'POST',
@@ -1034,11 +963,11 @@
                         return JSON.parse(jsonText);
                     }
                 } catch(err) {
-                    if (attempt === 1) throw err;
-                    await new Promise(r => setTimeout(r, 500));
+                    if (attempt === 2) throw err;
+                    await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
                 }
             }
-            throw new Error("Impossibile connettersi al servizio di generazione.");
+            throw new Error("Impossibile generare i quesiti con l'IA.");
         }
 
         async function startSelectedQuiz() {
@@ -1066,16 +995,10 @@
                 let combinedText = loadedReferenceFiles.map(f => `FILE: ${f.name}\n${f.text}`).join("\n\n");
                 let directives = localStorage.getItem('PHYSICS_TEACHER_DIRECTIVES') || '';
 
-                let generatedQuestions = [];
-                try {
-                    generatedQuestions = await fetchQuestionsFromAI(count + 2, combinedText, directives);
-                } catch(netErr) {
-                    console.warn("Utilizzo sistema di generazione locale di sicurezza:", netErr);
-                    generatedQuestions = getLocalFallbackQuestions(count + 2, combinedText, directives);
-                }
+                let generatedQuestions = await fetchQuestionsFromAI(count + 2, combinedText, directives);
 
                 if (!Array.isArray(generatedQuestions) || generatedQuestions.length === 0) {
-                    generatedQuestions = getLocalFallbackQuestions(count + 2, combinedText, directives);
+                    throw new Error("Formato risposte non valido.");
                 }
 
                 let pool = generatedQuestions.slice(0, count);
@@ -1112,7 +1035,7 @@
                 renderCurrentQuestion();
             } catch (err) {
                 console.error("Errore Avvio:", err);
-                alert("Si è verificato un errore imprevisto durante l'avvio. Riprova.");
+                alert("Si è verificato un errore durante la generazione della prova. Controlla la connessione e riprova.");
             } finally {
                 document.getElementById('loadingOverlay').classList.add('hidden');
             }
@@ -1434,7 +1357,7 @@
                 renderLoadedFilesList();
                 loadTeacherTable();
             } else {
-                document.getElementById('teacherAuthError').classList.add('hidden');
+                document.getElementById('teacherAuthError').classList.remove('hidden');
             }
         }
 
